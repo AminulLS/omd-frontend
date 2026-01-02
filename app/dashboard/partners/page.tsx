@@ -47,6 +47,7 @@ import {
 import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { MoreVerticalIcon, PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 type PartnerStatus = 'active' | 'inactive' | 'pending' | 'suspended'
@@ -452,7 +453,11 @@ export default function PartnersPage() {
             <TableBody>
               {partners.map((partner) => (
                 <TableRow key={partner.id}>
-                  <TableCell className="font-medium">{partner.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/dashboard/partners/${partner.id}`} className="hover:underline">
+                      {partner.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={typeVariantMap[partner.type]}>
                       {typeLabelMap[partner.type]}
