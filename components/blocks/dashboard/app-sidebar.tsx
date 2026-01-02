@@ -1,157 +1,157 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 import {
     AudioWaveform,
-    BookOpen,
-    Bot,
+    ChartNoAxesCombined,
     Command,
-    Frame,
     GalleryVerticalEnd,
-    Map,
-    PieChart,
-    Settings2,
+    Handshake,
+    HatGlasses,
+    Newspaper,
+    Rss,
+    Settings,
     SquareTerminal,
-} from "lucide-react"
+    Users,
+} from 'lucide-react'
 
-import { NavMain } from "@/components/blocks/dashboard/nav-main"
-import { NavProjects } from "@/components/blocks/dashboard/nav-projects"
-import { NavUser } from "@/components/blocks/dashboard/nav-user"
-import { TeamSwitcher } from "@/components/blocks/dashboard/team-switcher"
+import { NavMain } from '@/components/blocks/dashboard/nav-main'
+import { NavSecondary } from '@/components/blocks/dashboard/nav-secondary'
+import { NavUser } from '@/components/blocks/dashboard/nav-user'
+import { TeamSwitcher } from '@/components/blocks/dashboard/team-switcher'
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 
 // This is sample data.
 const data = {
     user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
+        name: 'aminul',
+        email: 'aminul@employers.io',
+        avatar: '/avatars/shadcn.jpg',
     },
     teams: [
         {
-            name: "Acme Inc",
+            name: 'Operation Media LLC',
             logo: GalleryVerticalEnd,
-            plan: "Enterprise",
+            plan: 'Enterprise',
         },
         {
-            name: "Acme Corp.",
+            name: 'Employers.io',
             logo: AudioWaveform,
-            plan: "Startup",
+            plan: 'Startup',
         },
         {
-            name: "Evil Corp.",
+            name: 'Local Staffing LLC',
             logo: Command,
-            plan: "Free",
+            plan: 'Free',
         },
     ],
     navMain: [
         {
-            title: "Playground",
-            url: "#",
+            title: 'Partners',
+            url: '/dashboard/partners',
+            icon: Handshake,
+        },
+        {
+            title: 'Ads',
+            url: '/dashboard/ads',
             icon: SquareTerminal,
-            isActive: true,
+            isActive: false,
             items: [
                 {
-                    title: "History",
-                    url: "#",
+                    title: 'Sponsored',
+                    url: '/dashboard/ads/sponsored',
                 },
                 {
-                    title: "Starred",
-                    url: "#",
+                    title: 'XML Direct Listings',
+                    url: '/dashboard/ads/xml-direct-listings',
                 },
                 {
-                    title: "Settings",
-                    url: "#",
+                    title: 'Listicles',
+                    url: '/dashboard/ads/listicles',
+                    icon: Newspaper,
                 },
             ],
         },
         {
-            title: "Models",
-            url: "#",
-            icon: Bot,
+            title: 'Publishers',
+            url: '/dashboard/publishers',
+            icon: Rss,
             items: [
                 {
-                    title: "Genesis",
-                    url: "#",
+                    title: 'Traffic',
+                    url: '/dashboard/publishers/traffics',
                 },
                 {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
+                    title: 'Syndicates',
+                    url: '/dashboard/publishers/syndicates',
                 },
             ],
         },
         {
-            title: "Documentation",
-            url: "#",
-            icon: BookOpen,
+            title: 'Reports',
+            url: '#',
+            icon: ChartNoAxesCombined,
             items: [
                 {
-                    title: "Introduction",
-                    url: "#",
+                    title: 'No Inventory',
+                    url: '/dashboard/reports/no-inventory',
                 },
                 {
-                    title: "Get Started",
-                    url: "#",
+                    title: 'All Ads List',
+                    url: '/dashboard/reports/all-ads-list',
                 },
                 {
-                    title: "Tutorials",
-                    url: "#",
+                    title: 'Active Ads List',
+                    url: '/dashboard/reports/active-ads-list',
                 },
                 {
-                    title: "Changelog",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Settings",
-            url: "#",
-            icon: Settings2,
-            items: [
-                {
-                    title: "General",
-                    url: "#",
+                    title: 'Ad Placement',
+                    url: '/dashboard/reports/ad-placement',
                 },
                 {
-                    title: "Team",
-                    url: "#",
+                    title: 'Source Block',
+                    url: '/dashboard/reports/source-block',
                 },
                 {
-                    title: "Billing",
-                    url: "#",
+                    title: 'Source Placement',
+                    url: '/dashboard/reports/source-placement',
                 },
                 {
-                    title: "Limits",
-                    url: "#",
+                    title: 'Direct Job Bid',
+                    url: '/dashboard/reports/direct-job-bid',
+                },
+                {
+                    title: 'APIs',
+                    url: '/dashboard/reports/api',
+                },
+                {
+                    title: 'Traffic Campaign Volume',
+                    url: '/dashboard/reports/traffic-campaign-volume',
                 },
             ],
         },
     ],
-    projects: [
+    navSecondary: [
         {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
+            name: 'Users',
+            url: '/dashboard/users',
+            icon: Users,
         },
         {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
+            name: 'ACLs',
+            url: '/dashboard/acls',
+            icon: HatGlasses,
         },
         {
-            name: "Travel",
-            url: "#",
-            icon: Map,
+            name: 'Settings',
+            url: '/dashboard/settings',
+            icon: Settings,
         },
     ],
 }
@@ -164,7 +164,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
+                <NavSecondary projects={data.navSecondary} />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />
