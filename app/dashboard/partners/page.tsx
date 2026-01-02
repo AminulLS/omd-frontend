@@ -53,7 +53,7 @@ import { useState } from 'react'
 type PartnerStatus = 'active' | 'inactive' | 'pending' | 'suspended'
 type PartnerType = 'internal' | 'external'
 
-type ProductType = 'sponsored_ads' | 'xml_direct_listing' | 'publisher' | 'syndication'
+type ProductType = 'sponsored-ads' | 'xml-direct-listing' | 'publisher' | 'syndication'
 
 type Partner = {
   id: string
@@ -77,7 +77,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 123-4567',
     created_at: '2024-01-15',
     number_users: 1240,
-    products: ['sponsored_ads', 'xml_direct_listing'],
+    products: ['sponsored-ads', 'xml-direct-listing'],
   },
   {
     id: '2',
@@ -99,7 +99,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 345-6789',
     created_at: '2024-03-10',
     number_users: 2341,
-    products: ['sponsored_ads', 'xml_direct_listing', 'publisher', 'syndication'],
+    products: ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'],
   },
   {
     id: '4',
@@ -110,7 +110,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 456-7890',
     created_at: '2024-06-05',
     number_users: 0,
-    products: ['sponsored_ads'],
+    products: ['sponsored-ads'],
   },
   {
     id: '5',
@@ -132,7 +132,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 678-9012',
     created_at: '2024-04-12',
     number_users: 1567,
-    products: ['xml_direct_listing', 'syndication'],
+    products: ['xml-direct-listing', 'syndication'],
   },
   {
     id: '7',
@@ -143,7 +143,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 789-0123',
     created_at: '2023-12-01',
     number_users: 89,
-    products: ['sponsored_ads', 'xml_direct_listing'],
+    products: ['sponsored-ads', 'xml-direct-listing'],
   },
   {
     id: '8',
@@ -154,7 +154,7 @@ const initialPartners: Partner[] = [
     phone: '+1 (555) 890-1234',
     created_at: '2024-05-18',
     number_users: 678,
-    products: ['publisher', 'syndication', 'xml_direct_listing'],
+    products: ['publisher', 'syndication', 'xml-direct-listing'],
   },
 ]
 
@@ -171,10 +171,10 @@ const typeVariantMap: Record<PartnerType, "default" | "secondary" | "outline"> =
 }
 
 const productLabelMap: Record<ProductType, string> = {
-  sponsored_ads: 'Sponsored Ads',
-  xml_direct_listing: 'XML Direct',
-  publisher: 'Publisher',
-  syndication: 'Syndication',
+  'sponsored-ads': 'Sponsored Ads',
+  'xml-direct-listing': 'XML Direct',
+  'publisher': 'Publisher',
+  'syndication': 'Syndication',
 }
 
 const typeLabelMap: Record<PartnerType, string> = {
@@ -408,7 +408,7 @@ export default function PartnersPage() {
                     <FieldLabel>Products</FieldLabel>
                     <FieldContent>
                       <div className="flex flex-wrap gap-2">
-                        {(['sponsored_ads', 'xml_direct_listing', 'publisher', 'syndication'] as ProductType[]).map(product => (
+                        {(['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'] as ProductType[]).map(product => (
                           <Button
                             key={product}
                             type="button"
