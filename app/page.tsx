@@ -1,7 +1,7 @@
-import { SiteHeader } from "@/components/site-header"
-import { HeroSection } from "@/components/hero-section"
-import { FeaturesSection } from "@/components/features-section"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/blocks/home/site-header"
+import { HeroSection } from "@/components/blocks/home/hero-section"
+import { FeaturesSection } from "@/components/blocks/home/features-section"
+import { SiteFooter } from "@/components/blocks/home/site-footer"
 
 export default function Page() {
   return (

@@ -44,9 +44,12 @@ export function SiteHeader() {
               Contact Us
             </Link>
             <Link href="/auth/login">
-              <Button className="text-sm font-medium hover:cursor-pointer">
+              <Button>
                 Login
               </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="secondary">Dashboard</Button>
             </Link>
           </nav>
 

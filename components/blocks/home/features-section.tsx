@@ -21,7 +21,7 @@ export function FeaturesSection() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="order-2 lg:order-1">
              <div className="relative aspect-square w-full max-w-lg mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl opacity-30" />
+                <div className="absolute inset-0 bg-linear-to-tr from-primary/20 to-secondary/20 rounded-full blur-3xl opacity-30" />
                 <Image
                   src="/features-img-1.png"
                   alt="Features Image"

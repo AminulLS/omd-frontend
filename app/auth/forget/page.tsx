@@ -1,4 +1,4 @@
-import { ForgetForm } from '@/components/forget-form'
+import { ForgetForm } from '@/components/blocks/auth/forget-form'
 
 export default function Page() {
     return <ForgetForm />
