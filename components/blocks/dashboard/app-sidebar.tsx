@@ -2,10 +2,7 @@
 
 import * as React from 'react'
 import {
-    AudioWaveform,
     ChartNoAxesCombined,
-    Command,
-    GalleryVerticalEnd,
     Handshake,
     HatGlasses,
     Newspaper,
@@ -16,16 +13,9 @@ import {
 } from 'lucide-react'
 
 import { NavMain } from '@/components/blocks/dashboard/nav-main'
-import { NavSecondary } from '@/components/blocks/dashboard/nav-secondary'
 import { NavUser } from '@/components/blocks/dashboard/nav-user'
-import { TeamSwitcher } from '@/components/blocks/dashboard/team-switcher'
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarRail,
-} from '@/components/ui/sidebar'
+import { SidebarLogo } from '@/components/blocks/dashboard/sidebar-logo'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
 
 // This is sample data.
 const data = {
@@ -34,23 +24,6 @@ const data = {
         email: 'aminul@employers.io',
         avatar: '/avatars/shadcn.jpg',
     },
-    teams: [
-        {
-            name: 'Operation Media LLC',
-            logo: GalleryVerticalEnd,
-            plan: 'Enterprise',
-        },
-        {
-            name: 'Employers.io',
-            logo: AudioWaveform,
-            plan: 'Startup',
-        },
-        {
-            name: 'Local Staffing LLC',
-            logo: Command,
-            plan: 'Free',
-        },
-    ],
     navMain: [
         {
             title: 'Partners',
@@ -82,6 +55,7 @@ const data = {
             title: 'Publishers',
             url: '/dashboard/publishers',
             icon: Rss,
+            isActive: false,
             items: [
                 {
                     title: 'Traffic',
@@ -97,6 +71,7 @@ const data = {
             title: 'Reports',
             url: '#',
             icon: ChartNoAxesCombined,
+            isActive: false,
             items: [
                 {
                     title: 'No Inventory',
@@ -139,17 +114,17 @@ const data = {
     ],
     navSecondary: [
         {
-            name: 'Users',
+            title: 'Users',
             url: '/dashboard/users',
             icon: Users,
         },
         {
-            name: 'ACLs',
+            title: 'ACLs',
             url: '/dashboard/acls',
             icon: HatGlasses,
         },
         {
-            name: 'Settings',
+            title: 'Settings',
             url: '/dashboard/settings',
             icon: Settings,
         },
@@ -160,11 +135,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <TeamSwitcher teams={data.teams} />
+                <SidebarLogo />
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} />
-                <NavSecondary projects={data.navSecondary} />
+                <NavMain items={data.navMain} name="Platform" />
+                <NavMain items={data.navSecondary} name="Setup" />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />
