@@ -732,7 +732,7 @@ export default function AuditLogsPage() {
                 {selectedLog.changes && (
                   <div className="border rounded-lg p-3">
                     <div
-                      className="text-sm font-medium mb-2 cursor-pointer flex items-center gap-1 hover:text-primary"
+                      className="text-sm font-medium cursor-pointer flex items-center gap-1 hover:text-primary"
                       onClick={() => toggleExpandChanges(selectedLog.id)}
                     >
                       {expandedChanges[selectedLog.id] ? (
