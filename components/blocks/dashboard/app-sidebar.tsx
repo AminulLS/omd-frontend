@@ -16,15 +16,11 @@ import { NavMain } from '@/components/blocks/dashboard/nav-main'
 import { NavUser } from '@/components/blocks/dashboard/nav-user'
 import { SidebarLogo } from '@/components/blocks/dashboard/sidebar-logo'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar'
+import { useAuth } from '@/lib/context/auth-context'
+import { Loader2 } from 'lucide-react'
 
 // This is sample data.
-const data = {
-    user: {
-        name: 'aminul',
-        email: 'aminul@employers.io',
-        avatar: '/avatars/shadcn.jpg',
-    },
-    navMain: [
+const navMainItems = [
         {
             title: 'Partners',
             url: '/dashboard/partners',
@@ -111,8 +107,9 @@ const data = {
                 },
             ],
         },
-    ],
-    navSecondary: [
+]
+
+const navSecondaryItems = [
         {
             title: 'Users',
             url: '/dashboard/users',
@@ -133,21 +130,55 @@ const data = {
             url: '/dashboard/settings',
             icon: Settings,
         },
-    ],
-}
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { user, isLoading } = useAuth()
+
+    if (isLoading || !user) {
+        return (
+            <Sidebar collapsible="icon" {...props}>
+                <SidebarHeader>
+                    <SidebarLogo />
+                </SidebarHeader>
+                <SidebarContent>
+                    <NavMain items={navMainItems} name="Platform" />
+                    <NavMain items={navSecondaryItems} name="Setup" />
+                </SidebarContent>
+                <SidebarFooter>
+                    <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                </SidebarFooter>
+                <SidebarRail />
+            </Sidebar>
+        )
+    }
+
+    const userInitials = user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarLogo />
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} name="Platform" />
-                <NavMain items={data.navSecondary} name="Setup" />
+                <NavMain items={navMainItems} name="Platform" />
+                <NavMain items={navSecondaryItems} name="Setup" />
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                <NavUser
+                    user={{
+                        name: user.name,
+                        email: user.email,
+                        avatar: user.profile.avatarUrl,
+                    }}
+                />
             </SidebarFooter>
             <SidebarRail />
         </Sidebar>
