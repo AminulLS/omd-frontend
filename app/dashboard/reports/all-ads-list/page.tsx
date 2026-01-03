@@ -30,6 +30,7 @@ import {
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { PLACEMENTS, getPlacementLabel, type PlacementSlug } from '@/lib/constants/placements'
+import { COUNTRIES } from '@/lib/constants/countries'
 
 type Ad = {
   id: string
@@ -38,122 +39,123 @@ type Ad = {
   weight: number
   status: 'active' | 'inactive'
   position: PlacementSlug
+  country: keyof typeof COUNTRIES
 }
 
 // Mock data for ads
 const mockAds: Ad[] = [
   // Redirect
-  { id: '1', partner: 'Google', title: 'Best Remote Jobs 2024', weight: 10, status: 'active', position: 'redirect' },
-  { id: '2', partner: 'Indeed', title: 'Hiring Now - Tech Jobs', weight: 8, status: 'active', position: 'redirect' },
+  { id: '1', partner: 'Google', title: 'Best Remote Jobs 2024', weight: 10, status: 'active', position: 'redirect', country: 'US' as keyof typeof COUNTRIES },
+  { id: '2', partner: 'Indeed', title: 'Hiring Now - Tech Jobs', weight: 8, status: 'active', position: 'redirect', country: 'CA' as keyof typeof COUNTRIES },
 
   // SERP Top
-  { id: '3', partner: 'LinkedIn', title: 'Premium Job Listings', weight: 9, status: 'active', position: 'serp-top' },
-  { id: '4', partner: 'Monster', title: 'Find Your Dream Job', weight: 7, status: 'active', position: 'serp-top' },
+  { id: '3', partner: 'LinkedIn', title: 'Premium Job Listings', weight: 9, status: 'active', position: 'serp-top', country: 'GB' as keyof typeof COUNTRIES },
+  { id: '4', partner: 'Monster', title: 'Find Your Dream Job', weight: 7, status: 'active', position: 'serp-top', country: 'US' as keyof typeof COUNTRIES },
 
   // Return
-  { id: '5', partner: 'CareerBuilder', title: 'Top Remote Opportunities', weight: 6, status: 'active', position: 'return' },
-  { id: '6', partner: 'ZipRecruiter', title: 'Apply with One Click', weight: 8, status: 'inactive', position: 'return' },
+  { id: '5', partner: 'CareerBuilder', title: 'Top Remote Opportunities', weight: 6, status: 'active', position: 'return', country: 'IN' as keyof typeof COUNTRIES },
+  { id: '6', partner: 'ZipRecruiter', title: 'Apply with One Click', weight: 8, status: 'inactive', position: 'return', country: 'ZA' as keyof typeof COUNTRIES },
 
   // External SMS
-  { id: '7', partner: 'Glassdoor', title: 'Salary & Company Reviews', weight: 7, status: 'active', position: 'external-sms' },
+  { id: '7', partner: 'Glassdoor', title: 'Salary & Company Reviews', weight: 7, status: 'active', position: 'external-sms', country: 'FR' as keyof typeof COUNTRIES },
 
   // SERP Middle
-  { id: '8', partner: 'Dice', title: 'Tech & IT Jobs', weight: 9, status: 'active', position: 'serp-mid' },
-  { id: '9', partner: 'SimplyHired', title: 'Local Job Search', weight: 5, status: 'active', position: 'serp-mid' },
+  { id: '8', partner: 'Dice', title: 'Tech & IT Jobs', weight: 9, status: 'active', position: 'serp-mid', country: 'DE' as keyof typeof COUNTRIES },
+  { id: '9', partner: 'SimplyHired', title: 'Local Job Search', weight: 5, status: 'active', position: 'serp-mid', country: 'US' as keyof typeof COUNTRIES },
 
   // SERP Bottom
-  { id: '10', partner: 'Snagajob', title: 'Hourly Jobs Near You', weight: 6, status: 'active', position: 'serp-bottom' },
-  { id: '11', partner: 'Jobs.net', title: 'Browse Job Openings', weight: 7, status: 'inactive', position: 'serp-bottom' },
+  { id: '10', partner: 'Snagajob', title: 'Hourly Jobs Near You', weight: 6, status: 'active', position: 'serp-bottom', country: 'CA' as keyof typeof COUNTRIES },
+  { id: '11', partner: 'Jobs.net', title: 'Browse Job Openings', weight: 7, status: 'inactive', position: 'serp-bottom', country: 'GB' as keyof typeof COUNTRIES },
 
   // BB
-  { id: '12', partner: 'Adzuna', title: 'Millions of Jobs', weight: 8, status: 'active', position: 'bb' },
-  { id: '13', partner: 'Idealist', title: 'Non-Profit Careers', weight: 6, status: 'active', position: 'bb' },
+  { id: '12', partner: 'Adzuna', title: 'Millions of Jobs', weight: 8, status: 'active', position: 'bb', country: 'IN' as keyof typeof COUNTRIES },
+  { id: '13', partner: 'Idealist', title: 'Non-Profit Careers', weight: 6, status: 'active', position: 'bb', country: 'ZA' as keyof typeof COUNTRIES },
 
   // Flow
-  { id: '14', partner: 'USAjobs', title: 'Government Positions', weight: 9, status: 'active', position: 'flow' },
+  { id: '14', partner: 'USAjobs', title: 'Government Positions', weight: 9, status: 'active', position: 'flow', country: 'FR' as keyof typeof COUNTRIES },
 
   // Return 2
-  { id: '15', partner: 'Remote.co', title: 'Remote-First Companies', weight: 7, status: 'active', position: 'return-2' },
+  { id: '15', partner: 'Remote.co', title: 'Remote-First Companies', weight: 7, status: 'active', position: 'return-2', country: 'DE' as keyof typeof COUNTRIES },
 
   // Path
-  { id: '16', partner: 'We Work Remotely', title: 'Remote Jobs', weight: 8, status: 'active', position: 'path' },
+  { id: '16', partner: 'We Work Remotely', title: 'Remote Jobs', weight: 8, status: 'active', position: 'path', country: 'US' as keyof typeof COUNTRIES },
 
   // Flow 2
-  { id: '17', partner: 'FlexJobs', title: 'Flexible Remote Work', weight: 6, status: 'active', position: 'flow-2' },
+  { id: '17', partner: 'FlexJobs', title: 'Flexible Remote Work', weight: 6, status: 'active', position: 'flow-2', country: 'CA' as keyof typeof COUNTRIES },
 
   // PEC
-  { id: '18', partner: 'AngelList', title: 'Startup Jobs', weight: 9, status: 'active', position: 'pec' },
-  { id: '19', partner: 'Wellfound', title: 'Tech Startup Careers', weight: 7, status: 'inactive', position: 'pec' },
+  { id: '18', partner: 'AngelList', title: 'Startup Jobs', weight: 9, status: 'active', position: 'pec', country: 'GB' as keyof typeof COUNTRIES },
+  { id: '19', partner: 'Wellfound', title: 'Tech Startup Careers', weight: 7, status: 'inactive', position: 'pec', country: 'IN' as keyof typeof COUNTRIES },
 
   // PEC Return
-  { id: '20', partner: 'Hired', title: 'Tech Job Matching', weight: 8, status: 'active', position: 'pec-return' },
+  { id: '20', partner: 'Hired', title: 'Tech Job Matching', weight: 8, status: 'active', position: 'pec-return', country: 'ZA' as keyof typeof COUNTRIES },
 
   // Offer 1
-  { id: '21', partner: 'Talent.com', title: 'Job Search Engine', weight: 7, status: 'active', position: 'offer-1' },
-  { id: '22', partner: 'Jobrapido', title: 'Find Jobs Fast', weight: 6, status: 'active', position: 'offer-1' },
+  { id: '21', partner: 'Talent.com', title: 'Job Search Engine', weight: 7, status: 'active', position: 'offer-1', country: 'FR' as keyof typeof COUNTRIES },
+  { id: '22', partner: 'Jobrapido', title: 'Find Jobs Fast', weight: 6, status: 'active', position: 'offer-1', country: 'DE' as keyof typeof COUNTRIES },
 
   // SERP
-  { id: '23', partner: 'Jooble', title: 'Job Aggregator', weight: 8, status: 'active', position: 'serp' },
+  { id: '23', partner: 'Jooble', title: 'Job Aggregator', weight: 8, status: 'active', position: 'serp', country: 'US' as keyof typeof COUNTRIES },
 
   // PEC 2
-  { id: '24', partner: 'Chron', title: 'Career Resources', weight: 5, status: 'active', position: 'pec-2' },
+  { id: '24', partner: 'Chron', title: 'Career Resources', weight: 5, status: 'active', position: 'pec-2', country: 'CA' as keyof typeof COUNTRIES },
 
   // PEC Return 2
-  { id: '25', partner: 'The Muse', title: 'Company Culture Jobs', weight: 9, status: 'inactive', position: 'pec-return-2' },
+  { id: '25', partner: 'The Muse', title: 'Company Culture Jobs', weight: 9, status: 'inactive', position: 'pec-return-2', country: 'GB' as keyof typeof COUNTRIES },
 
   // SERP All
-  { id: '26', partner: 'LinkUp', title: 'Verified Job Listings', weight: 7, status: 'active', position: 'serp-all' },
-  { id: '27', partner: 'Jobster', title: 'Social Recruiting', weight: 6, status: 'active', position: 'serp-all' },
+  { id: '26', partner: 'LinkUp', title: 'Verified Job Listings', weight: 7, status: 'active', position: 'serp-all', country: 'IN' as keyof typeof COUNTRIES },
+  { id: '27', partner: 'Jobster', title: 'Social Recruiting', weight: 6, status: 'active', position: 'serp-all', country: 'ZA' as keyof typeof COUNTRIES },
 
   // Internal SMS
-  { id: '28', partner: 'Beyond', title: 'Career Networking', weight: 8, status: 'active', position: 'internal-sms' },
+  { id: '28', partner: 'Beyond', title: 'Career Networking', weight: 8, status: 'active', position: 'internal-sms', country: 'FR' as keyof typeof COUNTRIES },
 
   // External Non-Billable SMS
-  { id: '29', partner: 'Craigslist', title: 'Local Classifieds Jobs', weight: 5, status: 'active', position: 'external-nonbillable-sms' },
+  { id: '29', partner: 'Craigslist', title: 'Local Classifieds Jobs', weight: 5, status: 'active', position: 'external-nonbillable-sms', country: 'DE' as keyof typeof COUNTRIES },
 
   // Sponsored SERP
-  { id: '30', partner: 'ZipRecruiter', title: 'Sponsored Job Listings', weight: 10, status: 'active', position: 'sponsored-serp' },
+  { id: '30', partner: 'ZipRecruiter', title: 'Sponsored Job Listings', weight: 10, status: 'active', position: 'sponsored-serp', country: 'US' as keyof typeof COUNTRIES },
 
   // Sponsored BB
-  { id: '31', partner: 'Indeed', title: 'Sponsored Positions', weight: 9, status: 'active', position: 'sponsored-bb' },
+  { id: '31', partner: 'Indeed', title: 'Sponsored Positions', weight: 9, status: 'active', position: 'sponsored-bb', country: 'CA' as keyof typeof COUNTRIES },
 
   // SERP Large
-  { id: '32', partner: 'LinkedIn', title: 'Premium Career Listings', weight: 8, status: 'active', position: 'serp-large' },
+  { id: '32', partner: 'LinkedIn', title: 'Premium Career Listings', weight: 8, status: 'active', position: 'serp-large', country: 'GB' as keyof typeof COUNTRIES },
 
   // Offer 2
-  { id: '33', partner: 'Monster', title: 'Featured Opportunities', weight: 7, status: 'active', position: 'offer-2' },
-  { id: '34', partner: 'CareerBuilder', title: 'Top Picks', weight: 6, status: 'inactive', position: 'offer-2' },
+  { id: '33', partner: 'Monster', title: 'Featured Opportunities', weight: 7, status: 'active', position: 'offer-2', country: 'IN' as keyof typeof COUNTRIES },
+  { id: '34', partner: 'CareerBuilder', title: 'Top Picks', weight: 6, status: 'inactive', position: 'offer-2', country: 'ZA' as keyof typeof COUNTRIES },
 
   // Offer 3
-  { id: '35', partner: 'Dice', title: 'Tech Hot Jobs', weight: 8, status: 'active', position: 'offer-3' },
+  { id: '35', partner: 'Dice', title: 'Tech Hot Jobs', weight: 8, status: 'active', position: 'offer-3', country: 'FR' as keyof typeof COUNTRIES },
 
   // Offer 4
-  { id: '36', partner: 'SimplyHired', title: 'Trending Roles', weight: 7, status: 'active', position: 'offer-4' },
+  { id: '36', partner: 'SimplyHired', title: 'Trending Roles', weight: 7, status: 'active', position: 'offer-4', country: 'DE' as keyof typeof COUNTRIES },
 
   // SERP Offer
-  { id: '37', partner: 'Snagajob', title: 'Featured Hourly Jobs', weight: 9, status: 'active', position: 'serp-offer' },
+  { id: '37', partner: 'Snagajob', title: 'Featured Hourly Jobs', weight: 9, status: 'active', position: 'serp-offer', country: 'US' as keyof typeof COUNTRIES },
 
   // Offer 6
-  { id: '38', partner: 'Jobs.net', title: 'Special Offers', weight: 6, status: 'active', position: 'offer-6' },
+  { id: '38', partner: 'Jobs.net', title: 'Special Offers', weight: 6, status: 'active', position: 'offer-6', country: 'CA' as keyof typeof COUNTRIES },
 
   // Offer 5
-  { id: '39', partner: 'Adzuna', title: 'Exclusive Deals', weight: 8, status: 'inactive', position: 'offer-5' },
+  { id: '39', partner: 'Adzuna', title: 'Exclusive Deals', weight: 8, status: 'inactive', position: 'offer-5', country: 'GB' as keyof typeof COUNTRIES },
 
   // Offer 7
-  { id: '40', partner: 'Idealist', title: 'Mission-Driven Work', weight: 7, status: 'active', position: 'offer-7' },
+  { id: '40', partner: 'Idealist', title: 'Mission-Driven Work', weight: 7, status: 'active', position: 'offer-7', country: 'IN' as keyof typeof COUNTRIES },
 
   // Medicare
-  { id: '41', partner: 'USAjobs', title: 'Healthcare Careers', weight: 9, status: 'active', position: 'medicare' },
+  { id: '41', partner: 'USAjobs', title: 'Healthcare Careers', weight: 9, status: 'active', position: 'medicare', country: 'ZA' as keyof typeof COUNTRIES },
 
   // Blur
-  { id: '42', partner: 'Remote.co', title: 'Work From Anywhere', weight: 6, status: 'active', position: 'blur' },
+  { id: '42', partner: 'Remote.co', title: 'Work From Anywhere', weight: 6, status: 'active', position: 'blur', country: 'FR' as keyof typeof COUNTRIES },
 
   // Listical
-  { id: '43', partner: 'We Work Remotely', title: 'Curated Remote Jobs', weight: 8, status: 'active', position: 'listical' },
-  { id: '44', partner: 'FlexJobs', title: 'Hand-Screened Roles', weight: 7, status: 'active', position: 'listical' },
+  { id: '43', partner: 'We Work Remotely', title: 'Curated Remote Jobs', weight: 8, status: 'active', position: 'listical', country: 'DE' as keyof typeof COUNTRIES },
+  { id: '44', partner: 'FlexJobs', title: 'Hand-Screened Roles', weight: 7, status: 'active', position: 'listical', country: 'US' as keyof typeof COUNTRIES },
 
   // Internal Email
-  { id: '45', partner: 'AngelList', title: 'Weekly Job Digest', weight: 5, status: 'inactive', position: 'internal-email' },
+  { id: '45', partner: 'AngelList', title: 'Weekly Job Digest', weight: 5, status: 'inactive', position: 'internal-email', country: 'CA' as keyof typeof COUNTRIES },
 ]
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
@@ -161,6 +163,7 @@ const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
 export default function AllAdsListPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedPosition, setSelectedPosition] = useState<PlacementSlug | null>(null)
+  const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [positionSearchQuery, setPositionSearchQuery] = useState('')
   const [itemsPerPage, setItemsPerPage] = useState(10)
@@ -186,7 +189,9 @@ export default function AllAdsListPage() {
 
     const matchesPosition = !selectedPosition || ad.position === selectedPosition
 
-    return matchesSearch && matchesPosition
+    const matchesCountry = selectedCountry === 'all' || ad.country === selectedCountry
+
+    return matchesSearch && matchesPosition && matchesCountry
   })
 
   // Pagination
@@ -196,12 +201,13 @@ export default function AllAdsListPage() {
 
   // Function to convert data to CSV format
   const convertToCSV = (data: Ad[]) => {
-    const headers = ['Partner', 'Title', 'Weight', 'Status']
+    const headers = ['Partner', 'Title', 'Weight', 'Status', 'Country']
     const rows = data.map((item) => [
       item.partner,
       item.title,
       `$${item.weight}`,
       item.status,
+      COUNTRIES[item.country],
     ])
 
     const csvContent = [
@@ -244,7 +250,7 @@ export default function AllAdsListPage() {
   // Reset pagination when filters change
   React.useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, selectedPosition, itemsPerPage])
+  }, [searchQuery, selectedPosition, selectedCountry, itemsPerPage])
 
   // Handle items per page change
   const handleItemsPerPageChange = (value: string) => {
@@ -343,6 +349,26 @@ export default function AllAdsListPage() {
                     </FieldContent>
                   </Field>
 
+                  {/* Country Filter */}
+                  <Field className="sm:w-[180px]">
+                    <FieldLabel>Country</FieldLabel>
+                    <FieldContent>
+                      <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Countries</SelectItem>
+                          {Object.entries(COUNTRIES).map(([code, name]) => (
+                            <SelectItem key={code} value={code}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldContent>
+                  </Field>
+
                   {/* Export Buttons */}
                   <Field className="sm:w-auto">
                     <FieldLabel>Export</FieldLabel>
@@ -371,12 +397,13 @@ export default function AllAdsListPage() {
                     <TableHead>Title</TableHead>
                     <TableHead className="text-right">Weight</TableHead>
                     <TableHead className="text-center">Status</TableHead>
+                    <TableHead>Country</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {paginatedAds.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center">
+                      <TableCell colSpan={5} className="h-24 text-center">
                         No ads found.
                       </TableCell>
                     </TableRow>
@@ -402,6 +429,7 @@ export default function AllAdsListPage() {
                             {formatStatus(ad.status)}
                           </span>
                         </TableCell>
+                        <TableCell>{COUNTRIES[ad.country]}</TableCell>
                       </TableRow>
                     ))
                   )}

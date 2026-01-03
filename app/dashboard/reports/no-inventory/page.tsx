@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { PLACEMENTS, getPlacementLabel, type PlacementSlug } from '@/lib/constants/placements'
+import { COUNTRIES } from '@/lib/constants/countries'
 
 // Mock data for no inventory report
 const mockData = [
@@ -45,6 +46,7 @@ const mockData = [
     origin: 'Google',
     placement: 'redirect' as PlacementSlug,
     keyword: 'medicare supplement plans',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 12,
   },
   {
@@ -52,6 +54,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'serp-top' as PlacementSlug,
     keyword: 'health insurance for seniors',
+    country: 'CA' as keyof typeof COUNTRIES,
     blockedReports: 8,
   },
   {
@@ -59,6 +62,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'return' as PlacementSlug,
     keyword: 'medicare advantage plans',
+    country: 'GB' as keyof typeof COUNTRIES,
     blockedReports: 5,
   },
   {
@@ -66,6 +70,7 @@ const mockData = [
     origin: 'Google',
     placement: 'external-sms' as PlacementSlug,
     keyword: 'dentist near me',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 15,
   },
   {
@@ -73,6 +78,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'serp-mid' as PlacementSlug,
     keyword: 'car insurance quotes',
+    country: 'IN' as keyof typeof COUNTRIES,
     blockedReports: 3,
   },
   {
@@ -80,6 +86,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'serp-bottom' as PlacementSlug,
     keyword: 'auto insurance comparison',
+    country: 'ZA' as keyof typeof COUNTRIES,
     blockedReports: 7,
   },
   {
@@ -87,6 +94,7 @@ const mockData = [
     origin: 'Google',
     placement: 'bb' as PlacementSlug,
     keyword: 'life insurance rates',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 22,
   },
   {
@@ -94,6 +102,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'flow' as PlacementSlug,
     keyword: 'home insurance quotes',
+    country: 'FR' as keyof typeof COUNTRIES,
     blockedReports: 9,
   },
   {
@@ -101,6 +110,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'return-2' as PlacementSlug,
     keyword: 'renters insurance',
+    country: 'DE' as keyof typeof COUNTRIES,
     blockedReports: 11,
   },
   {
@@ -108,6 +118,7 @@ const mockData = [
     origin: 'Google',
     placement: 'path' as PlacementSlug,
     keyword: 'pet insurance reviews',
+    country: 'CA' as keyof typeof COUNTRIES,
     blockedReports: 6,
   },
   {
@@ -115,6 +126,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'flow-2' as PlacementSlug,
     keyword: 'travel insurance',
+    country: 'GB' as keyof typeof COUNTRIES,
     blockedReports: 18,
   },
   {
@@ -122,6 +134,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'pec' as PlacementSlug,
     keyword: 'business insurance',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 4,
   },
   {
@@ -129,6 +142,7 @@ const mockData = [
     origin: 'Google',
     placement: 'pec-return' as PlacementSlug,
     keyword: 'disability insurance',
+    country: 'IN' as keyof typeof COUNTRIES,
     blockedReports: 14,
   },
   {
@@ -136,6 +150,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'offer-1' as PlacementSlug,
     keyword: 'insurance brokers',
+    country: 'ZA' as keyof typeof COUNTRIES,
     blockedReports: 25,
   },
   {
@@ -143,6 +158,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'serp' as PlacementSlug,
     keyword: 'insurance agents',
+    country: 'FR' as keyof typeof COUNTRIES,
     blockedReports: 10,
   },
   {
@@ -150,6 +166,7 @@ const mockData = [
     origin: 'Google',
     placement: 'pec-2' as PlacementSlug,
     keyword: 'cheap car insurance',
+    country: 'DE' as keyof typeof COUNTRIES,
     blockedReports: 8,
   },
   {
@@ -157,6 +174,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'pec-return-2' as PlacementSlug,
     keyword: 'best home insurance',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 5,
   },
   {
@@ -164,6 +182,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'serp-all' as PlacementSlug,
     keyword: 'insurance company ratings',
+    country: 'CA' as keyof typeof COUNTRIES,
     blockedReports: 13,
   },
   {
@@ -171,6 +190,7 @@ const mockData = [
     origin: 'Google',
     placement: 'internal-sms' as PlacementSlug,
     keyword: 'insurance claims',
+    country: 'GB' as keyof typeof COUNTRIES,
     blockedReports: 19,
   },
   {
@@ -178,6 +198,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'external-nonbillable-sms' as PlacementSlug,
     keyword: 'insurance deductible',
+    country: 'IN' as keyof typeof COUNTRIES,
     blockedReports: 16,
   },
   {
@@ -185,6 +206,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'sponsored-serp' as PlacementSlug,
     keyword: 'insurance premium',
+    country: 'ZA' as keyof typeof COUNTRIES,
     blockedReports: 7,
   },
   {
@@ -192,6 +214,7 @@ const mockData = [
     origin: 'Google',
     placement: 'sponsored-bb' as PlacementSlug,
     keyword: 'insurance policy',
+    country: 'FR' as keyof typeof COUNTRIES,
     blockedReports: 21,
   },
   {
@@ -199,6 +222,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'serp-large' as PlacementSlug,
     keyword: 'insurance coverage',
+    country: 'DE' as keyof typeof COUNTRIES,
     blockedReports: 9,
   },
   {
@@ -206,6 +230,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'offer-2' as PlacementSlug,
     keyword: 'insurance quote online',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 28,
   },
   {
@@ -213,6 +238,7 @@ const mockData = [
     origin: 'Google',
     placement: 'offer-3' as PlacementSlug,
     keyword: 'insurance calculator',
+    country: 'CA' as keyof typeof COUNTRIES,
     blockedReports: 12,
   },
   {
@@ -220,6 +246,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'offer-4' as PlacementSlug,
     keyword: 'insurance discounts',
+    country: 'GB' as keyof typeof COUNTRIES,
     blockedReports: 17,
   },
   {
@@ -227,6 +254,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'serp-offer' as PlacementSlug,
     keyword: 'insurance providers',
+    country: 'IN' as keyof typeof COUNTRIES,
     blockedReports: 6,
   },
   {
@@ -234,6 +262,7 @@ const mockData = [
     origin: 'Google',
     placement: 'offer-6' as PlacementSlug,
     keyword: 'insurance plans',
+    country: 'ZA' as keyof typeof COUNTRIES,
     blockedReports: 23,
   },
   {
@@ -241,6 +270,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'offer-5' as PlacementSlug,
     keyword: 'insurance types',
+    country: 'FR' as keyof typeof COUNTRIES,
     blockedReports: 11,
   },
   {
@@ -248,6 +278,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'offer-7' as PlacementSlug,
     keyword: 'insurance terms',
+    country: 'DE' as keyof typeof COUNTRIES,
     blockedReports: 8,
   },
   {
@@ -255,6 +286,7 @@ const mockData = [
     origin: 'Google',
     placement: 'medicare' as PlacementSlug,
     keyword: 'medicare part b',
+    country: 'US' as keyof typeof COUNTRIES,
     blockedReports: 33,
   },
   {
@@ -262,6 +294,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'blur' as PlacementSlug,
     keyword: 'medicare part d',
+    country: 'CA' as keyof typeof COUNTRIES,
     blockedReports: 4,
   },
   {
@@ -269,6 +302,7 @@ const mockData = [
     origin: 'Facebook',
     placement: 'listical' as PlacementSlug,
     keyword: 'insurance tips',
+    country: 'GB' as keyof typeof COUNTRIES,
     blockedReports: 15,
   },
   {
@@ -276,6 +310,7 @@ const mockData = [
     origin: 'Google',
     placement: 'internal-email' as PlacementSlug,
     keyword: 'insurance guide',
+    country: 'IN' as keyof typeof COUNTRIES,
     blockedReports: 20,
   },
   {
@@ -283,6 +318,7 @@ const mockData = [
     origin: 'Bing',
     placement: 'serp-top' as PlacementSlug,
     keyword: 'insurance help',
+    country: 'ZA' as keyof typeof COUNTRIES,
     blockedReports: 9,
   },
 ]
@@ -292,6 +328,7 @@ type NoInventoryReport = {
   origin: string
   placement: PlacementSlug
   keyword: string
+  country: keyof typeof COUNTRIES
   blockedReports: number
 }
 
@@ -306,6 +343,7 @@ export default function NoInventoryReportPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
@@ -317,7 +355,9 @@ export default function NoInventoryReportPage() {
       getPlacementLabel(item.placement).toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.keyword.toLowerCase().includes(searchQuery.toLowerCase())
 
-    return matchesSearch
+    const matchesCountry = selectedCountry === 'all' || item.country === selectedCountry
+
+    return matchesSearch && matchesCountry
   })
 
   // Pagination
@@ -326,10 +366,10 @@ export default function NoInventoryReportPage() {
   const endIndex = startIndex + itemsPerPage
   const paginatedData = filteredData.slice(startIndex, endIndex)
 
-  // Reset to page 1 when search query or items per page changes
+  // Reset to page 1 when search query, items per page, or country changes
   React.useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, itemsPerPage])
+  }, [searchQuery, itemsPerPage, selectedCountry])
 
   // Handle items per page change
   const handleItemsPerPageChange = (value: string) => {
@@ -345,11 +385,12 @@ export default function NoInventoryReportPage() {
 
   // Function to convert data to CSV format
   const convertToCSV = (data: NoInventoryReport[]) => {
-    const headers = ['Origin', 'Placement', 'Keyword', 'Blocked Reports']
+    const headers = ['Origin', 'Placement', 'Keyword', 'Country', 'Blocked Reports']
     const rows = data.map((item) => [
       item.origin,
       getPlacementLabel(item.placement),
       item.keyword,
+      COUNTRIES[item.country],
       item.blockedReports.toString(),
     ])
 
@@ -410,6 +451,26 @@ export default function NoInventoryReportPage() {
                       className="pl-9"
                     />
                   </div>
+                </FieldContent>
+              </Field>
+
+              {/* Country Filter */}
+              <Field className="sm:w-[180px]">
+                <FieldLabel>Country</FieldLabel>
+                <FieldContent>
+                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Countries</SelectItem>
+                      {Object.entries(COUNTRIES).map(([code, name]) => (
+                        <SelectItem key={code} value={code}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FieldContent>
               </Field>
 
@@ -501,13 +562,14 @@ export default function NoInventoryReportPage() {
                 <TableHead>Origin</TableHead>
                 <TableHead>Placement</TableHead>
                 <TableHead>Keyword</TableHead>
+                <TableHead>Country</TableHead>
                 <TableHead className="text-right">Blocked Reports</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell colSpan={5} className="h-24 text-center">
                     No inventory reports found.
                   </TableCell>
                 </TableRow>
@@ -521,6 +583,7 @@ export default function NoInventoryReportPage() {
                         {item.keyword}
                       </code>
                     </TableCell>
+                    <TableCell>{COUNTRIES[item.country]}</TableCell>
                     <TableCell className="text-right">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
                         {item.blockedReports}

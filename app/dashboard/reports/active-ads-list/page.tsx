@@ -38,6 +38,7 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { PLACEMENTS, getPlacementLabel, type PlacementSlug } from '@/lib/constants/placements'
+import { COUNTRIES } from '@/lib/constants/countries'
 
 type ActiveAd = {
   id: string
@@ -46,6 +47,7 @@ type ActiveAd = {
   position: PlacementSlug
   title: string
   nickname: string
+  country: keyof typeof COUNTRIES
   impressions: number
   clicks: number
   avgCpc: number
@@ -68,6 +70,7 @@ const mockData: ActiveAd[] = [
     position: 'redirect',
     title: 'Best Remote Jobs 2024',
     nickname: 'google-remote-jobs',
+    country: 'US' as keyof typeof COUNTRIES,
     impressions: 125000,
     clicks: 3125,
     avgCpc: 2.45,
@@ -87,6 +90,7 @@ const mockData: ActiveAd[] = [
     position: 'serp-top',
     title: 'Hiring Now - Tech Jobs',
     nickname: 'indeed-tech-jobs',
+    country: 'CA' as keyof typeof COUNTRIES,
     impressions: 98000,
     clicks: 2450,
     avgCpc: 1.85,
@@ -106,6 +110,7 @@ const mockData: ActiveAd[] = [
     position: 'serp-mid',
     title: 'Premium Job Listings',
     nickname: 'linkedin-premium',
+    country: 'GB' as keyof typeof COUNTRIES,
     impressions: 76000,
     clicks: 1824,
     avgCpc: 3.20,
@@ -125,6 +130,7 @@ const mockData: ActiveAd[] = [
     position: 'return',
     title: 'Find Your Dream Job',
     nickname: 'monster-dream-job',
+    country: 'US' as keyof typeof COUNTRIES,
     impressions: 65000,
     clicks: 1625,
     avgCpc: 1.65,
@@ -144,6 +150,7 @@ const mockData: ActiveAd[] = [
     position: 'bb',
     title: 'Top Remote Opportunities',
     nickname: 'cb-remote',
+    country: 'IN' as keyof typeof COUNTRIES,
     impressions: 54000,
     clicks: 1350,
     avgCpc: 2.10,
@@ -163,6 +170,7 @@ const mockData: ActiveAd[] = [
     position: 'flow',
     title: 'Apply with One Click',
     nickname: 'zip-one-click',
+    country: 'ZA' as keyof typeof COUNTRIES,
     impressions: 89000,
     clicks: 2225,
     avgCpc: 2.75,
@@ -182,6 +190,7 @@ const mockData: ActiveAd[] = [
     position: 'pec',
     title: 'Salary & Company Reviews',
     nickname: 'glassdoor-reviews',
+    country: 'FR' as keyof typeof COUNTRIES,
     impressions: 72000,
     clicks: 1800,
     avgCpc: 2.30,
@@ -201,6 +210,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-1',
     title: 'Tech & IT Jobs',
     nickname: 'dice-tech',
+    country: 'DE' as keyof typeof COUNTRIES,
     impressions: 61000,
     clicks: 1525,
     avgCpc: 2.90,
@@ -220,6 +230,7 @@ const mockData: ActiveAd[] = [
     position: 'serp-bottom',
     title: 'Local Job Search',
     nickname: 'simplyhired-local',
+    country: 'US' as keyof typeof COUNTRIES,
     impressions: 48000,
     clicks: 1200,
     avgCpc: 1.95,
@@ -239,6 +250,7 @@ const mockData: ActiveAd[] = [
     position: 'path',
     title: 'Hourly Jobs Near You',
     nickname: 'snagajob-hourly',
+    country: 'CA' as keyof typeof COUNTRIES,
     impressions: 57000,
     clicks: 1425,
     avgCpc: 1.75,
@@ -258,6 +270,7 @@ const mockData: ActiveAd[] = [
     position: 'return-2',
     title: 'Millions of Jobs',
     nickname: 'adzuna-millions',
+    country: 'GB' as keyof typeof COUNTRIES,
     impressions: 69000,
     clicks: 1725,
     avgCpc: 2.25,
@@ -277,6 +290,7 @@ const mockData: ActiveAd[] = [
     position: 'flow-2',
     title: 'Non-Profit Careers',
     nickname: 'idealist-nonprofit',
+    country: 'IN' as keyof typeof COUNTRIES,
     impressions: 42000,
     clicks: 1050,
     avgCpc: 1.85,
@@ -296,6 +310,7 @@ const mockData: ActiveAd[] = [
     position: 'medicare',
     title: 'Government Positions',
     nickname: 'usajobs-gov',
+    country: 'ZA' as keyof typeof COUNTRIES,
     impressions: 78000,
     clicks: 1950,
     avgCpc: 2.60,
@@ -315,6 +330,7 @@ const mockData: ActiveAd[] = [
     position: 'blur',
     title: 'Remote-First Companies',
     nickname: 'remoteco-first',
+    country: 'FR' as keyof typeof COUNTRIES,
     impressions: 55000,
     clicks: 1375,
     avgCpc: 2.40,
@@ -334,6 +350,7 @@ const mockData: ActiveAd[] = [
     position: 'listical',
     title: 'Remote Jobs',
     nickname: 'wwr-remote',
+    country: 'DE' as keyof typeof COUNTRIES,
     impressions: 63000,
     clicks: 1575,
     avgCpc: 2.80,
@@ -353,6 +370,7 @@ const mockData: ActiveAd[] = [
     position: 'internal-email',
     title: 'Flexible Remote Work',
     nickname: 'flexjobs-flexible',
+    country: 'US' as keyof typeof COUNTRIES,
     impressions: 44000,
     clicks: 1100,
     avgCpc: 2.15,
@@ -372,6 +390,7 @@ const mockData: ActiveAd[] = [
     title: 'Startup Jobs',
     nickname: 'angellist-startup',
     position: 'pec-2' as PlacementSlug,
+    country: 'CA' as keyof typeof COUNTRIES,
     impressions: 67000,
     clicks: 1675,
     avgCpc: 3.10,
@@ -391,6 +410,7 @@ const mockData: ActiveAd[] = [
     position: 'pec-return',
     title: 'Tech Startup Careers',
     nickname: 'wellfound-startup',
+    country: 'GB' as keyof typeof COUNTRIES,
     impressions: 59000,
     clicks: 1475,
     avgCpc: 2.95,
@@ -410,6 +430,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-2',
     title: 'Tech Job Matching',
     nickname: 'hired-matching',
+    country: 'IN' as keyof typeof COUNTRIES,
     impressions: 71000,
     clicks: 1775,
     avgCpc: 3.05,
@@ -429,6 +450,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-3',
     title: 'Job Search Engine',
     nickname: 'talent-engine',
+    country: 'ZA' as keyof typeof COUNTRIES,
     impressions: 52000,
     clicks: 1300,
     avgCpc: 2.20,
@@ -448,6 +470,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-4',
     title: 'Find Jobs Fast',
     nickname: 'jobrapido-fast',
+    country: 'FR' as keyof typeof COUNTRIES,
     impressions: 46000,
     clicks: 1150,
     avgCpc: 1.90,
@@ -467,6 +490,7 @@ const mockData: ActiveAd[] = [
     position: 'serp-offer',
     title: 'Job Aggregator',
     nickname: 'jooble-aggregator',
+    country: 'DE' as keyof typeof COUNTRIES,
     impressions: 64000,
     clicks: 1600,
     avgCpc: 2.55,
@@ -486,6 +510,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-5',
     title: 'Career Resources',
     nickname: 'chron-career',
+    country: 'US' as keyof typeof COUNTRIES,
     impressions: 39000,
     clicks: 975,
     avgCpc: 2.05,
@@ -505,6 +530,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-6',
     title: 'Company Culture Jobs',
     nickname: 'muse-culture',
+    country: 'CA' as keyof typeof COUNTRIES,
     impressions: 51000,
     clicks: 1275,
     avgCpc: 2.65,
@@ -524,6 +550,7 @@ const mockData: ActiveAd[] = [
     position: 'offer-7',
     title: 'Verified Job Listings',
     nickname: 'linkup-verified',
+    country: 'GB' as keyof typeof COUNTRIES,
     impressions: 58000,
     clicks: 1450,
     avgCpc: 2.45,
@@ -549,6 +576,7 @@ export default function ActiveAdsListPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
@@ -561,7 +589,9 @@ export default function ActiveAdsListPage() {
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.nickname.toLowerCase().includes(searchQuery.toLowerCase())
 
-    return matchesSearch
+    const matchesCountry = selectedCountry === 'all' || item.country === selectedCountry
+
+    return matchesSearch && matchesCountry
   })
 
   // Pagination
@@ -570,10 +600,10 @@ export default function ActiveAdsListPage() {
   const endIndex = startIndex + itemsPerPage
   const paginatedData = filteredData.slice(startIndex, endIndex)
 
-  // Reset to page 1 when search query or items per page changes
+  // Reset to page 1 when search query, items per page, or country changes
   React.useEffect(() => {
     setCurrentPage(1)
-  }, [searchQuery, itemsPerPage])
+  }, [searchQuery, itemsPerPage, selectedCountry])
 
   // Handle items per page change
   const handleItemsPerPageChange = (value: string) => {
@@ -594,6 +624,7 @@ export default function ActiveAdsListPage() {
       'Position',
       'Title',
       'Nickname',
+      'Country',
       'Impressions',
       'Clicks',
       'Avg CPC',
@@ -611,6 +642,7 @@ export default function ActiveAdsListPage() {
       getPlacementLabel(item.position),
       item.title,
       item.nickname,
+      COUNTRIES[item.country],
       item.impressions.toString(),
       item.clicks.toString(),
       item.avgCpc.toFixed(2),
@@ -696,6 +728,26 @@ export default function ActiveAdsListPage() {
                       className="pl-9"
                     />
                   </div>
+                </FieldContent>
+              </Field>
+
+              {/* Country Filter */}
+              <Field className="sm:w-[180px]">
+                <FieldLabel>Country</FieldLabel>
+                <FieldContent>
+                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Countries</SelectItem>
+                      {Object.entries(COUNTRIES).map(([code, name]) => (
+                        <SelectItem key={code} value={code}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FieldContent>
               </Field>
 
@@ -789,6 +841,7 @@ export default function ActiveAdsListPage() {
                   <TableHead>Position</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead>Nickname</TableHead>
+                  <TableHead>Country</TableHead>
                   <TableHead className="text-right">Impressions</TableHead>
                   <TableHead className="text-right">Clicks</TableHead>
                   <TableHead className="text-right">Avg CPC</TableHead>
@@ -805,7 +858,7 @@ export default function ActiveAdsListPage() {
               <TableBody>
                 {filteredData.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={15} className="h-24 text-center">
+                    <TableCell colSpan={16} className="h-24 text-center">
                       No active ads found.
                     </TableCell>
                   </TableRow>
@@ -824,6 +877,7 @@ export default function ActiveAdsListPage() {
                           {item.nickname}
                         </code>
                       </TableCell>
+                      <TableCell>{COUNTRIES[item.country]}</TableCell>
                       <TableCell className="text-right">{formatNumber(item.impressions)}</TableCell>
                       <TableCell className="text-right">{formatNumber(item.clicks)}</TableCell>
                       <TableCell className="text-right">{formatCurrency(item.avgCpc)}</TableCell>
