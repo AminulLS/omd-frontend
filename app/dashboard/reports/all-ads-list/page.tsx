@@ -259,8 +259,8 @@ export default function AllAdsListPage() {
           <CardTitle>All Ads List</CardTitle>
           <CardDescription>View and manage all ads across different positions</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
+        <CardContent className="max-h-[calc(100vh-240px)] overflow-hidden">
+          <div className="flex gap-4 h-full">
             {/* Left Sidebar - Ad Positions */}
             <div className="w-64 flex-shrink-0 border-r pr-4 flex flex-col">
               <h3 className="font-semibold mb-4 text-sm">Ad Positions</h3>
@@ -276,7 +276,7 @@ export default function AllAdsListPage() {
                 />
               </div>
 
-              <nav className="space-y-1 overflow-y-auto flex-1" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+              <nav className="space-y-1 overflow-y-auto flex-1 min-h-0">
                 <button
                   onClick={() => setSelectedPosition(null)}
                   className={cn(
@@ -323,7 +323,7 @@ export default function AllAdsListPage() {
             </div>
 
             {/* Right Side - Table */}
-            <div className="flex-1">
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
               {/* Search and Export */}
               <FieldGroup className="mb-4">
                 <div className="flex gap-3">
@@ -362,9 +362,10 @@ export default function AllAdsListPage() {
                 </div>
               </FieldGroup>
 
-              {/* Table */}
-              <Table>
-                <TableHeader>
+              {/* Table Container */}
+              <div className="flex-1 overflow-y-auto min-h-0">
+                <Table>
+                  <TableHeader>
                   <TableRow>
                     <TableHead>Partner</TableHead>
                     <TableHead>Title</TableHead>
@@ -406,6 +407,7 @@ export default function AllAdsListPage() {
                   )}
                 </TableBody>
               </Table>
+              </div>
 
               {/* Pagination */}
               {filteredAds.length > 0 && (
