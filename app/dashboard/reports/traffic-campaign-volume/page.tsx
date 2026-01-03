@@ -42,36 +42,32 @@ type TrafficCampaignVolumeData = {
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
 
+// Deterministic pseudo-random number generator
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed) * 10000
+  return x - Math.floor(x)
+}
+
 // Helper to generate mock traffic campaign volume data
 const generateMockData = (count: number): TrafficCampaignVolumeData[] => {
-  // Generate traffic names (alpha-num 4 chars)
-  const trafficNames: string[] = []
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  for (let i = 0; i < 100; i++) {
-    let name = ''
-    for (let j = 0; j < 4; j++) {
-      name += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    trafficNames.push(name)
-  }
-
   const countries: (keyof typeof COUNTRIES)[] = ['US', 'CA', 'GB', 'DE', 'FR', 'IN', 'ZA', 'AU', 'JP', 'BR']
-
-  // Deterministic pseudo-random number generator
-  const seededRandom = (seed: number) => {
-    const x = Math.sin(seed) * 10000
-    return x - Math.floor(x)
-  }
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
   const data: TrafficCampaignVolumeData[] = []
 
-  trafficNames.forEach((trafficName, nameIndex) => {
-    const country = countries[nameIndex % countries.length]
-    const seed = trafficName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  for (let i = 0; i < count; i++) {
+    // Generate traffic name deterministically using seeded random
+    let trafficName = ''
+    for (let j = 0; j < 4; j++) {
+      const randomValue = seededRandom(i * 4 + j)
+      trafficName += chars.charAt(Math.floor(randomValue * chars.length))
+    }
 
-    const todayClicks = Math.floor(seededRandom(seed + 1) * 5000) + 500
-    const sdlwClicks = Math.floor(seededRandom(seed + 2) * 5000) + 500
-    const yesterdayClicks = Math.floor(seededRandom(seed + 3) * 5000) + 500
+    const country = countries[i % countries.length]
+
+    const todayClicks = Math.floor(seededRandom(i * 10 + 1) * 5000) + 500
+    const sdlwClicks = Math.floor(seededRandom(i * 10 + 2) * 5000) + 500
+    const yesterdayClicks = Math.floor(seededRandom(i * 10 + 3) * 5000) + 500
 
     data.push({
       id: `${trafficName}-${country}`,
@@ -81,9 +77,9 @@ const generateMockData = (count: number): TrafficCampaignVolumeData[] => {
       sdlwClicks,
       yesterdayClicks,
     })
-  })
+  }
 
-  return data.slice(0, count)
+  return data
 }
 
 const mockData: TrafficCampaignVolumeData[] = generateMockData(100)
