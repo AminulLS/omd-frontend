@@ -121,7 +121,8 @@ const emptyForm: FormData = {
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
 
 export default function PartnersPage() {
-  const [partners, setPartners] = useState<Partner[]>(initialPartners)
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null)
   const [formData, setFormData] = useState<FormData>(emptyForm)
@@ -260,6 +261,14 @@ export default function PartnersPage() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const paginatedPartners = partners.slice(startIndex, endIndex)
+
+  // Initialize partners data on mount to ensure consistency
+  useEffect(() => {
+    if (!isInitialized) {
+      setPartners(initialPartners)
+      setIsInitialized(true)
+    }
+  }, [isInitialized])
 
   // Reset to page 1 when items per page changes
   useEffect(() => {
