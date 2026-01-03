@@ -27,7 +27,6 @@ export function HourlyChart({
             _ckf: d.key,
         }
     })
-    console.log(chartData)
     return (
         <ChartContainer
             config={config}

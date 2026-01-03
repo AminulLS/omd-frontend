@@ -44,9 +44,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { MoreVerticalIcon, PlusIcon } from 'lucide-react'
+import { MoreVerticalIcon, PlusIcon, TrashIcon, UserIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -54,6 +67,15 @@ type PartnerStatus = 'active' | 'inactive' | 'pending' | 'suspended'
 type PartnerType = 'internal' | 'external'
 
 type ProductType = 'sponsored-ads' | 'xml-direct-listing' | 'publisher' | 'syndication'
+
+type UserRole = 'main_user' | 'manager'
+
+type User = {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
 
 type Partner = {
   id: string
@@ -63,9 +85,23 @@ type Partner = {
   email: string
   phone: string
   created_at: string
-  number_users: number
+  users: User[]
   products: ProductType[]
 }
+
+// Predefined list of users available to be assigned to partners
+const availableUsers: User[] = [
+  { id: 'u1', name: 'John Smith', email: 'john@company.com', role: 'main_user' },
+  { id: 'u2', name: 'Sarah Johnson', email: 'sarah@company.com', role: 'main_user' },
+  { id: 'u3', name: 'Mike Chen', email: 'mike@company.com', role: 'main_user' },
+  { id: 'u4', name: 'Lisa Park', email: 'lisa@company.com', role: 'main_user' },
+  { id: 'u5', name: 'Tom Wilson', email: 'tom@company.com', role: 'main_user' },
+  { id: 'u6', name: 'Emily Davis', email: 'emily@company.com', role: 'manager' },
+  { id: 'u7', name: 'Alex Brown', email: 'alex@company.com', role: 'manager' },
+  { id: 'u8', name: 'Jessica Lee', email: 'jessica@company.com', role: 'manager' },
+  { id: 'u9', name: 'David Kim', email: 'david@company.com', role: 'manager' },
+  { id: 'u10', name: 'Rachel Green', email: 'rachel@company.com', role: 'manager' },
+]
 
 const initialPartners: Partner[] = [
   {
@@ -76,7 +112,7 @@ const initialPartners: Partner[] = [
     email: 'contact@techglobal.com',
     phone: '+1 (555) 123-4567',
     created_at: '2024-01-15',
-    number_users: 1240,
+    users: [{ ...availableUsers[0], role: 'main_user' }, { ...availableUsers[5], role: 'manager' }],
     products: ['sponsored-ads', 'xml-direct-listing'],
   },
   {
@@ -87,7 +123,7 @@ const initialPartners: Partner[] = [
     email: 'partners@mediaflow.io',
     phone: '+1 (555) 234-5678',
     created_at: '2024-02-20',
-    number_users: 856,
+    users: [{ ...availableUsers[1], role: 'main_user' }, { ...availableUsers[6], role: 'manager' }],
     products: ['publisher', 'syndication'],
   },
   {
@@ -98,7 +134,7 @@ const initialPartners: Partner[] = [
     email: 'info@adnetworkpro.com',
     phone: '+1 (555) 345-6789',
     created_at: '2024-03-10',
-    number_users: 2341,
+    users: [{ ...availableUsers[2], role: 'main_user' }, { ...availableUsers[7], role: 'manager' }, { ...availableUsers[8], role: 'manager' }],
     products: ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'],
   },
   {
@@ -109,7 +145,7 @@ const initialPartners: Partner[] = [
     email: 'hello@digitalreach.co',
     phone: '+1 (555) 456-7890',
     created_at: '2024-06-05',
-    number_users: 0,
+    users: [],
     products: ['sponsored-ads'],
   },
   {
@@ -120,7 +156,7 @@ const initialPartners: Partner[] = [
     email: 'team@publisherhub.net',
     phone: '+1 (555) 567-8901',
     created_at: '2023-11-28',
-    number_users: 423,
+    users: [],
     products: ['publisher', 'syndication'],
   },
   {
@@ -131,7 +167,7 @@ const initialPartners: Partner[] = [
     email: 'team@internal.company',
     phone: '+1 (555) 678-9012',
     created_at: '2024-04-12',
-    number_users: 1567,
+    users: [],
     products: ['xml-direct-listing', 'syndication'],
   },
   {
@@ -142,7 +178,7 @@ const initialPartners: Partner[] = [
     email: 'support@globaladsmedia.com',
     phone: '+1 (555) 789-0123',
     created_at: '2023-12-01',
-    number_users: 89,
+    users: [],
     products: ['sponsored-ads', 'xml-direct-listing'],
   },
   {
@@ -153,7 +189,7 @@ const initialPartners: Partner[] = [
     email: 'business@contentstream.ai',
     phone: '+1 (555) 890-1234',
     created_at: '2024-05-18',
-    number_users: 678,
+    users: [],
     products: ['publisher', 'syndication', 'xml-direct-listing'],
   },
 ]
@@ -197,7 +233,7 @@ type FormData = {
   status: PartnerStatus
   email: string
   phone: string
-  number_users: string
+  users: User[]
   products: ProductType[]
 }
 
@@ -207,7 +243,7 @@ const emptyForm: FormData = {
   status: 'active',
   email: '',
   phone: '',
-  number_users: '0',
+  users: [],
   products: [],
 }
 
@@ -217,6 +253,7 @@ export default function PartnersPage() {
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null)
   const [formData, setFormData] = useState<FormData>(emptyForm)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [userSearchQuery, setUserSearchQuery] = useState('')
 
   const handleEdit = (partner: Partner) => {
     setEditingPartner(partner)
@@ -226,7 +263,7 @@ export default function PartnersPage() {
       status: partner.status,
       email: partner.email,
       phone: partner.phone,
-      number_users: partner.number_users.toString(),
+      users: partner.users,
       products: partner.products,
     })
     setSheetOpen(true)
@@ -235,6 +272,7 @@ export default function PartnersPage() {
   const handleAdd = () => {
     setEditingPartner(null)
     setFormData({ ...emptyForm })
+    setUserSearchQuery('')
     setSheetOpen(true)
   }
 
@@ -261,7 +299,7 @@ export default function PartnersPage() {
               status: formData.status,
               email: formData.email,
               phone: formData.phone,
-              number_users: parseInt(formData.number_users) || 0,
+              users: formData.users,
               products: formData.products,
             }
           : p
@@ -276,7 +314,7 @@ export default function PartnersPage() {
         email: formData.email,
         phone: formData.phone,
         created_at: new Date().toISOString().split('T')[0],
-        number_users: parseInt(formData.number_users) || 0,
+        users: formData.users,
         products: formData.products,
       }
       setPartners([...partners, newPartner])
@@ -293,6 +331,53 @@ export default function PartnersPage() {
         ? prev.products.filter(p => p !== product)
         : [...prev.products, product],
     }))
+  }
+
+  const addUser = (userId: string) => {
+    const selectedUser = availableUsers.find(u => u.id === userId)
+    if (!selectedUser) return
+
+    // Check if user is already added
+    if (formData.users.some(u => u.id === userId)) return
+
+    const defaultRole: UserRole = formData.users.length === 0 ? 'main_user' : 'manager'
+    const newUser: User = {
+      ...selectedUser,
+      role: defaultRole,
+    }
+    setFormData(prev => ({
+      ...prev,
+      users: [...prev.users, newUser],
+    }))
+  }
+
+  const getAvailableUsersToAdd = () => {
+    const assignedUserIds = formData.users.map(u => u.id)
+    return availableUsers.filter(u => !assignedUserIds.includes(u.id))
+  }
+
+  const removeUser = (userId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      users: prev.users.filter(u => u.id !== userId),
+    }))
+  }
+
+  const updateUser = (userId: string, field: keyof User, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      users: prev.users.map(u =>
+        u.id === userId ? { ...u, [field]: value } : u
+      ),
+    }))
+  }
+
+  const getMainUser = (users: User[]) => {
+    return users.find(u => u.role === 'main_user')
+  }
+
+  const getManagerCount = (users: User[]) => {
+    return users.filter(u => u.role === 'manager').length
   }
 
   return (
@@ -393,14 +478,92 @@ export default function PartnersPage() {
                   </Field>
 
                   <Field>
-                    <FieldLabel>Number of Users</FieldLabel>
+                    <FieldLabel>Users</FieldLabel>
                     <FieldContent>
-                      <Input
-                        type="number"
-                        value={formData.number_users}
-                        onChange={e => setFormData({ ...formData, number_users: e.target.value })}
-                        placeholder="0"
-                      />
+                      <div className="space-y-2">
+                        {formData.users.length === 0 ? (
+                          <div className="text-sm text-muted-foreground p-3 border rounded-md border-dashed flex items-center justify-center gap-2">
+                            <UserIcon className="size-4" />
+                            No users added yet
+                          </div>
+                        ) : (
+                          formData.users.map((user) => (
+                            <div key={user.id} className="flex items-center gap-2 p-3 border rounded-md bg-muted/20">
+                              <div className="flex-1">
+                                <div className="font-medium text-sm">{user.name}</div>
+                                <div className="text-xs text-muted-foreground">{user.email}</div>
+                              </div>
+                              <Select
+                                value={user.role}
+                                onValueChange={(value: UserRole) => updateUser(user.id, 'role', value)}
+                              >
+                                <SelectTrigger className="h-8 w-[120px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="main_user">Main User</SelectItem>
+                                  <SelectItem value="manager">Manager</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => removeUser(user.id)}
+                              >
+                                <TrashIcon className="size-4" />
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                        {getAvailableUsersToAdd().length > 0 ? (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="w-full justify-start">
+                                <SearchIcon className="size-4 mr-2" />
+                                Add a user...
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0" align="start">
+                              <Command>
+                                <CommandInput
+                                  placeholder="Search users..."
+                                  value={userSearchQuery}
+                                  onValueChange={setUserSearchQuery}
+                                />
+                                <CommandList>
+                                  <CommandEmpty>No users found.</CommandEmpty>
+                                  <CommandGroup>
+                                    {getAvailableUsersToAdd()
+                                      .filter(user =>
+                                        user.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
+                                        user.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+                                      )
+                                      .map((user) => (
+                                        <CommandItem
+                                          key={user.id}
+                                          value={user.id}
+                                          onSelect={() => {
+                                            addUser(user.id)
+                                            setUserSearchQuery('')
+                                          }}
+                                        >
+                                          <UserIcon className="size-3 mr-2" />
+                                          <span>{user.name}</span>
+                                          <span className="text-muted-foreground text-xs ml-2">({user.email})</span>
+                                        </CommandItem>
+                                      ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        ) : (
+                          <div className="text-sm text-muted-foreground text-center py-2">
+                            All users have been added
+                          </div>
+                        )}
+                      </div>
                     </FieldContent>
                   </Field>
 
@@ -470,7 +633,26 @@ export default function PartnersPage() {
                   </TableCell>
                   <TableCell>{partner.email}</TableCell>
                   <TableCell>{partner.phone}</TableCell>
-                  <TableCell>{partner.number_users.toLocaleString()}</TableCell>
+                  <TableCell>
+                    {partner.users.length === 0 ? (
+                      <span className="text-muted-foreground text-sm">No users</span>
+                    ) : (
+                      <div className="space-y-1">
+                        {getMainUser(partner.users) && (
+                          <div className="flex items-center gap-1 text-sm">
+                            <UserIcon className="size-3 text-muted-foreground" />
+                            <span className="font-medium">{getMainUser(partner.users)?.name}</span>
+                            <Badge variant="secondary" className="text-[10px] px-1">Main</Badge>
+                          </div>
+                        )}
+                        {getManagerCount(partner.users) > 0 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{getManagerCount(partner.users)} manager{getManagerCount(partner.users) > 1 ? 's' : ''}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1 flex-wrap">
                       {partner.products.map((product) => (
