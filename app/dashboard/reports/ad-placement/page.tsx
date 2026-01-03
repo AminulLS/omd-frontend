@@ -313,7 +313,7 @@ function PlacementTable({
         <div className="mb-4">
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>
-        <div className="rounded-md border p-8 text-center text-muted-foreground">
+        <div className="border p-8 text-center text-muted-foreground">
           No results found for this placement.
         </div>
       </div>
@@ -359,7 +359,7 @@ function PlacementTable({
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="border">
         <Table>
           <TableHeader>
             <TableRow>
