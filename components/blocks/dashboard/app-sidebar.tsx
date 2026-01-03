@@ -4,7 +4,7 @@ import * as React from 'react'
 import {
     ChartNoAxesCombined,
     Handshake,
-    HatGlasses,
+    HatGlasses, Logs,
     Newspaper,
     Rss,
     Settings,
@@ -122,6 +122,11 @@ const data = {
             title: 'ACLs',
             url: '/dashboard/acls',
             icon: HatGlasses,
+        },
+        {
+            title: 'Audit Logs',
+            url: '/dashboard/audit-logs',
+            icon: Logs,
         },
         {
             title: 'Settings',
