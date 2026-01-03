@@ -307,27 +307,16 @@ function PlacementTable({
     return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
   }
 
-  if (tableData.length === 0) {
-    return (
-      <div className="mb-8">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-        </div>
-        <div className="border p-8 text-center text-muted-foreground">
-          No results found for this placement.
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="mb-8">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">{title}</h3>
-          <p className="text-sm text-muted-foreground">
-            {startIndex + 1}-{Math.min(endIndex, tableData.length)} of {tableData.length} results
-          </p>
+          {tableData.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {startIndex + 1}-{Math.min(endIndex, tableData.length)} of {tableData.length} results
+            </p>
+          )}
         </div>
       </div>
 
@@ -347,16 +336,18 @@ function PlacementTable({
           </FieldContent>
         </Field>
 
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" type="button" onClick={downloadCSV}>
-            <FileDownIcon className="size-4 mr-2" />
-            CSV
-          </Button>
-          <Button variant="outline" size="sm" type="button" onClick={copyToClipboard}>
-            <CopyIcon className="size-4 mr-2" />
-            Copy
-          </Button>
-        </div>
+        {tableData.length > 0 && (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" type="button" onClick={downloadCSV}>
+              <FileDownIcon className="size-4 mr-2" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" type="button" onClick={copyToClipboard}>
+              <CopyIcon className="size-4 mr-2" />
+              Copy
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="border">
@@ -381,7 +372,14 @@ function PlacementTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map((item) => (
+            {paginatedData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={15} className="text-center text-muted-foreground">
+                  No results found
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedData.map((item) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">
                   <Link href={`/dashboard/partners/${item.partnerId}`} className="hover:underline">
@@ -415,7 +413,8 @@ function PlacementTable({
                   </span>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -510,6 +509,29 @@ export default function AdPlacementPage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [selectedTab, setSelectedTab] = useState<string>('all')
+
+  // Calculate counts for each placement based on country filter
+  const placementCounts = React.useMemo(() => {
+    const counts: Record<string, number> = {}
+
+    // Count for each placement
+    PLACEMENT_TABS.forEach((tab) => {
+      if (tab.value === 'all') {
+        // Count all items across all placements
+        counts.all = mockData.filter((item) =>
+          selectedCountry === 'all' || item.country === selectedCountry
+        ).length
+      } else {
+        // Count for specific placement
+        counts[tab.value] = mockData.filter((item) =>
+          item.placement === tab.value &&
+          (selectedCountry === 'all' || item.country === selectedCountry)
+        ).length
+      }
+    })
+
+    return counts
+  }, [selectedCountry])
 
   const formatDateRange = () => {
     if (!dateRange?.from) return 'Select range'
@@ -617,7 +639,7 @@ export default function AdPlacementPage() {
             <TabsList variant="line">
               {PLACEMENT_TABS.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
+                  {tab.label} <span className="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-muted text-xs font-medium">{placementCounts[tab.value] || 0}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
