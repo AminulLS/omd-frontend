@@ -90,8 +90,8 @@ const data = {
                     url: '/dashboard/reports/ad-placement',
                 },
                 {
-                    title: 'Source Block',
-                    url: '/dashboard/reports/source-block',
+                    title: 'Ad Source Block',
+                    url: '/dashboard/reports/ad-source-block',
                 },
                 {
                     title: 'Source Placement',
