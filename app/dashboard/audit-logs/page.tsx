@@ -1,41 +1,22 @@
-"use client"
+'use client'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  EyeIcon,
-  FilterIcon,
-  SearchIcon,
-  ShieldAlertIcon,
-  UserIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    EyeIcon,
+    FilterIcon,
+    SearchIcon,
+    ShieldAlertIcon,
+    UserIcon,
+    XIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -611,22 +592,36 @@ export default function AuditLogsPage() {
       </Card>
 
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0" showCloseButton={false}>
           {selectedLog && (
             <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center justify-between">
-                  <span>Audit Log Details</span>
+              {/* Fixed header with close button */}
+              <div className="flex items-center justify-between border-b px-6 py-4 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div>
+                    <DialogTitle className="text-base font-semibold">
+                      Audit Log Details
+                    </DialogTitle>
+                    <DialogDescription className="mt-0.5">
+                      {eventLabelMap[selectedLog.event_type]} - {selectedLog.id}
+                    </DialogDescription>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <Badge variant={levelVariantMap[selectedLog.level]}>
                     {levelLabelMap[selectedLog.level]}
                   </Badge>
-                </DialogTitle>
-                <DialogDescription>
-                  {eventLabelMap[selectedLog.event_type]} - {selectedLog.id}
-                </DialogDescription>
-              </DialogHeader>
+                  <DialogClose asChild>
+                    <Button variant="ghost" size="icon" className="shrink-0">
+                      <XIcon className="size-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  </DialogClose>
+                </div>
+              </div>
 
-              <div className="space-y-4">
+              {/* Scrollable content */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
                 {/* Timestamp */}
                 <div>
                   <div className="text-sm font-medium mb-1">Timestamp</div>
@@ -770,12 +765,6 @@ export default function AuditLogsPage() {
                   </div>
                 )}
               </div>
-
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
-                  Close
-                </Button>
-              </DialogFooter>
             </>
           )}
         </DialogContent>
