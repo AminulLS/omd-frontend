@@ -66,7 +66,7 @@ export const PLACEMENTS: readonly Placement[] = [
   { label: 'Offer 2', slug: 'offer-2' },
   { label: 'Offer 3', slug: 'offer-3' },
   { label: 'Offer 4', slug: 'offer-4' },
-  { label: 'SERP offer', slug: 'serp-offer' },
+  { label: 'SERP Offer', slug: 'serp-offer' },
   { label: 'Offer 6', slug: 'offer-6' },
   { label: 'Offer 5', slug: 'offer-5' },
   { label: 'Offer 7', slug: 'offer-7' },
