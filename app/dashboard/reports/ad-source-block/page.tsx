@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
+import { Field, FieldContent } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -446,12 +446,12 @@ export default function AdSourceBlockPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Ad Source Block</CardTitle>
-          <CardDescription>View source blocking information by placement type</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">Ad Source Block</h2>
+          <p className="text-sm text-muted-foreground">View source blocking information by placement type</p>
+        </div>
+        <div>
           {/* Tabs */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab}>
             <TabsList variant="line">
@@ -486,8 +486,8 @@ export default function AdSourceBlockPage() {
               )}
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

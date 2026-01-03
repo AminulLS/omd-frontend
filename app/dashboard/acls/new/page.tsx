@@ -105,18 +105,18 @@ export default function NewRolePage() {
   return (
     <div className="flex flex-col gap-y-4">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 border-b pb-2">
         <Link href="/dashboard/acls">
           <Button variant="ghost" size="icon">
             <ArrowLeftIcon className="size-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldIcon className="size-6" />
+          <h1 className="text-lg font-semibold flex items-center gap-2">
+            <ShieldIcon className="size-4" />
             Create New Role
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Configure a new role with specific permissions
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function NewRolePage() {
         <CardContent>
           <div className="space-y-6">
             {permissionGroups.map(group => (
-              <div key={group.category} className="border rounded-lg p-4">
+              <div key={group.category} className="border p-4">
                 <div className="mb-3">
                   <div className="text-sm font-medium">{group.label}</div>
                   <div className="text-xs text-muted-foreground">{group.description}</div>
@@ -208,7 +208,7 @@ export default function NewRolePage() {
                   {group.permissions.map(permission => (
                     <div
                       key={permission}
-                      className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer ${
+                      className={`flex items-center justify-between p-3 border transition-colors cursor-pointer ${
                         formData.permissions.includes(permission)
                           ? 'bg-primary/10 border-primary'
                           : 'hover:bg-muted/50'

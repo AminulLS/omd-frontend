@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -706,12 +705,12 @@ export default function ActiveAdsListPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Ads List</CardTitle>
-          <CardDescription>View performance metrics for all active ads</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">Active Ads List</h2>
+          <p className="text-sm text-muted-foreground">View performance metrics for all active ads</p>
+        </div>
+        <div>
           {/* Filters */}
           <FieldGroup className="mb-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -833,7 +832,7 @@ export default function ActiveAdsListPage() {
           </FieldGroup>
 
           {/* Table */}
-          <div className="rounded-md border">
+          <div className="border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -984,8 +983,8 @@ export default function ActiveAdsListPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

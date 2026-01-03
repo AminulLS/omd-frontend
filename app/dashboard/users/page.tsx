@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -273,14 +272,13 @@ export default function UsersPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Users</CardTitle>
-              <CardDescription>Manage all user accounts and their access</CardDescription>
-            </div>
-            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <div>
+        <div className="flex items-center justify-between mb-4 border-b pb-2">
+          <div>
+            <h2 className="text-lg font-semibold">Users</h2>
+            <p className="text-sm text-muted-foreground">Manage all user accounts and their access</p>
+          </div>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button size="sm" onClick={handleAdd}>
                   <PlusIcon className="size-4" />
@@ -531,8 +529,7 @@ export default function UsersPage() {
               </SheetContent>
             </Sheet>
           </div>
-        </CardHeader>
-        <CardContent>
+        <div>
           {/* Filters */}
           <FieldGroup className="mb-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -596,148 +593,150 @@ export default function UsersPage() {
           </FieldGroup>
 
           {/* Table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Partners</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
+          <div className="border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
-                    Loading users...
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Location</TableHead>
+                  <TableHead>Partners</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
-              ) : filteredUsers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center">
-                    No users found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">
-                      <Link href={`/dashboard/users/${user.id}`} className="hover:underline">
-                        <div className="flex items-center gap-2">
-                          <UserIcon className="size-4 text-muted-foreground" />
-                          {user.name}
-                        </div>
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <MailIcon className="size-3 text-muted-foreground" />
-                        {user.email}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={statusVariantMap[user.status]}>
-                        {statusLabelMap[user.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={roleVariantMap[user.role]}>
-                        <div className="flex items-center gap-1">
-                          <ShieldIcon className="size-3" />
-                          {roleLabelMap[user.role]}
-                        </div>
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <BuildingIcon className="size-3 text-muted-foreground" />
-                        {user.profile.department}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <MapPinIcon className="size-3 text-muted-foreground" />
-                        {user.profile.location}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {user.partners.length === 0 ? (
-                        <span className="text-muted-foreground text-sm">No partners</span>
-                      ) : (
-                        <div className="flex gap-1 flex-wrap">
-                          {user.partners.slice(0, 2).map((partner) => (
-                            <Badge key={partner.partnerId} variant="outline" className="text-[10px]">
-                              {partner.partnerName}
-                            </Badge>
-                          ))}
-                          {user.partners.length > 2 && (
-                            <Badge variant="outline" className="text-[10px]">
-                              +{user.partners.length - 2}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{formatDate(user.createdAt)}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-xs">
-                            <MoreVerticalIcon className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(user)}>
-                            Edit
-                          </DropdownMenuItem>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
-                                variant="destructive"
-                                onSelect={(e) => {
-                                  e.preventDefault()
-                                  handleDelete(user.id)
-                                }}
-                              >
-                                Delete
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete User</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Are you sure you want to delete "{user.name}"? This action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={confirmDelete} variant="destructive" disabled={isDeleting}>
-                                  {isDeleting ? 'Deleting...' : 'Delete'}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="h-24 text-center">
+                      Loading users...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : filteredUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} className="h-24 text-center">
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">
+                        <Link href={`/dashboard/users/${user.id}`} className="hover:underline">
+                          <div className="flex items-center gap-2">
+                            <UserIcon className="size-4 text-muted-foreground" />
+                            {user.name}
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <MailIcon className="size-3 text-muted-foreground" />
+                          {user.email}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={statusVariantMap[user.status]}>
+                          {statusLabelMap[user.status]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={roleVariantMap[user.role]}>
+                          <div className="flex items-center gap-1">
+                            <ShieldIcon className="size-3" />
+                            {roleLabelMap[user.role]}
+                          </div>
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <BuildingIcon className="size-3 text-muted-foreground" />
+                          {user.profile.department}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <MapPinIcon className="size-3 text-muted-foreground" />
+                          {user.profile.location}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {user.partners.length === 0 ? (
+                          <span className="text-muted-foreground text-sm">No partners</span>
+                        ) : (
+                          <div className="flex gap-1 flex-wrap">
+                            {user.partners.slice(0, 2).map((partner) => (
+                              <Badge key={partner.partnerId} variant="outline" className="text-[10px]">
+                                {partner.partnerName}
+                              </Badge>
+                            ))}
+                            {user.partners.length > 2 && (
+                              <Badge variant="outline" className="text-[10px]">
+                                +{user.partners.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{formatDate(user.createdAt)}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon-xs">
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEdit(user)}>
+                              Edit
+                            </DropdownMenuItem>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onSelect={(e) => {
+                                    e.preventDefault()
+                                    handleDelete(user.id)
+                                  }}
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete User</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete "{user.name}"? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={confirmDelete} variant="destructive" disabled={isDeleting}>
+                                    {isDeleting ? 'Deleting...' : 'Delete'}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {filteredUsers.length > 0 && (
             <div className="flex items-center justify-between text-xs text-muted-foreground mt-4">
               <span>Showing {filteredUsers.length} of {users.length} users</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

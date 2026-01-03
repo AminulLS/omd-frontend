@@ -5,14 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import {
   ArrowLeftIcon,
   ShieldIcon,
@@ -168,11 +161,11 @@ export default function EditRolePage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <ShieldIcon className="size-6" />
+            <h1 className="text-lg font-semibold flex items-center gap-2">
+              <ShieldIcon className="size-4" />
               Edit Role
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Update role details and permissions
             </p>
           </div>
@@ -190,22 +183,13 @@ export default function EditRolePage() {
 
       {/* System Role Warning */}
       {role.isSystemRole && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-900">
-          <CardContent className="pt-4">
-            <div className="flex items-start gap-3">
-              <AlertCircleIcon className="size-5 text-yellow-600 dark:text-yellow-500 mt-0.5" />
-              <div className="flex-1">
-                <div className="font-medium text-yellow-800 dark:text-yellow-500">
-                  System Role
-                </div>
-                <div className="text-sm text-yellow-700 dark:text-yellow-600 mt-1">
-                  This is a predefined system role. Some fields may be restricted and this role
-                  cannot be deleted.
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Alert className="border-yellow-200 bg-yellow-50 text-yellow-900 dark:bg-yellow-950/20 dark:border-yellow-900 dark:text-yellow-500">
+          <AlertCircleIcon className="size-4 text-yellow-600 dark:text-yellow-500" />
+          <AlertTitle>System Role</AlertTitle>
+          <AlertDescription>
+            Some fields are restricted and this role cannot be deleted.
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Form */}
@@ -313,7 +297,7 @@ export default function EditRolePage() {
         <CardContent>
           <div className="space-y-6">
             {permissionGroups.map(group => (
-              <div key={group.category} className="border rounded-lg p-4">
+              <div key={group.category} className="border p-4">
                 <div className="mb-3">
                   <div className="text-sm font-medium">{group.label}</div>
                   <div className="text-xs text-muted-foreground">{group.description}</div>
@@ -322,7 +306,7 @@ export default function EditRolePage() {
                   {group.permissions.map(permission => (
                     <div
                       key={permission}
-                      className={`flex items-center justify-between p-3 border rounded-lg transition-colors cursor-pointer ${
+                      className={`flex items-center justify-between p-3 border transition-colors cursor-pointer ${
                         formData.permissions.includes(permission)
                           ? 'bg-primary/10 border-primary'
                           : 'hover:bg-muted/50'

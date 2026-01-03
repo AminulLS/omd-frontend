@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -429,12 +428,12 @@ export default function NoInventoryReportPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>No Inventory Report</CardTitle>
-          <CardDescription>View placements and keywords with blocked inventory reports</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">No Inventory Report</h2>
+          <p className="text-sm text-muted-foreground">View placements and keywords with blocked inventory reports</p>
+        </div>
+        <div>
           {/* Filters */}
           <FieldGroup className="mb-4">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -556,44 +555,46 @@ export default function NoInventoryReportPage() {
           </FieldGroup>
 
           {/* Table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Origin</TableHead>
-                <TableHead>Placement</TableHead>
-                <TableHead>Keyword</TableHead>
-                <TableHead>Country</TableHead>
-                <TableHead className="text-right">Blocked Reports</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.length === 0 ? (
+          <div className="border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
-                    No inventory reports found.
-                  </TableCell>
+                  <TableHead>Origin</TableHead>
+                  <TableHead>Placement</TableHead>
+                  <TableHead>Keyword</TableHead>
+                  <TableHead>Country</TableHead>
+                  <TableHead className="text-right">Blocked Reports</TableHead>
                 </TableRow>
-              ) : (
-                paginatedData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.origin}</TableCell>
-                    <TableCell>{getPlacementLabel(item.placement)}</TableCell>
-                    <TableCell>
-                      <code className="text-sm bg-muted px-2 py-1 rounded">
-                        {item.keyword}
-                      </code>
-                    </TableCell>
-                    <TableCell>{COUNTRIES[item.country]}</TableCell>
-                    <TableCell className="text-right">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
-                        {item.blockedReports}
-                      </span>
+              </TableHeader>
+              <TableBody>
+                {filteredData.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      No inventory reports found.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  paginatedData.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.origin}</TableCell>
+                      <TableCell>{getPlacementLabel(item.placement)}</TableCell>
+                      <TableCell>
+                        <code className="text-sm bg-muted px-2 py-1 rounded">
+                          {item.keyword}
+                        </code>
+                      </TableCell>
+                      <TableCell>{COUNTRIES[item.country]}</TableCell>
+                      <TableCell className="text-right">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
+                          {item.blockedReports}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination */}
           {filteredData.length > 0 && (
@@ -679,8 +680,8 @@ export default function NoInventoryReportPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

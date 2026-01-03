@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldContent, FieldDescription } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2 } from 'lucide-react'
+import { Alert, AlertTitle } from '@/components/ui/alert'
+import { Loader2, CheckIcon } from 'lucide-react'
 import { ColorThemeSettings } from '@/lib/types/settings'
 import { getSettingsByCategory, updateSettingsByCategory, resetSettingsToDefaults } from '@/lib/api/settings-api'
 import { ColorPicker } from './shared/color-picker'
@@ -101,110 +101,106 @@ export function ThemeSettingsForm() {
     <div className="space-y-4">
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-          {successMessage}
-        </div>
+        <Alert className="mb-4 border-green-600 bg-green-50 text-green-800">
+          <CheckIcon className="" />
+          <AlertTitle>{successMessage}</AlertTitle>
+        </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Theme Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Theme Mode</FieldLabel>
-              <FieldContent>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="theme-mode"
-                      value="light"
-                      checked={settings.mode === 'light'}
-                      onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
-                      className="size-4"
-                    />
-                    <span>Light</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="theme-mode"
-                      value="dark"
-                      checked={settings.mode === 'dark'}
-                      onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
-                      className="size-4"
-                    />
-                    <span>Dark</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="theme-mode"
-                      value="system"
-                      checked={settings.mode === 'system'}
-                      onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
-                      className="size-4"
-                    />
-                    <span>System</span>
-                  </label>
-                </div>
-                <FieldDescription>
-                  Choose the default theme mode for the application
-                </FieldDescription>
-              </FieldContent>
-            </Field>
+      <div>
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Theme Mode</FieldLabel>
+            <FieldContent>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="theme-mode"
+                    value="light"
+                    checked={settings.mode === 'light'}
+                    onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
+                    className="size-4"
+                  />
+                  <span>Light</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="theme-mode"
+                    value="dark"
+                    checked={settings.mode === 'dark'}
+                    onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
+                    className="size-4"
+                  />
+                  <span>Dark</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="theme-mode"
+                    value="system"
+                    checked={settings.mode === 'system'}
+                    onChange={(e) => handleChange('mode', e.target.value as 'light' | 'dark' | 'system')}
+                    className="size-4"
+                  />
+                  <span>System</span>
+                </label>
+              </div>
+              <FieldDescription>
+                Choose the default theme mode for the application
+              </FieldDescription>
+            </FieldContent>
+          </Field>
 
-            <ColorPicker
-              label="Primary Color"
-              value={settings.primaryColor}
-              onChange={(value) => handleChange('primaryColor', value)}
-              description="Main brand color used throughout the application"
-              error={errors.primaryColor}
-            />
-
-            <ColorPicker
-              label="Secondary Color"
-              value={settings.secondaryColor}
-              onChange={(value) => handleChange('secondaryColor', value)}
-              description="Secondary accent color for supporting elements"
-              error={errors.secondaryColor}
-            />
-
-            <ColorPicker
-              label="Accent Color"
-              value={settings.accentColor}
-              onChange={(value) => handleChange('accentColor', value)}
-              description="Highlight color for call-to-action elements"
-              error={errors.accentColor}
-            />
-
-            <Field>
-              <FieldLabel>Custom CSS</FieldLabel>
-              <FieldContent>
-                <Textarea
-                  value={settings.customCss}
-                  onChange={(e) => handleChange('customCss', e.target.value)}
-                  placeholder="/* Enter custom CSS here */"
-                  rows={8}
-                  className="font-mono text-sm"
-                />
-                <FieldDescription>
-                  Additional CSS to customize the application styling
-                </FieldDescription>
-              </FieldContent>
-            </Field>
-          </FieldGroup>
-
-          <SettingsSaveBar
-            onSave={handleSave}
-            onReset={handleReset}
-            isSaving={isSaving}
-            isResetting={isResetting}
+          <ColorPicker
+            label="Primary Color"
+            value={settings.primaryColor}
+            onChange={(value) => handleChange('primaryColor', value)}
+            description="Main brand color used throughout the application"
+            error={errors.primaryColor}
           />
-        </CardContent>
-      </Card>
+
+          <ColorPicker
+            label="Secondary Color"
+            value={settings.secondaryColor}
+            onChange={(value) => handleChange('secondaryColor', value)}
+            description="Secondary accent color for supporting elements"
+            error={errors.secondaryColor}
+          />
+
+          <ColorPicker
+            label="Accent Color"
+            value={settings.accentColor}
+            onChange={(value) => handleChange('accentColor', value)}
+            description="Highlight color for call-to-action elements"
+            error={errors.accentColor}
+          />
+
+          <Field>
+            <FieldLabel>Custom CSS</FieldLabel>
+            <FieldContent>
+              <Textarea
+                value={settings.customCss}
+                onChange={(e) => handleChange('customCss', e.target.value)}
+                placeholder="/* Enter custom CSS here */"
+                rows={8}
+                className="font-mono text-sm"
+              />
+              <FieldDescription>
+                Additional CSS to customize the application styling
+              </FieldDescription>
+            </FieldContent>
+          </Field>
+        </FieldGroup>
+
+        <SettingsSaveBar
+          onSave={handleSave}
+          onReset={handleReset}
+          isSaving={isSaving}
+          isResetting={isResetting}
+        />
+      </div>
     </div>
   )
 }

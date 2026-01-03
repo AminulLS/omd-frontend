@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -541,12 +540,12 @@ export default function AdPlacementPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Ad Placement Report</CardTitle>
-          <CardDescription>View performance metrics by placement type</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">Ad Placement Report</h2>
+          <p className="text-sm text-muted-foreground">View performance metrics by placement type</p>
+        </div>
+        <div>
           {/* Global Filters */}
           <FieldGroup className="mb-6">
             <div className="flex flex-col sm:flex-row gap-3">
@@ -665,8 +664,8 @@ export default function AdPlacementPage() {
               )}
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

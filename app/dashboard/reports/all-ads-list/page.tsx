@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -260,248 +259,246 @@ export default function AllAdsListPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>All Ads List</CardTitle>
-          <CardDescription>View and manage all ads across different positions</CardDescription>
-        </CardHeader>
-        <CardContent className="max-h-[calc(100vh-240px)] overflow-hidden">
-          <div className="flex gap-4 h-full">
-            {/* Left Sidebar - Ad Positions */}
-            <div className="w-64 flex-shrink-0 border-r pr-4 flex flex-col">
-              <h3 className="font-semibold mb-4 text-sm">Ad Positions</h3>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">All Ads List</h2>
+          <p className="text-sm text-muted-foreground">View and manage all ads across different positions</p>
+        </div>
+        <div className="flex gap-4">
+          {/* Left Sidebar - Ad Positions */}
+          <div className="w-64 shrink-0 border-r pr-4 flex flex-col">
+            <h3 className="font-semibold mb-4 text-sm">Ad Positions</h3>
 
-              {/* Position Search */}
-              <div className="relative mb-3">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                <Input
-                  placeholder="Search positions..."
-                  value={positionSearchQuery}
-                  onChange={(e) => setPositionSearchQuery(e.target.value)}
-                  className="pl-8 h-8 text-sm"
-                />
-              </div>
+            {/* Position Search */}
+            <div className="relative mb-3 shrink-0">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <Input
+                placeholder="Search positions..."
+                value={positionSearchQuery}
+                onChange={(e) => setPositionSearchQuery(e.target.value)}
+                className="pl-8 h-8 text-sm"
+              />
+            </div>
 
-              <nav className="space-y-1 overflow-y-auto flex-1 min-h-0">
+            <nav className="space-y-1 overflow-y-auto flex-1 min-h-0">
+              <button
+                onClick={() => setSelectedPosition(null)}
+                className={cn(
+                  "w-full text-left px-3 py-2 text-sm transition-colors flex items-center justify-between",
+                  selectedPosition === null
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "hover:bg-muted"
+                )}
+              >
+                <span>All Positions</span>
+                <span className={cn(
+                  "text-xs",
+                  selectedPosition === null ? "text-primary-foreground/70" : "text-muted-foreground"
+                )}>
+                  {mockAds.length}
+                </span>
+              </button>
+              {filteredPositions.map((position) => (
                 <button
-                  onClick={() => setSelectedPosition(null)}
+                  key={position.id}
+                  onClick={() => setSelectedPosition(position.id)}
                   className={cn(
-                    "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between",
-                    selectedPosition === null
+                    "w-full text-left px-3 py-2 text-sm transition-colors flex items-center justify-between",
+                    selectedPosition === position.id
                       ? "bg-primary text-primary-foreground font-medium"
                       : "hover:bg-muted"
                   )}
                 >
-                  <span>All Positions</span>
+                  <span>{position.name}</span>
                   <span className={cn(
                     "text-xs",
-                    selectedPosition === null ? "text-primary-foreground/70" : "text-muted-foreground"
+                    selectedPosition === position.id ? "text-primary-foreground/70" : "text-muted-foreground"
                   )}>
-                    {mockAds.length}
+                    {position.count}
                   </span>
                 </button>
-                {filteredPositions.map((position) => (
-                  <button
-                    key={position.id}
-                    onClick={() => setSelectedPosition(position.id)}
-                    className={cn(
-                      "w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between",
-                      selectedPosition === position.id
-                        ? "bg-primary text-primary-foreground font-medium"
-                        : "hover:bg-muted"
-                    )}
-                  >
-                    <span>{position.name}</span>
-                    <span className={cn(
-                      "text-xs",
-                      selectedPosition === position.id ? "text-primary-foreground/70" : "text-muted-foreground"
-                    )}>
-                      {position.count}
-                    </span>
-                  </button>
-                ))}
-                {filteredPositions.length === 0 && (
-                  <div className="px-3 py-4 text-center text-sm text-muted-foreground">
-                    No positions found
-                  </div>
-                )}
-              </nav>
-            </div>
-
-            {/* Right Side - Table */}
-            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-              {/* Search and Export */}
-              <FieldGroup className="mb-4">
-                <div className="flex gap-3">
-                  {/* Search */}
-                  <Field className="flex-1">
-                    <FieldLabel>Search</FieldLabel>
-                    <FieldContent>
-                      <div className="relative">
-                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                        <Input
-                          placeholder="Search by partner or title..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </FieldContent>
-                  </Field>
-
-                  {/* Country Filter */}
-                  <Field className="sm:w-[180px]">
-                    <FieldLabel>Country</FieldLabel>
-                    <FieldContent>
-                      <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Countries</SelectItem>
-                          {Object.entries(COUNTRIES).map(([code, name]) => (
-                            <SelectItem key={code} value={code}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FieldContent>
-                  </Field>
-
-                  {/* Export Buttons */}
-                  <Field className="sm:w-auto">
-                    <FieldLabel>Export</FieldLabel>
-                    <FieldContent>
-                      <div className="flex gap-2">
-                        <Button variant="outline" type="button" onClick={downloadCSV}>
-                          <FileDownIcon className="size-4 mr-2" />
-                          CSV
-                        </Button>
-                        <Button variant="outline" type="button" onClick={copyToClipboard}>
-                          <CopyIcon className="size-4 mr-2" />
-                          Copy
-                        </Button>
-                      </div>
-                    </FieldContent>
-                  </Field>
-                </div>
-              </FieldGroup>
-
-              {/* Table Container */}
-              <div className="flex-1 overflow-y-auto min-h-0">
-                <Table>
-                  <TableHeader>
-                  <TableRow>
-                    <TableHead>Partner</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead className="text-right">Weight</TableHead>
-                    <TableHead className="text-center">Status</TableHead>
-                    <TableHead>Country</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedAds.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center">
-                        No ads found.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    paginatedAds.map((ad) => (
-                      <TableRow key={ad.id}>
-                        <TableCell className="font-medium">{ad.partner}</TableCell>
-                        <TableCell>{ad.title}</TableCell>
-                        <TableCell className="text-right">
-                          <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-muted text-xs font-medium">
-                            ${ad.weight}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span
-                            className={cn(
-                              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border",
-                              ad.status === 'active'
-                                ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-                                : "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20"
-                            )}
-                          >
-                            {formatStatus(ad.status)}
-                          </span>
-                        </TableCell>
-                        <TableCell>{COUNTRIES[ad.country]}</TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-              </div>
-
-              {/* Pagination */}
-              {filteredAds.length > 0 && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-muted-foreground">
-                      Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAds.length)} of {filteredAds.length} results
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground">Rows per page:</span>
-                      <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="h-7 w-[70px] text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-                            <SelectItem key={option} value={option.toString()} className="text-xs">
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeftIcon className="size-4" />
-                      Previous
-                    </Button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          size="sm"
-                          type="button"
-                          onClick={() => setCurrentPage(page)}
-                          className="w-8 h-8 p-0"
-                        >
-                          {page}
-                        </Button>
-                      ))}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                      <ChevronRightIcon className="size-4" />
-                    </Button>
-                  </div>
+              ))}
+              {filteredPositions.length === 0 && (
+                <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                  No positions found
                 </div>
               )}
-            </div>
+            </nav>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Right Side - Table */}
+          <div className="flex-1 flex flex-col gap-4">
+            {/* Search and Export */}
+            <FieldGroup>
+              <div className="flex gap-3">
+                {/* Search */}
+                <Field className="flex-1">
+                  <FieldLabel>Search</FieldLabel>
+                  <FieldContent>
+                    <div className="relative">
+                      <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by partner or title..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+                  </FieldContent>
+                </Field>
+
+                {/* Country Filter */}
+                <Field className="sm:w-45">
+                  <FieldLabel>Country</FieldLabel>
+                  <FieldContent>
+                    <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Countries</SelectItem>
+                        {Object.entries(COUNTRIES).map(([code, name]) => (
+                          <SelectItem key={code} value={code}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FieldContent>
+                </Field>
+
+                {/* Export Buttons */}
+                <Field className="sm:w-auto">
+                  <FieldLabel>Export</FieldLabel>
+                  <FieldContent>
+                    <div className="flex gap-2">
+                      <Button variant="outline" type="button" onClick={downloadCSV}>
+                        <FileDownIcon className="size-4 mr-2" />
+                        CSV
+                      </Button>
+                      <Button variant="outline" type="button" onClick={copyToClipboard}>
+                        <CopyIcon className="size-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                  </FieldContent>
+                </Field>
+              </div>
+            </FieldGroup>
+
+            {/* Table Container */}
+            <div className="border">
+              <Table>
+                <TableHeader>
+                <TableRow>
+                  <TableHead>Partner</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead className="text-right">Weight</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead>Country</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedAds.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      No ads found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedAds.map((ad) => (
+                    <TableRow key={ad.id}>
+                      <TableCell className="font-medium">{ad.partner}</TableCell>
+                      <TableCell>{ad.title}</TableCell>
+                      <TableCell className="text-right">
+                        <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-muted text-xs font-medium">
+                          ${ad.weight}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span
+                          className={cn(
+                            "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border",
+                            ad.status === 'active'
+                              ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+                              : "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20"
+                          )}
+                        >
+                          {formatStatus(ad.status)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{COUNTRIES[ad.country]}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+            </div>
+
+            {/* Pagination - Aligned with table */}
+            {filteredAds.length > 0 && (
+              <div className="flex items-center justify-between border-t pt-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-muted-foreground">
+                    Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredAds.length)} of {filteredAds.length} results
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Rows per page:</span>
+                    <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                      <SelectTrigger className="h-7 w-[70px] text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                          <SelectItem key={option} value={option.toString()} className="text-xs">
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeftIcon className="size-4" />
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRightIcon className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

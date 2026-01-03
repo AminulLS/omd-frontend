@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldContent, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
+import { Alert, AlertTitle } from '@/components/ui/alert'
+import { Loader2, CheckIcon } from 'lucide-react'
 import { SystemSettings } from '@/lib/types/settings'
 import { getSettingsByCategory, updateSettingsByCategory, resetSettingsToDefaults } from '@/lib/api/settings-api'
 import { KeywordInput } from './shared/keyword-input'
@@ -105,189 +105,185 @@ export function SystemSettingsForm() {
     <div className="space-y-4">
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-          {successMessage}
-        </div>
+          <Alert className="mb-4 border-green-600 bg-green-50 text-green-800">
+            <CheckIcon className="" />
+            <AlertTitle>{successMessage}</AlertTitle>
+          </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>System Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FieldGroup>
-            {/* Cache Settings Section */}
-            <div className="space-y-4 pb-4 border-b">
-              <h3 className="text-sm font-semibold">Cache Configuration</h3>
+      <div>
+        <FieldGroup>
+          {/* Cache Settings Section */}
+          <div className="space-y-4 pb-4 border-b">
+            <h3 className="text-sm font-semibold">Cache Configuration</h3>
 
+            <Field>
+              <FieldLabel>Enable Caching</FieldLabel>
+              <FieldContent>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.cacheEnabled}
+                    onChange={(e) => handleChange('cacheEnabled', e.target.checked)}
+                    className="size-4"
+                  />
+                  <span className="text-sm">Cache responses to improve performance</span>
+                </label>
+              </FieldContent>
+            </Field>
+
+            {settings.cacheEnabled && (
               <Field>
-                <FieldLabel>Enable Caching</FieldLabel>
+                <FieldLabel>Cache TTL (Minutes)</FieldLabel>
                 <FieldContent>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.cacheEnabled}
-                      onChange={(e) => handleChange('cacheEnabled', e.target.checked)}
-                      className="size-4"
-                    />
-                    <span className="text-sm">Cache responses to improve performance</span>
-                  </label>
+                  <Input
+                    type="number"
+                    value={settings.cacheTtlMinutes}
+                    onChange={(e) => handleChange('cacheTtlMinutes', parseInt(e.target.value) || 0)}
+                    min={1}
+                    max={1440}
+                  />
+                  <FieldDescription>
+                    Time-to-live for cached data (min: 1 minute)
+                  </FieldDescription>
+                  {errors.cacheTtlMinutes && (
+                    <div className="text-destructive text-xs mt-1">
+                      {errors.cacheTtlMinutes[0]}
+                    </div>
+                  )}
                 </FieldContent>
               </Field>
+            )}
+          </div>
 
-              {settings.cacheEnabled && (
+          {/* Storage Settings Section */}
+          <div className="space-y-4 py-4 border-b">
+            <h3 className="text-sm font-semibold">Storage Configuration</h3>
+
+            <Field>
+              <FieldLabel>Storage Provider</FieldLabel>
+              <FieldContent>
+                <Select
+                  value={settings.storageProvider}
+                  onValueChange={(value) => handleChange('storageProvider', value as 'local' | 's3' | 'azure' | 'gcs')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="local">Local Storage</SelectItem>
+                    <SelectItem value="s3">Amazon S3</SelectItem>
+                    <SelectItem value="azure">Azure Blob Storage</SelectItem>
+                    <SelectItem value="gcs">Google Cloud Storage</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  Choose where to store uploaded files
+                </FieldDescription>
+              </FieldContent>
+            </Field>
+
+            {settings.storageProvider !== 'local' && (
+              <>
                 <Field>
-                  <FieldLabel>Cache TTL (Minutes)</FieldLabel>
+                  <FieldLabel>Bucket Name</FieldLabel>
                   <FieldContent>
                     <Input
-                      type="number"
-                      value={settings.cacheTtlMinutes}
-                      onChange={(e) => handleChange('cacheTtlMinutes', parseInt(e.target.value) || 0)}
-                      min={1}
-                      max={1440}
+                      value={settings.storageBucketName}
+                      onChange={(e) => handleChange('storageBucketName', e.target.value)}
+                      placeholder="my-bucket-name"
                     />
                     <FieldDescription>
-                      Time-to-live for cached data (min: 1 minute)
+                      Name of the storage bucket/container
                     </FieldDescription>
-                    {errors.cacheTtlMinutes && (
-                      <div className="text-destructive text-xs mt-1">
-                        {errors.cacheTtlMinutes[0]}
-                      </div>
-                    )}
                   </FieldContent>
                 </Field>
-              )}
-            </div>
 
-            {/* Storage Settings Section */}
-            <div className="space-y-4 py-4 border-b">
-              <h3 className="text-sm font-semibold">Storage Configuration</h3>
+                <Field>
+                  <FieldLabel>Storage Region</FieldLabel>
+                  <FieldContent>
+                    <Input
+                      value={settings.storageRegion}
+                      onChange={(e) => handleChange('storageRegion', e.target.value)}
+                      placeholder="us-east-1"
+                    />
+                    <FieldDescription>
+                      Geographic region for the storage bucket
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              </>
+            )}
+          </div>
 
-              <Field>
-                <FieldLabel>Storage Provider</FieldLabel>
-                <FieldContent>
-                  <Select
-                    value={settings.storageProvider}
-                    onValueChange={(value) => handleChange('storageProvider', value as 'local' | 's3' | 'azure' | 'gcs')}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="local">Local Storage</SelectItem>
-                      <SelectItem value="s3">Amazon S3</SelectItem>
-                      <SelectItem value="azure">Azure Blob Storage</SelectItem>
-                      <SelectItem value="gcs">Google Cloud Storage</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    Choose where to store uploaded files
-                  </FieldDescription>
-                </FieldContent>
-              </Field>
+          {/* Audit Log Settings Section */}
+          <div className="space-y-4 py-4 border-b">
+            <h3 className="text-sm font-semibold">Audit Log Settings</h3>
 
-              {settings.storageProvider !== 'local' && (
-                <>
-                  <Field>
-                    <FieldLabel>Bucket Name</FieldLabel>
-                    <FieldContent>
-                      <Input
-                        value={settings.storageBucketName}
-                        onChange={(e) => handleChange('storageBucketName', e.target.value)}
-                        placeholder="my-bucket-name"
-                      />
-                      <FieldDescription>
-                        Name of the storage bucket/container
-                      </FieldDescription>
-                    </FieldContent>
-                  </Field>
+            <Field>
+              <FieldLabel>Log Retention (Days)</FieldLabel>
+              <FieldContent>
+                <Input
+                  type="number"
+                  value={settings.auditLogRetentionDays}
+                  onChange={(e) => handleChange('auditLogRetentionDays', parseInt(e.target.value) || 0)}
+                  min={7}
+                  max={3650}
+                />
+                <FieldDescription>
+                  Number of days to retain audit logs before deletion (min: 7 days)
+                </FieldDescription>
+                {errors.auditLogRetentionDays && (
+                  <div className="text-destructive text-xs mt-1">
+                    {errors.auditLogRetentionDays[0]}
+                  </div>
+                )}
+              </FieldContent>
+            </Field>
+          </div>
 
-                  <Field>
-                    <FieldLabel>Storage Region</FieldLabel>
-                    <FieldContent>
-                      <Input
-                        value={settings.storageRegion}
-                        onChange={(e) => handleChange('storageRegion', e.target.value)}
-                        placeholder="us-east-1"
-                      />
-                      <FieldDescription>
-                        Geographic region for the storage bucket
-                      </FieldDescription>
-                    </FieldContent>
-                  </Field>
-                </>
-              )}
-            </div>
+          {/* File Upload Settings Section */}
+          <div className="space-y-4 pt-4">
+            <h3 className="text-sm font-semibold">File Upload Settings</h3>
 
-            {/* Audit Log Settings Section */}
-            <div className="space-y-4 py-4 border-b">
-              <h3 className="text-sm font-semibold">Audit Log Settings</h3>
+            <Field>
+              <FieldLabel>Maximum File Size (MB)</FieldLabel>
+              <FieldContent>
+                <Input
+                  type="number"
+                  value={settings.maxFileSize}
+                  onChange={(e) => handleChange('maxFileSize', parseInt(e.target.value) || 0)}
+                  min={1}
+                  max={100}
+                />
+                <FieldDescription>
+                  Maximum size for uploaded files in megabytes
+                </FieldDescription>
+                {errors.maxFileSize && (
+                  <div className="text-destructive text-xs mt-1">
+                    {errors.maxFileSize[0]}
+                  </div>
+                )}
+              </FieldContent>
+            </Field>
 
-              <Field>
-                <FieldLabel>Log Retention (Days)</FieldLabel>
-                <FieldContent>
-                  <Input
-                    type="number"
-                    value={settings.auditLogRetentionDays}
-                    onChange={(e) => handleChange('auditLogRetentionDays', parseInt(e.target.value) || 0)}
-                    min={7}
-                    max={3650}
-                  />
-                  <FieldDescription>
-                    Number of days to retain audit logs before deletion (min: 7 days)
-                  </FieldDescription>
-                  {errors.auditLogRetentionDays && (
-                    <div className="text-destructive text-xs mt-1">
-                      {errors.auditLogRetentionDays[0]}
-                    </div>
-                  )}
-                </FieldContent>
-              </Field>
-            </div>
+            <KeywordInput
+              label="Allowed File Types"
+              value={settings.allowedFileTypes}
+              onChange={(value) => handleChange('allowedFileTypes', value)}
+              description="MIME types allowed for upload (e.g., image/png, application/pdf)"
+              placeholder="Type MIME type and press Enter"
+            />
+          </div>
+        </FieldGroup>
 
-            {/* File Upload Settings Section */}
-            <div className="space-y-4 pt-4">
-              <h3 className="text-sm font-semibold">File Upload Settings</h3>
-
-              <Field>
-                <FieldLabel>Maximum File Size (MB)</FieldLabel>
-                <FieldContent>
-                  <Input
-                    type="number"
-                    value={settings.maxFileSize}
-                    onChange={(e) => handleChange('maxFileSize', parseInt(e.target.value) || 0)}
-                    min={1}
-                    max={100}
-                  />
-                  <FieldDescription>
-                    Maximum size for uploaded files in megabytes
-                  </FieldDescription>
-                  {errors.maxFileSize && (
-                    <div className="text-destructive text-xs mt-1">
-                      {errors.maxFileSize[0]}
-                    </div>
-                  )}
-                </FieldContent>
-              </Field>
-
-              <KeywordInput
-                label="Allowed File Types"
-                value={settings.allowedFileTypes}
-                onChange={(value) => handleChange('allowedFileTypes', value)}
-                description="MIME types allowed for upload (e.g., image/png, application/pdf)"
-                placeholder="Type MIME type and press Enter"
-              />
-            </div>
-          </FieldGroup>
-
-          <SettingsSaveBar
-            onSave={handleSave}
-            onReset={handleReset}
-            isSaving={isSaving}
-            isResetting={isResetting}
-          />
-        </CardContent>
-      </Card>
+        <SettingsSaveBar
+          onSave={handleSave}
+          onReset={handleReset}
+          isSaving={isSaving}
+          isResetting={isResetting}
+        />
+      </div>
     </div>
   )
 }

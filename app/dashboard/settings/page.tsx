@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Loader2 } from 'lucide-react'
 import { BasicSettingsForm } from '@/components/blocks/dashboard/settings/basic-settings-form'
@@ -42,35 +41,35 @@ export default function SettingsPage() {
   if (!hasAccess) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Access Denied</CardTitle>
-            <CardDescription>
+        <div className="max-w-md border p-6">
+          <div>
+            <h3 className="text-lg font-semibold">Access Denied</h3>
+            <p className="text-sm text-muted-foreground">
               You don't have permission to access this page.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="mt-4">
             <p className="text-sm text-muted-foreground">
               This page is only accessible to administrators.
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Settings</CardTitle>
-          <CardDescription>
+      <div>
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">Settings</h2>
+          <p className="text-sm text-muted-foreground">
             Manage your application settings and preferences
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <div>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList variant="line">
+            <TabsList variant="line" className="mb-3">
               <TabsTrigger value="basic">Basic</TabsTrigger>
               <TabsTrigger value="seo">SEO</TabsTrigger>
               <TabsTrigger value="theme">Theme</TabsTrigger>
@@ -98,8 +97,8 @@ export default function SettingsPage() {
               <SystemSettingsForm />
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

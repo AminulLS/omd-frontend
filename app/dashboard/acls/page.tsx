@@ -111,19 +111,17 @@ export default function ACLsPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <ShieldIcon className="size-5" />
-            <div>
-              <CardTitle>Access Control Lists (ACLs)</CardTitle>
-              <CardDescription>
-                Manage roles, permissions, and user access control
-              </CardDescription>
-            </div>
+      <div>
+        <div className="flex items-center gap-2 mb-4 border-b pb-2">
+          <ShieldIcon className="size-5" />
+          <div>
+            <h2 className="text-lg font-semibold">Access Control Lists (ACLs)</h2>
+            <p className="text-sm text-muted-foreground">
+              Manage roles, permissions, and user access control
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList variant="line">
               <TabsTrigger value="roles">
@@ -156,7 +154,7 @@ export default function ACLsPage() {
                 </div>
 
                 {/* Roles Table */}
-                <div className="rounded-md border">
+                <div className="border">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -258,7 +256,7 @@ export default function ACLsPage() {
                           return (
                             <div
                               key={permission}
-                              className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                              className="flex items-center justify-between p-3 border hover:bg-muted/50"
                             >
                               <div className="flex-1">
                                 <div className="font-medium text-sm">
@@ -334,7 +332,7 @@ export default function ACLsPage() {
                   </div>
                 </FieldGroup>
 
-                <div className="rounded-md border">
+                <div className="border">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -438,8 +436,8 @@ export default function ACLsPage() {
               </div>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

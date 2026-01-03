@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -59,140 +58,12 @@ import {
 } from '@/components/ui/command'
 import { Field, FieldGroup, FieldLabel, FieldContent } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { MoreVerticalIcon, PlusIcon, TrashIcon, UserIcon, SearchIcon } from 'lucide-react'
+import { MoreVerticalIcon, PlusIcon, TrashIcon, UserIcon, SearchIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { availableUsers, initialPartners, type Partner, type User, type ProductType, type PartnerStatus, type PartnerType, type UserRole } from './constants'
 
-type PartnerStatus = 'active' | 'inactive' | 'pending' | 'suspended'
-type PartnerType = 'internal' | 'external'
-
-type ProductType = 'sponsored-ads' | 'xml-direct-listing' | 'publisher' | 'syndication'
-
-type UserRole = 'main_user' | 'manager'
-
-type User = {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-type Partner = {
-  id: string
-  name: string
-  type: PartnerType
-  status: PartnerStatus
-  email: string
-  phone: string
-  created_at: string
-  users: User[]
-  products: ProductType[]
-}
-
-// Predefined list of users available to be assigned to partners
-const availableUsers: User[] = [
-  { id: 'u1', name: 'John Smith', email: 'john@company.com', role: 'main_user' },
-  { id: 'u2', name: 'Sarah Johnson', email: 'sarah@company.com', role: 'main_user' },
-  { id: 'u3', name: 'Mike Chen', email: 'mike@company.com', role: 'main_user' },
-  { id: 'u4', name: 'Lisa Park', email: 'lisa@company.com', role: 'main_user' },
-  { id: 'u5', name: 'Tom Wilson', email: 'tom@company.com', role: 'main_user' },
-  { id: 'u6', name: 'Emily Davis', email: 'emily@company.com', role: 'manager' },
-  { id: 'u7', name: 'Alex Brown', email: 'alex@company.com', role: 'manager' },
-  { id: 'u8', name: 'Jessica Lee', email: 'jessica@company.com', role: 'manager' },
-  { id: 'u9', name: 'David Kim', email: 'david@company.com', role: 'manager' },
-  { id: 'u10', name: 'Rachel Green', email: 'rachel@company.com', role: 'manager' },
-]
-
-const initialPartners: Partner[] = [
-  {
-    id: '1',
-    name: 'TechGlobal Inc.',
-    type: 'external',
-    status: 'active',
-    email: 'contact@techglobal.com',
-    phone: '+1 (555) 123-4567',
-    created_at: '2024-01-15',
-    users: [{ ...availableUsers[0], role: 'main_user' }, { ...availableUsers[5], role: 'manager' }],
-    products: ['sponsored-ads', 'xml-direct-listing'],
-  },
-  {
-    id: '2',
-    name: 'MediaFlow Partners',
-    type: 'external',
-    status: 'active',
-    email: 'partners@mediaflow.io',
-    phone: '+1 (555) 234-5678',
-    created_at: '2024-02-20',
-    users: [{ ...availableUsers[1], role: 'main_user' }, { ...availableUsers[6], role: 'manager' }],
-    products: ['publisher', 'syndication'],
-  },
-  {
-    id: '3',
-    name: 'AdNetwork Pro',
-    type: 'external',
-    status: 'active',
-    email: 'info@adnetworkpro.com',
-    phone: '+1 (555) 345-6789',
-    created_at: '2024-03-10',
-    users: [{ ...availableUsers[2], role: 'main_user' }, { ...availableUsers[7], role: 'manager' }, { ...availableUsers[8], role: 'manager' }],
-    products: ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'],
-  },
-  {
-    id: '4',
-    name: 'Digital Reach Ltd.',
-    type: 'external',
-    status: 'pending',
-    email: 'hello@digitalreach.co',
-    phone: '+1 (555) 456-7890',
-    created_at: '2024-06-05',
-    users: [],
-    products: ['sponsored-ads'],
-  },
-  {
-    id: '5',
-    name: 'PublisherHub',
-    type: 'external',
-    status: 'inactive',
-    email: 'team@publisherhub.net',
-    phone: '+1 (555) 567-8901',
-    created_at: '2023-11-28',
-    users: [],
-    products: ['publisher', 'syndication'],
-  },
-  {
-    id: '6',
-    name: 'Internal Media Team',
-    type: 'internal',
-    status: 'active',
-    email: 'team@internal.company',
-    phone: '+1 (555) 678-9012',
-    created_at: '2024-04-12',
-    users: [],
-    products: ['xml-direct-listing', 'syndication'],
-  },
-  {
-    id: '7',
-    name: 'Global Ads Media',
-    type: 'external',
-    status: 'suspended',
-    email: 'support@globaladsmedia.com',
-    phone: '+1 (555) 789-0123',
-    created_at: '2023-12-01',
-    users: [],
-    products: ['sponsored-ads', 'xml-direct-listing'],
-  },
-  {
-    id: '8',
-    name: 'ContentStream AI',
-    type: 'external',
-    status: 'active',
-    email: 'business@contentstream.ai',
-    phone: '+1 (555) 890-1234',
-    created_at: '2024-05-18',
-    users: [],
-    products: ['publisher', 'syndication', 'xml-direct-listing'],
-  },
-]
+const ALL_PRODUCT_TYPES: ProductType[] = ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication']
 
 const statusVariantMap: Record<PartnerStatus, "default" | "secondary" | "destructive" | "outline"> = {
   active: 'default',
@@ -247,6 +118,8 @@ const emptyForm: FormData = {
   products: [],
 }
 
+const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
+
 export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>(initialPartners)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -254,6 +127,8 @@ export default function PartnersPage() {
   const [formData, setFormData] = useState<FormData>(emptyForm)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
 
   const handleEdit = (partner: Partner) => {
     setEditingPartner(partner)
@@ -380,16 +255,32 @@ export default function PartnersPage() {
     return users.filter(u => u.role === 'manager').length
   }
 
+  // Pagination
+  const totalPages = Math.ceil(partners.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedPartners = partners.slice(startIndex, endIndex)
+
+  // Reset to page 1 when items per page changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [itemsPerPage])
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value))
+    setCurrentPage(1)
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Partners</CardTitle>
-              <CardDescription>Manage all partner relationships and their associated products</CardDescription>
-            </div>
-            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <div>
+        <div className="flex items-center justify-between mb-4 border-b pb-2">
+          <div>
+            <h2 className="text-lg font-semibold">Partners</h2>
+            <p className="text-sm text-muted-foreground">Manage all partner relationships and their associated products</p>
+          </div>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button size="sm" onClick={handleAdd}>
                   <PlusIcon className="size-4" />
@@ -571,7 +462,7 @@ export default function PartnersPage() {
                     <FieldLabel>Products</FieldLabel>
                     <FieldContent>
                       <div className="flex flex-wrap gap-2">
-                        {(['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'] as ProductType[]).map(product => (
+                        {ALL_PRODUCT_TYPES.map(product => (
                           <Button
                             key={product}
                             type="button"
@@ -597,119 +488,205 @@ export default function PartnersPage() {
               </SheetContent>
             </Sheet>
           </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Users</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Created At</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {partners.map((partner) => (
-                <TableRow key={partner.id}>
-                  <TableCell className="font-medium">
-                    <Link href={`/dashboard/partners/${partner.id}`} className="hover:underline">
-                      {partner.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={typeVariantMap[partner.type]}>
-                      {typeLabelMap[partner.type]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariantMap[partner.status]}>
-                      {partner.status.charAt(0).toUpperCase() + partner.status.slice(1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{partner.email}</TableCell>
-                  <TableCell>{partner.phone}</TableCell>
-                  <TableCell>
-                    {partner.users.length === 0 ? (
-                      <span className="text-muted-foreground text-sm">No users</span>
-                    ) : (
-                      <div className="space-y-1">
-                        {getMainUser(partner.users) && (
-                          <div className="flex items-center gap-1 text-sm">
-                            <UserIcon className="size-3 text-muted-foreground" />
-                            <span className="font-medium">{getMainUser(partner.users)?.name}</span>
-                            <Badge variant="secondary" className="text-[10px] px-1">Main</Badge>
-                          </div>
-                        )}
-                        {getManagerCount(partner.users) > 0 && (
-                          <div className="text-xs text-muted-foreground">
-                            +{getManagerCount(partner.users)} manager{getManagerCount(partner.users) > 1 ? 's' : ''}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {partner.products.map((product) => (
-                        <Badge key={product} variant="outline" className="text-[10px]">
-                          {productLabelMap[product]}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatDate(partner.created_at)}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon-xs">
-                          <MoreVerticalIcon className="size-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(partner)}>
-                          Edit
-                        </DropdownMenuItem>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onSelect={(e) => {
-                                e.preventDefault()
-                                handleDelete(partner.id)
-                              }}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Partner</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete "{partner.name}"? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={confirmDelete} variant="destructive">
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+        <div>
+          <div className="border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Users</TableHead>
+                  <TableHead>Products</TableHead>
+                  <TableHead>Created At</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {paginatedPartners.map((partner) => (
+                  <TableRow key={partner.id}>
+                    <TableCell className="font-medium">
+                      <Link href={`/dashboard/partners/${partner.id}`} className="hover:underline">
+                        {partner.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={typeVariantMap[partner.type]}>
+                        {typeLabelMap[partner.type]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={statusVariantMap[partner.status]}>
+                        {partner.status.charAt(0).toUpperCase() + partner.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{partner.email}</TableCell>
+                    <TableCell>{partner.phone}</TableCell>
+                    <TableCell>
+                      {partner.users.length === 0 ? (
+                        <span className="text-muted-foreground text-sm">No users</span>
+                      ) : (
+                        <div className="space-y-1">
+                          {getMainUser(partner.users) && (
+                            <div className="flex items-center gap-1 text-sm">
+                              <UserIcon className="size-3 text-muted-foreground" />
+                              <span className="font-medium">{getMainUser(partner.users)?.name}</span>
+                              <Badge variant="secondary" className="text-[10px] px-1">Main</Badge>
+                            </div>
+                          )}
+                          {getManagerCount(partner.users) > 0 && (
+                            <div className="text-xs text-muted-foreground">
+                              +{getManagerCount(partner.users)} manager{getManagerCount(partner.users) > 1 ? 's' : ''}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 flex-wrap">
+                        {partner.products.map((product) => (
+                          <Badge key={product} variant="outline" className="text-[10px]">
+                            {productLabelMap[product]}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatDate(partner.created_at)}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon-xs">
+                            <MoreVerticalIcon className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEdit(partner)}>
+                            Edit
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onSelect={(e) => {
+                                  e.preventDefault()
+                                  handleDelete(partner.id)
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Partner</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "{partner.name}"? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setDeleteId(null)}>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={confirmDelete} variant="destructive">
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+          {partners.length > 0 && (
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-4">
+                <span className="text-xs text-muted-foreground">
+                  Showing {startIndex + 1}-{Math.min(endIndex, partners.length)} of {partners.length} partners
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Rows per page:</span>
+                  <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                    <SelectTrigger className="h-7 w-[70px] text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option.toString()} className="text-xs">
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeftIcon className="size-4" />
+                  Previous
+                </Button>
+
+                {/* Page Numbers */}
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and adjacent pages
+                    const showPage =
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+
+                    if (!showPage) {
+                      // Show ellipsis for skipped pages
+                      if (page === currentPage - 2 || page === currentPage + 2) {
+                        return (
+                          <span key={page} className="px-2 text-xs text-muted-foreground">
+                            ...
+                          </span>
+                        )
+                      }
+                      return null
+                    }
+
+                    return (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className="min-w-[2rem] px-2"
+                      >
+                        {page}
+                      </Button>
+                    )
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                >
+                  Next
+                  <ChevronRightIcon className="size-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

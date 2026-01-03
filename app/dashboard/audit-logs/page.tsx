@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -426,21 +425,19 @@ export default function AuditLogsPage() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <ShieldAlertIcon className="size-5" />
-                Audit Logs
-              </CardTitle>
-              <CardDescription>
-                Track all system events, changes, and user activities
-              </CardDescription>
-            </div>
+      <div>
+        <div className="flex items-center justify-between mb-4 border-b pb-2">
+          <div>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <ShieldAlertIcon className="size-4" />
+              Audit Logs
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Track all system events, changes, and user activities
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div>
           <FieldGroup className="mb-4">
             <div className="flex flex-col sm:flex-row gap-3">
               <Field className="flex-1">
@@ -510,7 +507,7 @@ export default function AuditLogsPage() {
             </div>
           </FieldGroup>
 
-          <div className="rounded-md border">
+          <div className="border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -588,8 +585,8 @@ export default function AuditLogsPage() {
               <span>Oldest records retained for 90 days</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
         <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0" showCloseButton={false}>
@@ -647,7 +644,7 @@ export default function AuditLogsPage() {
                 </div>
 
                 {/* Actor */}
-                <div className="border rounded-lg p-3">
+                <div className="border p-3">
                   <div className="text-sm font-medium mb-2 flex items-center gap-2">
                     <UserIcon className="size-4" />
                     Actor (Who made the change)
@@ -677,7 +674,7 @@ export default function AuditLogsPage() {
                 </div>
 
                 {/* Target */}
-                <div className="border rounded-lg p-3">
+                <div className="border p-3">
                   <div className="text-sm font-medium mb-2">Target (What was affected)</div>
                   <div className="grid grid-cols-3 gap-2 text-sm">
                     <div>
@@ -697,7 +694,7 @@ export default function AuditLogsPage() {
 
                 {/* User Footprint */}
                 {selectedLog.metadata.footprints && (
-                  <div className="border rounded-lg p-3">
+                  <div className="border p-3">
                     <div className="text-sm font-medium mb-2">User Footprint</div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
                       {selectedLog.metadata.footprints.browser && (
@@ -730,7 +727,7 @@ export default function AuditLogsPage() {
 
                 {/* Changes */}
                 {selectedLog.changes && (
-                  <div className="border rounded-lg p-3">
+                  <div className="border p-3">
                     <div
                       className="text-sm font-medium cursor-pointer flex items-center gap-1 hover:text-primary"
                       onClick={() => toggleExpandChanges(selectedLog.id)}
@@ -746,7 +743,7 @@ export default function AuditLogsPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         <div>
                           <div className="text-xs font-medium mb-1 text-muted-foreground">Before</div>
-                          <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                          <pre className="bg-muted p-3 text-xs overflow-x-auto">
                                 {selectedLog.changes.before
                                   ? formatJson(selectedLog.changes.before)
                                   : 'null'}
@@ -754,7 +751,7 @@ export default function AuditLogsPage() {
                         </div>
                         <div>
                           <div className="text-xs font-medium mb-1 text-muted-foreground">After</div>
-                          <pre className="bg-muted p-3 rounded text-xs overflow-x-auto">
+                          <pre className="bg-muted p-3 text-xs overflow-x-auto">
                                 {selectedLog.changes.after
                                   ? formatJson(selectedLog.changes.after)
                                   : 'null'}

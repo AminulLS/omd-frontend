@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel, FieldContent, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2 } from 'lucide-react'
+import { Alert, AlertTitle } from '@/components/ui/alert'
+import { Loader2, CheckIcon } from 'lucide-react'
 import { BasicSettings } from '@/lib/types/settings'
 import { getSettingsByCategory, updateSettingsByCategory, resetSettingsToDefaults } from '@/lib/api/settings-api'
 import { ColorPicker } from './shared/color-picker'
@@ -102,106 +102,102 @@ export function BasicSettingsForm() {
     <div className="space-y-4">
       {/* Success Message */}
       {successMessage && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-md text-sm">
-          {successMessage}
-        </div>
+        <Alert className="mb-4 border-green-600 bg-green-50 text-green-800">
+          <CheckIcon />
+          <AlertTitle>{successMessage}</AlertTitle>
+        </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FieldGroup>
-            <Field>
-              <FieldLabel>Site Title</FieldLabel>
-              <FieldContent>
-                <Input
-                  value={settings.siteTitle}
-                  onChange={(e) => handleChange('siteTitle', e.target.value)}
-                  placeholder="Enter site title"
-                />
-                <FieldDescription>
-                  The main title displayed in the header and browser tab
-                </FieldDescription>
-                {errors.siteTitle && (
-                  <div className="text-destructive text-xs mt-1">
-                    {errors.siteTitle[0]}
-                  </div>
-                )}
-              </FieldContent>
-            </Field>
+      <div>
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Site Title</FieldLabel>
+            <FieldContent>
+              <Input
+                value={settings.siteTitle}
+                onChange={(e) => handleChange('siteTitle', e.target.value)}
+                placeholder="Enter site title"
+              />
+              <FieldDescription>
+                The main title displayed in the header and browser tab
+              </FieldDescription>
+              {errors.siteTitle && (
+                <div className="text-destructive text-xs mt-1">
+                  {errors.siteTitle[0]}
+                </div>
+              )}
+            </FieldContent>
+          </Field>
 
-            <Field>
-              <FieldLabel>Site Description</FieldLabel>
-              <FieldContent>
-                <Textarea
-                  value={settings.siteDescription}
-                  onChange={(e) => handleChange('siteDescription', e.target.value)}
-                  placeholder="Enter site description"
-                  rows={3}
-                />
-                <FieldDescription>
-                  A brief description of your site
-                </FieldDescription>
-              </FieldContent>
-            </Field>
+          <Field>
+            <FieldLabel>Site Description</FieldLabel>
+            <FieldContent>
+              <Textarea
+                value={settings.siteDescription}
+                onChange={(e) => handleChange('siteDescription', e.target.value)}
+                placeholder="Enter site description"
+                rows={3}
+              />
+              <FieldDescription>
+                A brief description of your site
+              </FieldDescription>
+            </FieldContent>
+          </Field>
 
-            <Field>
-              <FieldLabel>Logo URL</FieldLabel>
-              <FieldContent>
-                <Input
-                  value={settings.logoUrl}
-                  onChange={(e) => handleChange('logoUrl', e.target.value)}
-                  placeholder="/logo.png"
-                />
-                <FieldDescription>
-                  Path or URL to your logo image
-                </FieldDescription>
-                {errors.logoUrl && (
-                  <div className="text-destructive text-xs mt-1">
-                    {errors.logoUrl[0]}
-                  </div>
-                )}
-              </FieldContent>
-            </Field>
+          <Field>
+            <FieldLabel>Logo URL</FieldLabel>
+            <FieldContent>
+              <Input
+                value={settings.logoUrl}
+                onChange={(e) => handleChange('logoUrl', e.target.value)}
+                placeholder="/logo.png"
+              />
+              <FieldDescription>
+                Path or URL to your logo image
+              </FieldDescription>
+              {errors.logoUrl && (
+                <div className="text-destructive text-xs mt-1">
+                  {errors.logoUrl[0]}
+                </div>
+              )}
+            </FieldContent>
+          </Field>
 
-            <Field>
-              <FieldLabel>Favicon URL</FieldLabel>
-              <FieldContent>
-                <Input
-                  value={settings.faviconUrl}
-                  onChange={(e) => handleChange('faviconUrl', e.target.value)}
-                  placeholder="/favicon.ico"
-                />
-                <FieldDescription>
-                  Path or URL to your favicon
-                </FieldDescription>
-                {errors.faviconUrl && (
-                  <div className="text-destructive text-xs mt-1">
-                    {errors.faviconUrl[0]}
-                  </div>
-                )}
-              </FieldContent>
-            </Field>
+          <Field>
+            <FieldLabel>Favicon URL</FieldLabel>
+            <FieldContent>
+              <Input
+                value={settings.faviconUrl}
+                onChange={(e) => handleChange('faviconUrl', e.target.value)}
+                placeholder="/favicon.ico"
+              />
+              <FieldDescription>
+                Path or URL to your favicon
+              </FieldDescription>
+              {errors.faviconUrl && (
+                <div className="text-destructive text-xs mt-1">
+                  {errors.faviconUrl[0]}
+                </div>
+              )}
+            </FieldContent>
+          </Field>
 
-            <ColorPicker
-              label="Brand Color"
-              value={settings.brandColor}
-              onChange={(value) => handleChange('brandColor', value)}
-              description="Primary brand color for the application"
-              error={errors.brandColor}
-            />
-          </FieldGroup>
-
-          <SettingsSaveBar
-            onSave={handleSave}
-            onReset={handleReset}
-            isSaving={isSaving}
-            isResetting={isResetting}
+          <ColorPicker
+            label="Brand Color"
+            value={settings.brandColor}
+            onChange={(value) => handleChange('brandColor', value)}
+            description="Primary brand color for the application"
+            error={errors.brandColor}
           />
-        </CardContent>
-      </Card>
+        </FieldGroup>
+
+        <SettingsSaveBar
+          onSave={handleSave}
+          onReset={handleReset}
+          isSaving={isSaving}
+          isResetting={isResetting}
+        />
+      </div>
     </div>
   )
 }
