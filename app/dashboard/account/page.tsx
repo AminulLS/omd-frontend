@@ -34,7 +34,7 @@ import {
   AvatarImage,
 } from '@/components/ui/avatar'
 import { toast } from 'sonner'
-import { Loader2, Camera, Save, Upload } from 'lucide-react'
+import { Loader2, Camera, Save } from 'lucide-react'
 
 export default function AccountPage() {
   const { user, updateUser: updateAuthUser } = useAuth()
@@ -206,15 +206,15 @@ export default function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
-        <p className="text-muted-foreground">
+      <div className="mb-4 border-b pb-2">
+        <h1 className="text-lg font-semibold">Account Settings</h1>
+        <p className="text-sm text-muted-foreground">
           Manage your account settings and preferences
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList>
+        <TabsList variant="line" className="mb-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
@@ -238,7 +238,7 @@ export default function AccountPage() {
                 <div className="space-y-2">
                   <div className="flex gap-2">
                     <Label htmlFor="avatar-upload" className="cursor-pointer">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90">
                         <Camera className="h-4 w-4" />
                         <span>Change Photo</span>
                       </div>
