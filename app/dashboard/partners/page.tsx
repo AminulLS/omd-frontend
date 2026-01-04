@@ -296,7 +296,7 @@ export default function PartnersPage() {
                   Add Partner
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-md">
+              <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>{editingPartner ? 'Edit Partner' : 'Add New Partner'}</SheetTitle>
                   <SheetDescription>
