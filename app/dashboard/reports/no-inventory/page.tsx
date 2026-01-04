@@ -534,25 +534,24 @@ export default function NoInventoryReportPage() {
                   </Popover>
                 </FieldContent>
               </Field>
-
-              {/* Export Buttons */}
-              <Field className="sm:w-auto">
-                <FieldLabel>Export</FieldLabel>
-                <FieldContent>
-                  <div className="flex gap-2">
-                    <Button variant="outline" type="button" onClick={downloadCSV}>
-                      <FileDownIcon className="size-4 mr-2" />
-                      CSV
-                    </Button>
-                    <Button variant="outline" type="button" onClick={copyToClipboard}>
-                      <CopyIcon className="size-4 mr-2" />
-                      Copy
-                    </Button>
-                  </div>
-                </FieldContent>
-              </Field>
             </div>
           </FieldGroup>
+
+          {/* Export buttons */}
+          <div className="flex justify-end gap-2 mb-4">
+            {filteredData.length > 0 && (
+              <>
+                <Button variant="outline" size="sm" type="button" onClick={downloadCSV}>
+                  <FileDownIcon className="size-4 mr-2" />
+                  Export CSV
+                </Button>
+                <Button variant="outline" size="sm" type="button" onClick={copyToClipboard}>
+                  <CopyIcon className="size-4 mr-2" />
+                  Copy
+                </Button>
+              </>
+            )}
+          </div>
 
           {/* Table */}
           <div className="border">
