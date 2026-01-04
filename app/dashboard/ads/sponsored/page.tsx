@@ -48,30 +48,6 @@ const config = {
     },
 }
 
-const snapshotData = {
-    today: {
-        revenue: data().reduce((acc, curr) => acc + curr.fields.today_revenue, 0),
-        clicks: data().reduce((acc, curr) => acc + curr.fields.today_clicks, 0),
-        cpc: data().reduce((acc, curr) => acc + curr.fields.today_revenue / curr.fields.today_clicks, 0),
-        cbh: data().reduce((acc, curr) => acc + curr.fields.today_clicks, 0),
-        total_revenue: data().reduce((acc, curr) => acc + curr.fields.today_revenue, 0),
-    },
-    yesterday: {
-        revenue: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue, 0),
-        clicks: data().reduce((acc, curr) => acc + curr.fields.yesterday_clicks, 0),
-        cpc: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue / curr.fields.yesterday_clicks, 0),
-        cbh: data().reduce((acc, curr) => acc + curr.fields.yesterday_clicks, 0),
-        total_revenue: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue, 0),
-    },
-    sdlw: {
-        revenue: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue, 0),
-        clicks: data().reduce((acc, curr) => acc + curr.fields.sdlw_clicks, 0),
-        cpc: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue / curr.fields.sdlw_clicks, 0),
-        cbh: data().reduce((acc, curr) => acc + curr.fields.sdlw_clicks, 0),
-        total_revenue: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue, 0),
-    },
-}
-
 const dataTwoMonth = () => {
     // get calendar days of current and last month:
     const daysInMonth = (month: number, year: number) => {
