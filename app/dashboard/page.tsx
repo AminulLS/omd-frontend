@@ -96,7 +96,27 @@ export default function Page() {
 
             <Card size="sm">
                 <CardHeader>
-                    <CardTitle>Global Traffic Publisher</CardTitle>
+                    <CardTitle>Global XML Advertisers</CardTitle>
+                    <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
+                    <CardAction>
+                        <Link href="/dashboard/ads/xml"><SquareArrowOutUpRight className="size-4" /></Link>
+                    </CardAction>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex gap-2">
+                        <div className="w-4/6">
+                            <HourlyChart data={data()} config={config} />
+                        </div>
+                        <div className="w-2/6">
+                            <SnapshotTable data={snapshotData} />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card size="sm">
+                <CardHeader>
+                    <CardTitle>Global Traffic Publishers</CardTitle>
                     <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
                     <CardAction>
                         <Link href="/dashboard/publishers/campaigns"><SquareArrowOutUpRight className="size-4" /></Link>
@@ -116,10 +136,10 @@ export default function Page() {
 
             <Card size="sm">
                 <CardHeader>
-                    <CardTitle>XML</CardTitle>
+                    <CardTitle>Global Syndicate Publishers</CardTitle>
                     <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
                     <CardAction>
-                        <Link href="/dashboard/ads/xml"><SquareArrowOutUpRight className="size-4" /></Link>
+                        <Link href="/dashboard/publishers/syndicates"><SquareArrowOutUpRight className="size-4" /></Link>
                     </CardAction>
                 </CardHeader>
                 <CardContent>
