@@ -2,6 +2,8 @@ import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import { MonthlyChart } from '@/components/blocks/charts/monthly-chart'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { format } from 'date-fns'
 
 const data = (hours = 24) => {
     return [...Array(hours)].map((_, h) => {
@@ -151,21 +153,68 @@ export default function Page() {
                     </CardContent>
                 </Card>
 
-                {/* Hourly chart */}
-                <Card size="sm">
-                    <CardHeader>
-                        <CardTitle>Recent Revenue</CardTitle>
-                        <CardAction>
-                            <span className="text-xs text-muted-foreground">Last Updated: {new Date().toLocaleString()}</span>
-                        </CardAction>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex justify-center items-center mb-2">
-                            // add
-                        </div>
-                        <HourlyChart data={data()} config={config} />
-                    </CardContent>
-                </Card>
+                <div className="flex gap-2">
+                    {/* Hourly chart */}
+                    <Card size="sm" className="w-4/6">
+                        <CardHeader>
+                            <CardTitle>Recent Revenue</CardTitle>
+                            <CardAction>
+                                <span className="text-xs text-muted-foreground">Last Updated: {new Date().toLocaleString()}</span>
+                            </CardAction>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex justify-center gap-4 items-center mb-2">
+                                <div className="text-center">
+                                    <div className="text-sm text-muted-foreground">Today</div>
+                                    <div className="text-lg font-semibold flex items-center gap-1">
+                                        ${data().reduce((acc, curr) => acc + curr.fields.today_revenue, 0).toLocaleString()}
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-sm text-muted-foreground">Yesterday</div>
+                                    <div className="text-lg font-semibold flex items-center gap-1">
+                                        ${data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue, 0).toLocaleString()}
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-sm text-muted-foreground">SDLW</div>
+                                    <div className="text-lg font-semibold flex items-center gap-1">
+                                        ${data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue, 0).toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+                            <HourlyChart data={data()} config={config} />
+                        </CardContent>
+                    </Card>
+
+                    <Card size="sm" className="w-2/6">
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Revenue</TableHead>
+                                        <TableHead>SDLW</TableHead>
+                                        <TableHead>Delta</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {[...Array(7)].map((row, idx) => (
+                                        <TableRow key={idx}>
+                                            <TableHead>
+                                                <span>{ format(new Date(2026, 1, 1+idx), `MM/dd/yyyy`) }</span>
+                                                <small> ({ format(new Date(2026, 1, 1+idx), `ccc`) })</small>
+                                            </TableHead>
+                                            <TableCell>${(Math.random() * 1000.54 + 200).toLocaleString()}</TableCell>
+                                            <TableCell>${(Math.random() * 1000.74 + 200).toLocaleString()}</TableCell>
+                                            <TableCell>${(Math.random() * 1000.23 + 200).toLocaleString()}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     )

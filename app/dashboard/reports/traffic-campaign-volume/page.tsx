@@ -240,7 +240,7 @@ export default function TrafficCampaignVolumePage() {
         <FieldGroup className="mb-6">
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Country Filter */}
-            <Field className="sm:w-[180px]">
+            <Field className="sm:w-45">
               <FieldLabel>Country</FieldLabel>
               <FieldContent>
                 <Select value={selectedCountry} onValueChange={setSelectedCountry}>
@@ -347,7 +347,7 @@ export default function TrafficCampaignVolumePage() {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">Rows per page:</span>
                 <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                  <SelectTrigger className="h-7 w-[70px] text-xs">
+                  <SelectTrigger className="h-7 w-17.5 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -397,7 +397,7 @@ export default function TrafficCampaignVolumePage() {
                       size="sm"
                       type="button"
                       onClick={() => setCurrentPage(page)}
-                      className="min-w-[2rem] px-2"
+                      className="min-w-8 px-2"
                     >
                       {page}
                     </Button>
