@@ -74,7 +74,7 @@ const snapshotData = {
 export default function Page() {
     return (
         <div className="flex flex-col gap-y-4">
-            <Card>
+            <Card size="sm">
                 <CardHeader>
                     <CardTitle>Global Ad Advertisers</CardTitle>
                     <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
@@ -82,48 +82,54 @@ export default function Page() {
                         <Link href="/dashboard/ads/sponsored"><SquareArrowOutUpRight className="size-4" /></Link>
                     </CardAction>
                 </CardHeader>
-                <div className="flex gap-2">
-                    <div className="w-4/6">
-                        <HourlyChart data={data()} config={config} />
+                <CardContent>
+                    <div className="flex gap-2">
+                        <div className="w-4/6">
+                            <HourlyChart data={data()} config={config} />
+                        </div>
+                        <div className="w-2/6">
+                            <SnapshotTable data={snapshotData} />
+                        </div>
                     </div>
-                    <div className="w-2/6">
-                        <SnapshotTable data={snapshotData} />
-                    </div>
-                </div>
+                </CardContent>
             </Card>
 
-            <Card>
+            <Card size="sm">
                 <CardHeader>
                     <CardTitle>Global Traffic Publisher</CardTitle>
                     <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
                     <CardAction>
-                        <Link href="/dashboard/publishers/traffic"><SquareArrowOutUpRight className="size-4" /></Link>
+                        <Link href="/dashboard/publishers/campaigns"><SquareArrowOutUpRight className="size-4" /></Link>
                     </CardAction>
                 </CardHeader>
-                <div className="flex gap-2">
-                    <div className="w-4/6">
-                        <HourlyChart data={data()} config={config} />
+                <CardContent>
+                    <div className="flex gap-2">
+                        <div className="w-4/6">
+                            <HourlyChart data={data()} config={config} />
+                        </div>
+                        <div className="w-2/6">
+                            <SnapshotTable data={snapshotData} />
+                        </div>
                     </div>
-                    <div className="w-2/6">
-                        <SnapshotTable data={snapshotData} />
-                    </div>
-                </div>
+                </CardContent>
             </Card>
 
-            <Card>
+            <Card size="sm">
                 <CardHeader>
-                    <CardTitle>XML Direct Listings</CardTitle>
+                    <CardTitle>XML</CardTitle>
                     <CardDescription>Ad Revenue / Clicks By Hours</CardDescription>
                     <CardAction>
-                        <Link href="/dashboard/ads/xml-direct-listings"><SquareArrowOutUpRight className="size-4" /></Link>
+                        <Link href="/dashboard/ads/xml"><SquareArrowOutUpRight className="size-4" /></Link>
                     </CardAction>
                 </CardHeader>
-                <CardContent className="flex gap-2">
-                    <div className="w-4/6">
-                        <HourlyChart data={data()} config={config} />
-                    </div>
-                    <div className="w-2/6">
-                        <SnapshotTable data={snapshotData} />
+                <CardContent>
+                    <div className="flex gap-2">
+                        <div className="w-4/6">
+                            <HourlyChart data={data()} config={config} />
+                        </div>
+                        <div className="w-2/6">
+                            <SnapshotTable data={snapshotData} />
+                        </div>
                     </div>
                 </CardContent>
             </Card>

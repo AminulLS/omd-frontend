@@ -37,8 +37,8 @@ const navMainItems = [
                     url: '/dashboard/ads/sponsored',
                 },
                 {
-                    title: 'XML Direct Listings',
-                    url: '/dashboard/ads/xml-direct-listings',
+                    title: 'XML',
+                    url: '/dashboard/ads/xml',
                 },
                 {
                     title: 'Listicles',
@@ -54,8 +54,8 @@ const navMainItems = [
             isActive: false,
             items: [
                 {
-                    title: 'Traffic',
-                    url: '/dashboard/publishers/traffics',
+                    title: 'Campaigns',
+                    url: '/dashboard/publishers/campaigns',
                 },
                 {
                     title: 'Syndicates',
