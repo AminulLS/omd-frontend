@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { HourlyChart } from '@/components/blocks/dashboard/hourly-chart'
+import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import SnapshotTable from '@/components/blocks/dashboard/snapshot-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

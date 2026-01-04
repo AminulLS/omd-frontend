@@ -460,7 +460,6 @@ export default function AllAdsListPage() {
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
-                    size="sm"
                     type="button"
                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
@@ -473,10 +472,8 @@ export default function AllAdsListPage() {
                       <Button
                         key={page}
                         variant={currentPage === page ? "default" : "outline"}
-                        size="sm"
                         type="button"
                         onClick={() => setCurrentPage(page)}
-                        className="w-8 h-8 p-0"
                       >
                         {page}
                       </Button>
@@ -484,7 +481,6 @@ export default function AllAdsListPage() {
                   </div>
                   <Button
                     variant="outline"
-                    size="sm"
                     type="button"
                     onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}

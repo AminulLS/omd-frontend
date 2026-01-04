@@ -1,5 +1,5 @@
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { HourlyChart } from '@/components/blocks/dashboard/hourly-chart'
+import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import SnapshotTable from '@/components/blocks/dashboard/snapshot-table'
 import Link from 'next/link'
 import { SquareArrowOutUpRight } from 'lucide-react'
@@ -49,25 +49,25 @@ const config = {
 
 const snapshotData = {
     today: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
+        revenue: data().reduce((acc, curr) => acc + curr.fields.today_revenue, 0),
+        clicks: data().reduce((acc, curr) => acc + curr.fields.today_clicks, 0),
+        cpc: data().reduce((acc, curr) => acc + curr.fields.today_revenue / curr.fields.today_clicks, 0),
+        cbh: data().reduce((acc, curr) => acc + curr.fields.today_clicks, 0),
+        total_revenue: data().reduce((acc, curr) => acc + curr.fields.today_revenue, 0),
     },
     yesterday: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
+        revenue: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue, 0),
+        clicks: data().reduce((acc, curr) => acc + curr.fields.yesterday_clicks, 0),
+        cpc: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue / curr.fields.yesterday_clicks, 0),
+        cbh: data().reduce((acc, curr) => acc + curr.fields.yesterday_clicks, 0),
+        total_revenue: data().reduce((acc, curr) => acc + curr.fields.yesterday_revenue, 0),
     },
     sdlw: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
+        revenue: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue, 0),
+        clicks: data().reduce((acc, curr) => acc + curr.fields.sdlw_clicks, 0),
+        cpc: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue / curr.fields.sdlw_clicks, 0),
+        cbh: data().reduce((acc, curr) => acc + curr.fields.sdlw_clicks, 0),
+        total_revenue: data().reduce((acc, curr) => acc + curr.fields.sdlw_revenue, 0),
     },
 }
 

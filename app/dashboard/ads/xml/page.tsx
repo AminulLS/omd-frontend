@@ -1,4 +1,4 @@
-import { HourlyChart } from '@/components/blocks/dashboard/hourly-chart'
+import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import SnapshotTable from '@/components/blocks/dashboard/snapshot-table'
 
 const data = (hours = 24) => {

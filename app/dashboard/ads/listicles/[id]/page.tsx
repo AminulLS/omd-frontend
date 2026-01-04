@@ -367,7 +367,7 @@ export default function EditListiclePage() {
                 <FieldContent>
                   <div className="space-y-3">
                     {formData.image ? (
-                      <div className="relative aspect-video rounded-lg overflow-hidden border bg-muted">
+                      <div className="relative aspect-video overflow-hidden border bg-muted">
                         <img
                           src={formData.image}
                           alt={formData.alt || formData.title}
@@ -375,7 +375,7 @@ export default function EditListiclePage() {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground">
+                      <div className="aspect-video border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground">
                         <ImageIcon className="size-8 mb-2" />
                         <span className="text-sm">No image selected</span>
                       </div>
@@ -444,11 +444,11 @@ export default function EditListiclePage() {
               </div>
 
               {formData.leftListicleAds.length === 0 ? (
-                <div className="text-center py-8 text-sm text-muted-foreground border rounded-lg">
+                <div className="text-center py-8 text-sm text-muted-foreground border">
                   No ads added yet
                 </div>
               ) : (
-                <div className="border rounded-lg">
+                <div className="border">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -523,11 +523,11 @@ export default function EditListiclePage() {
               </div>
 
               {formData.rightListicleAds.length === 0 ? (
-                <div className="text-center py-8 text-sm text-muted-foreground border rounded-lg">
+                <div className="text-center py-8 text-sm text-muted-foreground border">
                   No ads added yet
                 </div>
               ) : (
-                <div className="border rounded-lg">
+                <div className="border">
                   <Table>
                     <TableHeader>
                       <TableRow>

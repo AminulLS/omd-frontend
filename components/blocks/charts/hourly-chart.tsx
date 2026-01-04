@@ -55,7 +55,7 @@ export function HourlyChart({
                 <ChartTooltip
                     cursor={false}
                     content={
-                        <ChartTooltipContent indicator="line"  />
+                        <ChartTooltipContent indicator="line" />
                     }
                 />
                 {Object.keys(config).map((key) => {
