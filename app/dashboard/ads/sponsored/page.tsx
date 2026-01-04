@@ -163,6 +163,7 @@ export default function Page() {
                         </CardContent>
                     </Card>
 
+                    {/* Weekly table */}
                     <Card size="sm" className="w-2/6">
                         <CardContent>
                             <Table>
@@ -178,8 +179,8 @@ export default function Page() {
                                     {[...Array(7)].map((row, idx) => (
                                         <TableRow key={idx}>
                                             <TableHead>
-                                                <span>{ format(new Date(2026, 1, 1+idx), `MM/dd/yyyy`) }</span>
-                                                <small> ({ format(new Date(2026, 1, 1+idx), `ccc`) })</small>
+                                                <span>{format(new Date(2026, 1, 1 + idx), `MM/dd/yyyy`)}</span>
+                                                <small> ({format(new Date(2026, 1, 1 + idx), `ccc`)})</small>
                                             </TableHead>
                                             <TableCell>${(Math.random() * 1000.54 + 200).toLocaleString()}</TableCell>
                                             <TableCell>${(Math.random() * 1000.74 + 200).toLocaleString()}</TableCell>
@@ -192,6 +193,8 @@ export default function Page() {
                     </Card>
                 </div>
             </div>
+
+            {/* Add Reports Here */}
         </div>
     )
 }
