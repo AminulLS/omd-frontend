@@ -337,11 +337,11 @@ function PlacementTable({
 
         {tableData.length > 0 && (
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" type="button" onClick={downloadCSV}>
+            <Button variant="outline" type="button" onClick={downloadCSV}>
               <FileDownIcon className="size-4 mr-2" />
               CSV
             </Button>
-            <Button variant="outline" size="sm" type="button" onClick={copyToClipboard}>
+            <Button variant="outline" type="button" onClick={copyToClipboard}>
               <CopyIcon className="size-4 mr-2" />
               Copy
             </Button>
