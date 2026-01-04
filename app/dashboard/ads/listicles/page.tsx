@@ -395,12 +395,6 @@ export default function ListiclesPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link href={`/dashboard/ads/listicles/${listicle.id}`}>
-                                <EyeIcon className="size-4 mr-2" />
-                                View
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/dashboard/ads/listicles/${listicle.id}/edit`}>
                                 <EditIcon className="size-4 mr-2" />
                                 Edit
                               </Link>
