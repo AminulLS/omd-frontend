@@ -22,7 +22,7 @@ const defaultSettings: AllSettings = {
     metaDescription: 'Comprehensive dashboard for managing operations, partners, and analytics',
     metaKeywords: ['dashboard', 'operations', 'management', 'analytics'],
     ogImage: '/og-image.png',
-    twitterHandle: '@omd_dashboard',
+    twitterHandle: '@operationmediallc',
   },
   theme: {
     mode: 'system',
