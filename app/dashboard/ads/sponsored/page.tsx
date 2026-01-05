@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { FieldGroup } from '@/components/ui/field'
 import { format } from 'date-fns'
 import { useState } from 'react'
@@ -237,16 +238,21 @@ const generateMockApiKeyData = () => [...Array(50)].map((_, idx) => ({
     revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
 }))
 
-const generateMockAdsData = () => [...Array(10)].map((_, idx) => ({
-    id: idx + 1,
-    title: `Ad Title ${idx + 1}`,
-    placement: `Placement ${idx + 1}`,
-    nickname: `Nickname ${idx + 1}`,
-    uniqueId: `ID-${Math.random().toString(36).substring(7).toUpperCase()}`,
-    status: Math.random() > 0.3 ? 'active' : 'inactive',
-    createdAt: format(new Date(2026, 0, 1 + idx), 'MM/dd/yyyy'),
-    updatedAt: format(new Date(2026, 0, 10 + idx), 'MM/dd/yyyy'),
-}))
+const generateMockAdsData = () => [...Array(50)].map((_, idx) => {
+    const countries = ['US', 'UK', 'CA', 'AU', 'DE', 'FR', 'JP', 'IN']
+    const statuses = ['active', 'inactive', 'pending', 'paused']
+    return {
+        id: idx + 1,
+        title: `Ad Title ${idx + 1}`,
+        placement: `Placement ${idx + 1}`,
+        nickname: `Nickname ${idx + 1}`,
+        uniqueId: `ID-${Math.random().toString(36).substring(7).toUpperCase()}`,
+        status: statuses[Math.floor(Math.random() * statuses.length)],
+        country: countries[Math.floor(Math.random() * countries.length)],
+        createdAt: format(new Date(2026, 0, 1 + idx), 'MM/dd/yyyy'),
+        updatedAt: format(new Date(2026, 0, 10 + idx), 'MM/dd/yyyy'),
+    }
+})
 
 // Mini hourly bar chart component
 interface HourlyBarChartProps {
@@ -310,8 +316,8 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                 return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             }
 
-            // Percentage fields
-            if (lowerCol.includes('ctr') || lowerCol.includes('conversion')) {
+            // Percentage fields (exclude 'Conversion' column, only format 'Conversion %')
+            if (lowerCol.includes('ctr') || lowerCol === 'conversion %') {
                 return `${value.toFixed(2)}%`
             }
 
@@ -368,6 +374,10 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
     const calculateTotals = () => {
         // Initialize totals array with zeros, aligned to columns (excluding first which is date/name)
         const totalsArray = new Array(columns.length - 1).fill(0)
+        // Count arrays for tracking which columns need averaging
+        const countArray = new Array(columns.length - 1).fill(0)
+        // Track which columns should be averaged
+        const averageColumns = ['CPC', 'CTR', 'Conversion %']
 
         data.forEach((row) => {
             columns.slice(1).forEach((colName, idx) => {
@@ -383,7 +393,24 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
 
                 const value = (row as any)[dataKey]
                 if (typeof value === 'number') {
-                    totalsArray[idx] += value
+                    // Check if this column should be averaged
+                    const shouldAverage = averageColumns.some(avgCol => colName.includes(avgCol))
+
+                    if (shouldAverage) {
+                        totalsArray[idx] += value
+                        countArray[idx]++
+                    } else {
+                        totalsArray[idx] += value
+                    }
+                }
+            })
+        })
+
+        // Calculate averages for columns that need them
+        averageColumns.forEach(avgCol => {
+            columns.slice(1).forEach((colName, idx) => {
+                if (colName.includes(avgCol) && countArray[idx] > 0) {
+                    totalsArray[idx] = totalsArray[idx] / countArray[idx]
                 }
             })
         })
@@ -584,6 +611,13 @@ export default function Page() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const [selectedCountry, setSelectedCountry] = useState<string>('all')
 
+    // Ads filters and pagination state
+    const [adsSearchQuery, setAdsSearchQuery] = useState<string>('')
+    const [adsCountryFilter, setAdsCountryFilter] = useState<string>('all')
+    const [adsStatusFilter, setAdsStatusFilter] = useState<string>('all')
+    const [adsCurrentPage, setAdsCurrentPage] = useState(1)
+    const [adsItemsPerPage, setAdsItemsPerPage] = useState(10)
+
     // Memoize data generation to prevent hydration errors
     const hourlyData = React.useMemo(() => data(), [])
     const monthlyData = React.useMemo(() => dataTwoMonth(), [])
@@ -598,6 +632,33 @@ export default function Page() {
     const companiesData = React.useMemo(() => generateMockCompaniesData(), [])
     const apiKeyData = React.useMemo(() => generateMockApiKeyData(), [])
     const adsData = React.useMemo(() => generateMockAdsData(), [])
+
+    // Filter and paginate ads data
+    const filteredAdsData = React.useMemo(() => {
+        return adsData.filter((ad) => {
+            const matchesSearch =
+                adsSearchQuery === '' ||
+                ad.title.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
+                ad.nickname.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
+                ad.placement.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
+                ad.uniqueId.toLowerCase().includes(adsSearchQuery.toLowerCase())
+
+            const matchesCountry = adsCountryFilter === 'all' || ad.country === adsCountryFilter
+            const matchesStatus = adsStatusFilter === 'all' || ad.status === adsStatusFilter
+
+            return matchesSearch && matchesCountry && matchesStatus
+        })
+    }, [adsData, adsSearchQuery, adsCountryFilter, adsStatusFilter])
+
+    const adsTotalPages = Math.ceil(filteredAdsData.length / adsItemsPerPage)
+    const adsStartIndex = (adsCurrentPage - 1) * adsItemsPerPage
+    const adsEndIndex = adsStartIndex + adsItemsPerPage
+    const paginatedAdsData = filteredAdsData.slice(adsStartIndex, adsEndIndex)
+
+    // Reset to page 1 when filters or items per page change
+    React.useEffect(() => {
+        setAdsCurrentPage(1)
+    }, [adsSearchQuery, adsCountryFilter, adsStatusFilter, adsItemsPerPage])
 
     const formatDateRange = () => {
         if (!dateRange?.from) return 'Select range'
@@ -892,6 +953,61 @@ export default function Page() {
                 {/* Ads Tab */}
                 <TabsContent value="ads">
                     <Card size="sm">
+                        <CardHeader>
+                            {/* Filters */}
+                            <FieldGroup>
+                                <div className="flex flex-wrap gap-4">
+                                    {/* Search Filter */}
+                                    <div className="flex flex-col gap-2">
+                                        <Label>Search</Label>
+                                        <Input
+                                            placeholder="Search ads..."
+                                            value={adsSearchQuery}
+                                            onChange={(e) => setAdsSearchQuery(e.target.value)}
+                                            className="w-[250px]"
+                                        />
+                                    </div>
+
+                                    {/* Country Filter */}
+                                    <div className="flex flex-col gap-2">
+                                        <Label>Country</Label>
+                                        <Select value={adsCountryFilter} onValueChange={setAdsCountryFilter}>
+                                            <SelectTrigger className="w-[200px]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All Countries</SelectItem>
+                                                <SelectItem value="US">United States</SelectItem>
+                                                <SelectItem value="UK">United Kingdom</SelectItem>
+                                                <SelectItem value="CA">Canada</SelectItem>
+                                                <SelectItem value="AU">Australia</SelectItem>
+                                                <SelectItem value="DE">Germany</SelectItem>
+                                                <SelectItem value="FR">France</SelectItem>
+                                                <SelectItem value="JP">Japan</SelectItem>
+                                                <SelectItem value="IN">India</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Status Filter */}
+                                    <div className="flex flex-col gap-2">
+                                        <Label>Status</Label>
+                                        <Select value={adsStatusFilter} onValueChange={setAdsStatusFilter}>
+                                            <SelectTrigger className="w-[200px]">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All Status</SelectItem>
+                                                <SelectItem value="active">Active</SelectItem>
+                                                <SelectItem value="inactive">Inactive</SelectItem>
+                                                <SelectItem value="pending">Pending</SelectItem>
+                                                <SelectItem value="paused">Paused</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                            </FieldGroup>
+                        </CardHeader>
                         <CardContent className="p-0">
                             <Table>
                                 <TableHeader>
@@ -900,6 +1016,7 @@ export default function Page() {
                                         <TableHead>Placement</TableHead>
                                         <TableHead>Nickname</TableHead>
                                         <TableHead>Unique ID</TableHead>
+                                        <TableHead>Country</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Created At</TableHead>
                                         <TableHead>Updated At</TableHead>
@@ -907,37 +1024,136 @@ export default function Page() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {adsData.map((ad) => (
-                                        <TableRow key={ad.id}>
-                                            <TableCell>
-                                                <Link
-                                                    href={`/dashboard/ads/sponsored/${ad.id}`}
-                                                    className="text-primary hover:underline font-medium"
-                                                >
-                                                    {ad.title}
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell>{ad.placement}</TableCell>
-                                            <TableCell>{ad.nickname}</TableCell>
-                                            <TableCell>{ad.uniqueId}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={ad.status === 'active' ? 'default' : 'secondary'}>
-                                                    {ad.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>{ad.createdAt}</TableCell>
-                                            <TableCell>{ad.updatedAt}</TableCell>
-                                            <TableCell>
-                                                <Button size="sm" variant="outline" asChild>
-                                                    <Link href={`/dashboard/ads/sponsored/${ad.id}`}>
-                                                        View
+                                    {paginatedAdsData.length > 0 ? (
+                                        paginatedAdsData.map((ad) => (
+                                            <TableRow key={ad.id}>
+                                                <TableCell>
+                                                    <Link
+                                                        href={`/dashboard/ads/sponsored/${ad.id}`}
+                                                        className="text-primary hover:underline font-medium"
+                                                    >
+                                                        {ad.title}
                                                     </Link>
-                                                </Button>
+                                                </TableCell>
+                                                <TableCell>{ad.placement}</TableCell>
+                                                <TableCell>{ad.nickname}</TableCell>
+                                                <TableCell>{ad.uniqueId}</TableCell>
+                                                <TableCell>{ad.country}</TableCell>
+                                                <TableCell>
+                                                    <Badge
+                                                        variant={
+                                                            ad.status === 'active'
+                                                                ? 'default'
+                                                                : ad.status === 'paused'
+                                                                  ? 'destructive'
+                                                                  : 'secondary'
+                                                        }
+                                                    >
+                                                        {ad.status}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>{ad.createdAt}</TableCell>
+                                                <TableCell>{ad.updatedAt}</TableCell>
+                                                <TableCell>
+                                                    <Button size="sm" variant="outline" asChild>
+                                                        <Link href={`/dashboard/ads/sponsored/${ad.id}`}>View</Link>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                                                No ads found matching the current filters
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    )}
                                 </TableBody>
                             </Table>
+
+                            {/* Pagination */}
+                            {filteredAdsData.length > 0 && (
+                                <div className="flex items-center justify-between p-4 border-t">
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-xs text-muted-foreground">
+                                            Showing {adsStartIndex + 1}-{Math.min(adsEndIndex, filteredAdsData.length)} of{' '}
+                                            {filteredAdsData.length} results
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-muted-foreground">Rows per page:</span>
+                                            <Select value={adsItemsPerPage.toString()} onValueChange={(v) => setAdsItemsPerPage(Number(v))}>
+                                                <SelectTrigger className="h-7 w-[70px] text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                                                        <SelectItem key={option} value={option.toString()} className="text-xs">
+                                                            {option}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            type="button"
+                                            onClick={() => setAdsCurrentPage((prev) => Math.max(1, prev - 1))}
+                                            disabled={adsCurrentPage === 1}
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                            Previous
+                                        </Button>
+
+                                        {/* Page Numbers */}
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: adsTotalPages }, (_, i) => i + 1).map((page) => {
+                                                const showPage =
+                                                    page === 1 ||
+                                                    page === adsTotalPages ||
+                                                    (page >= adsCurrentPage - 1 && page <= adsCurrentPage + 1)
+
+                                                if (!showPage) {
+                                                    if (page === adsCurrentPage - 2 || page === adsCurrentPage + 2) {
+                                                        return (
+                                                            <span key={page} className="px-2 text-xs text-muted-foreground">
+                                                                ...
+                                                            </span>
+                                                        )
+                                                    }
+                                                    return null
+                                                }
+
+                                                return (
+                                                    <Button
+                                                        key={page}
+                                                        variant={adsCurrentPage === page ? 'default' : 'outline'}
+                                                        size="sm"
+                                                        type="button"
+                                                        onClick={() => setAdsCurrentPage(page)}
+                                                        className="min-w-[2rem] px-2"
+                                                    >
+                                                        {page}
+                                                    </Button>
+                                                )
+                                            })}
+                                        </div>
+
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            type="button"
+                                            onClick={() => setAdsCurrentPage((prev) => Math.min(adsTotalPages, prev + 1))}
+                                            disabled={adsCurrentPage === adsTotalPages || adsTotalPages === 0}
+                                        >
+                                            Next
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
