@@ -284,7 +284,7 @@ interface ReportTableProps {
     data: Record<string, string | number | number[]>[]
     linkColumn?: string // Column name that should be a link
     linkPath?: string // Base path for the link (e.g., '/dashboard/partners')
-    linkSuffix?: string // Suffix to add to the link (e.g., '/sponsored-ads')
+    linkSuffix?: string // Suffix to add to the link (e.g., '/sponsored')
 }
 
 function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: ReportTableProps) {
@@ -527,7 +527,7 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                             <div className="flex items-center gap-2">
                                 <span className="text-xs text-muted-foreground">Rows per page:</span>
                                 <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                                    <SelectTrigger className="h-7 w-[70px] text-xs">
+                                    <SelectTrigger className="h-7 w-17.5 text-xs">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -580,7 +580,7 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                                             size="sm"
                                             type="button"
                                             onClick={() => setCurrentPage(page)}
-                                            className="min-w-[2rem] px-2"
+                                            className="min-w-8 px-2"
                                         >
                                             {page}
                                         </Button>
@@ -794,7 +794,7 @@ export default function Page() {
                                     <PopoverTrigger asChild>
                                         <Button
                                             variant="outline"
-                                            className="w-[280px] justify-start text-left font-normal"
+                                            className="w-70 justify-start text-left font-normal"
                                             type="button"
                                         >
                                             <CalendarIcon className="h-4 w-4 mr-2" />
@@ -851,7 +851,7 @@ export default function Page() {
                             <div className="flex flex-col gap-2">
                                 <Label>Country</Label>
                                 <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                                    <SelectTrigger className="w-[200px]">
+                                    <SelectTrigger className="w-50">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -867,55 +867,55 @@ export default function Page() {
                     </FieldGroup>
 
                     {/* Report Sub-tabs */}
-                    <Tabs defaultValue="partner">
+                    <Tabs defaultValue="partners">
                         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
-                            <TabsTrigger value="partner">Partner</TabsTrigger>
-                            <TabsTrigger value="board">Board</TabsTrigger>
-                            <TabsTrigger value="placement">Placement</TabsTrigger>
-                            <TabsTrigger value="source">Source</TabsTrigger>
-                            <TabsTrigger value="medium">Medium</TabsTrigger>
+                            <TabsTrigger value="partners">Partners</TabsTrigger>
+                            <TabsTrigger value="boards">Boards</TabsTrigger>
+                            <TabsTrigger value="placements">Placements</TabsTrigger>
+                            <TabsTrigger value="sources">Sources</TabsTrigger>
+                            <TabsTrigger value="mediums">Mediums</TabsTrigger>
                             <TabsTrigger value="keywords">Keywords</TabsTrigger>
                             <TabsTrigger value="companies">Companies</TabsTrigger>
-                            <TabsTrigger value="apikey">API Key</TabsTrigger>
+                            <TabsTrigger value="apikeys">API Keys</TabsTrigger>
                         </TabsList>
 
                         {/* Partner Table */}
-                        <TabsContent value="partner">
+                        <TabsContent value="partners">
                             <ReportTable
                                 columns={['Date', 'Partner', 'Impressions', 'Clicks', 'CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue', 'LS #s', 'Clicks Hourly']}
                                 data={partnerData}
                                 linkColumn="Partner"
                                 linkPath="/dashboard/partners"
-                                linkSuffix="/sponsored-ads"
+                                linkSuffix="/sponsored"
                             />
                         </TabsContent>
 
-                        {/* Board Table */}
-                        <TabsContent value="board">
+                        {/* Boards Table */}
+                        <TabsContent value="boards">
                             <ReportTable
                                 columns={['Date', 'Board', 'Impressions', 'Clicks', 'CTR', 'RPM', 'Revenue']}
                                 data={boardData}
                             />
                         </TabsContent>
 
-                        {/* Placement Table */}
-                        <TabsContent value="placement">
+                        {/* Placements Table */}
+                        <TabsContent value="placements">
                             <ReportTable
                                 columns={['Date', 'Placement', 'Impressions', 'Clicks', 'Avg. CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue']}
                                 data={placementData}
                             />
                         </TabsContent>
 
-                        {/* Source Table */}
-                        <TabsContent value="source">
+                        {/* Sources Table */}
+                        <TabsContent value="sources">
                             <ReportTable
                                 columns={['Date', 'Source', 'Impressions', 'Clicks', 'Avg. CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue']}
                                 data={sourceData}
                             />
                         </TabsContent>
 
-                        {/* Medium Table */}
-                        <TabsContent value="medium">
+                        {/* Mediums Table */}
+                        <TabsContent value="mediums">
                             <ReportTable
                                 columns={['Date', 'Medium', 'Impressions', 'Clicks', 'Avg. CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue']}
                                 data={mediumData}
@@ -939,7 +939,7 @@ export default function Page() {
                         </TabsContent>
 
                         {/* API Key Table */}
-                        <TabsContent value="apikey">
+                        <TabsContent value="apikeys">
                             <ReportTable
                                 columns={['Date', 'API Key', 'Impressions', 'Clicks', 'Avg. CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue']}
                                 data={apiKeyData}
@@ -964,7 +964,7 @@ export default function Page() {
                                             placeholder="Search ads..."
                                             value={adsSearchQuery}
                                             onChange={(e) => setAdsSearchQuery(e.target.value)}
-                                            className="w-[250px]"
+                                            className="w-62.5"
                                         />
                                     </div>
 
@@ -972,7 +972,7 @@ export default function Page() {
                                     <div className="flex flex-col gap-2">
                                         <Label>Country</Label>
                                         <Select value={adsCountryFilter} onValueChange={setAdsCountryFilter}>
-                                            <SelectTrigger className="w-[200px]">
+                                            <SelectTrigger className="w-50">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -993,7 +993,7 @@ export default function Page() {
                                     <div className="flex flex-col gap-2">
                                         <Label>Status</Label>
                                         <Select value={adsStatusFilter} onValueChange={setAdsStatusFilter}>
-                                            <SelectTrigger className="w-[200px]">
+                                            <SelectTrigger className="w-50">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -1082,7 +1082,7 @@ export default function Page() {
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs text-muted-foreground">Rows per page:</span>
                                             <Select value={adsItemsPerPage.toString()} onValueChange={(v) => setAdsItemsPerPage(Number(v))}>
-                                                <SelectTrigger className="h-7 w-[70px] text-xs">
+                                                <SelectTrigger className="h-7 w-17.5 text-xs">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -1133,7 +1133,7 @@ export default function Page() {
                                                         size="sm"
                                                         type="button"
                                                         onClick={() => setAdsCurrentPage(page)}
-                                                        className="min-w-[2rem] px-2"
+                                                        className="min-w-8 px-2"
                                                     >
                                                         {page}
                                                     </Button>

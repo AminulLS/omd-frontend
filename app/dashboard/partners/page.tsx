@@ -63,7 +63,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { availableUsers, initialPartners, type Partner, type User, type ProductType, type PartnerStatus, type PartnerType, type UserRole } from './constants'
 
-const ALL_PRODUCT_TYPES: ProductType[] = ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication']
+const ALL_PRODUCT_TYPES: ProductType[] = ['sponsored', 'xml', 'publisher', 'syndication']
 
 const statusVariantMap: Record<PartnerStatus, "default" | "secondary" | "destructive" | "outline"> = {
   active: 'default',
@@ -78,8 +78,8 @@ const typeVariantMap: Record<PartnerType, "default" | "secondary" | "outline"> =
 }
 
 const productLabelMap: Record<ProductType, string> = {
-  'sponsored-ads': 'Sponsored Ads',
-  'xml-direct-listing': 'XML Direct',
+  'sponsored': 'Sponsored',
+  'xml': 'XML',
   'publisher': 'Publisher',
   'syndication': 'Syndication',
 }

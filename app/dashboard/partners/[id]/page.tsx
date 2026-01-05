@@ -1,13 +1,20 @@
 import { redirect } from 'next/navigation'
 import { partnersData } from '../constants'
 
-export default async function PartnerDetailsPage() {
+interface PageProps {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export default async function PartnerDetailsPage({ params }: PageProps) {
   // Always redirect to the first partner's first product
-  const firstPartner = partnersData['1']
+  const { id } = await params
+  const firstPartner = partnersData[id]
 
   if (!firstPartner || firstPartner.products.length === 0) {
     redirect('/dashboard/partners')
   }
 
-  redirect(`/dashboard/partners/1/${firstPartner.products[0]}`)
+  redirect(`/dashboard/partners/${id}/${firstPartner.products[0]}`)
 }

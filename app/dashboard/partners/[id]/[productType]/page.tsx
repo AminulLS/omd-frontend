@@ -43,7 +43,7 @@ import { TabNavigation } from '@/components/dashboard/tab-navigation'
 import { notFound } from 'next/navigation'
 import { availableUsers, partnersData, type User, type ProductType, type PartnerStatus, type PartnerType, type UserRole } from '../../constants'
 
-const ALL_PRODUCT_TYPES: ProductType[] = ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication']
+const ALL_PRODUCT_TYPES: ProductType[] = ['sponsored', 'xml', 'publisher', 'syndication']
 
 const data = (hours = 24) => {
   return [...Array(hours)].map((_, h) => {
@@ -126,8 +126,8 @@ const typeVariantMap: Record<PartnerType, "default" | "secondary" | "outline"> =
 }
 
 const productLabelMap: Record<ProductType, string> = {
-  'sponsored-ads': 'Sponsored Ads',
-  'xml-direct-listing': 'XML Direct',
+  'sponsored': 'Sponsored',
+  'xml': 'XML',
   'publisher': 'Publisher',
   'syndication': 'Syndication',
 }
@@ -165,7 +165,9 @@ interface PageProps {
 
 export default function PartnerProductPage({ params }: PageProps) {
   const { id, productType } = use(params)
-  const partner = partnersData[id]
+  // const partner = partnersData[id]
+  // TODO: Replace with real data fetching
+  const partner = partnersData['1']
 
   const [sheetOpen, setSheetOpen] = useState(false)
   const [formData, setFormData] = useState<FormData>({
@@ -193,9 +195,9 @@ export default function PartnerProductPage({ params }: PageProps) {
   }))
 
   const productTitle = {
-    'sponsored-ads': 'Sponsored Ads',
-    'xml-direct-listing': 'XML Direct Listings',
-    'publisher': 'Traffic Publisher',
+    'sponsored': 'Sponsored',
+    'xml': 'XML',
+    'publisher': 'Publishers',
     'syndication': 'Syndication',
   }[productType]
 

@@ -1,6 +1,6 @@
 type PartnerStatus = 'active' | 'inactive' | 'pending' | 'suspended'
 type PartnerType = 'internal' | 'external'
-type ProductType = 'sponsored-ads' | 'xml-direct-listing' | 'publisher' | 'syndication'
+type ProductType = 'sponsored' | 'xml' | 'publisher' | 'syndication'
 type UserRole = 'main_user' | 'manager'
 
 type User = {
@@ -80,7 +80,7 @@ function randomStatus(rng: SeededRandom): PartnerStatus {
 
 // Helper function to get random products
 function randomProducts(rng: SeededRandom): ProductType[] {
-  const allProducts: ProductType[] = ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication']
+  const allProducts: ProductType[] = ['sponsored', 'xml', 'publisher', 'syndication']
   const count = rng.nextInt(1, 4)
   const shuffled = [...allProducts].sort(() => rng.next() - 0.5)
   return shuffled.slice(0, count)
@@ -150,7 +150,7 @@ function generatePartners(): Partner[] {
 
     // First partner always has all products
     const products = i === 0
-      ? ['sponsored-ads', 'xml-direct-listing', 'publisher', 'syndication'] as ProductType[]
+      ? ['sponsored', 'xml', 'publisher', 'syndication'] as ProductType[]
       : randomProducts(rng)
 
     return {
