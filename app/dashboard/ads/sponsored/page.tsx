@@ -703,9 +703,9 @@ export default function Page() {
                                         <TableHead className="text-right font-semibold">
                                             Totals
                                         </TableHead>
-                                        <TableCell>$00000000.00</TableCell>
-                                        <TableCell>$00000000.00</TableCell>
-                                        <TableCell>$00000000.00</TableCell>
+                                        <TableCell>${(Math.random() * 1000.54 + 200).toLocaleString()}</TableCell>
+                                        <TableCell>${(Math.random() * 1000.54 + 200).toLocaleString()}</TableCell>
+                                        <TableCell>${(Math.random() * 1000.54 + 200).toLocaleString()}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>
