@@ -143,20 +143,36 @@ const generateMockPartnerData = () => [...Array(50)].map((_, idx) => {
     }
 })
 
-const generateMockBoardData = () => [...Array(50)].map((_, idx) => ({
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    board: `Board ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
+const generateMockParsingData = () => [...Array(50)].map((_, idx) => {
+    const cyclesCompleted = Math.floor(Math.random() * 100) + 1
+    const cyclesTotal = cyclesCompleted + Math.floor(Math.random() * 10)
+    const indexingSpeedSeconds = Math.floor(Math.random() * 86400) + 60 // Up to 24 hours in seconds
+    const totalTimeSeconds = Math.floor(Math.random() * 86400) + 60
 
-const generateMockPlacementData = () => [...Array(50)].map((_, idx) => ({
+    return {
+        id: idx + 1,
+        feedId: idx + 1,
+        partnerId: (idx % 10) + 1,
+        feed: `Feed ${idx + 1}`,
+        partner: `Partner ${(idx % 10) + 1}`,
+        jobs: Math.floor(Math.random() * 5000) + 100,
+        lastUpdated: format(new Date(2026, 0, 1 + idx), 'MM/dd/yyyy HH:mm'),
+        nextRun: format(new Date(2026, 0, 1 + idx + 1), 'MM/dd/yyyy HH:mm'),
+        cycles: `${cyclesCompleted}/${cyclesTotal}`,
+        lastStatus: ['success', 'failed', 'running', 'pending'][Math.floor(Math.random() * 4)],
+        indexingSpeed: indexingSpeedSeconds,
+        totalTimeIndexing: totalTimeSeconds,
+    }
+})
+
+const generateMockCampaignData = () => [...Array(50)].map((_, idx) => ({
+    id: idx + 1,
+    feedId: idx + 1,
+    partnerId: (idx % 10) + 1,
     date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    placement: `Placement ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
+    feed: `Feed ${idx + 1}`,
+    partner: `Partner ${(idx % 10) + 1}`,
+    jobs: Math.floor(Math.random() * 5000) + 100,
     clicks: Math.floor(Math.random() * 1000) + 100,
     avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
     ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
@@ -167,19 +183,25 @@ const generateMockPlacementData = () => [...Array(50)].map((_, idx) => ({
     revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
 }))
 
-const generateMockSourceData = () => [...Array(50)].map((_, idx) => ({
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    source: `Source ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    conversion: Math.floor(Math.random() * 100) + 10,
-    conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
-    cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
+const generateMockCategoryData = () => [...Array(50)].map((_, idx) => {
+    const categories = ['Technology', 'Healthcare', 'Finance', 'Education', 'Retail', 'Manufacturing', 'Transportation', 'Entertainment']
+    const category = categories[idx % categories.length]
+    return {
+        date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
+        category: `${category} ${Math.floor(idx / categories.length) + 1}`,
+        impressions: Math.floor(Math.random() * 50000) + 10000,
+        clicks: Math.floor(Math.random() * 1000) + 100,
+        minCpc: Math.round((Math.random() * 1 + 0.3) * 100) / 100,
+        avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
+        maxCpc: Math.round((Math.random() * 4 + 2) * 100) / 100,
+        ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
+        rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
+        conversion: Math.floor(Math.random() * 100) + 10,
+        conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
+        cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
+        revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
+    }
+})
 
 const generateMockMediumData = () => [...Array(50)].map((_, idx) => ({
     date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
@@ -243,12 +265,15 @@ const generateMockAdsData = () => [...Array(50)].map((_, idx) => {
     const statuses = ['active', 'inactive', 'pending', 'paused']
     return {
         id: idx + 1,
-        title: `Ad Title ${idx + 1}`,
+        partnerId: (idx % 10) + 1,
+        title: `Campaign Title ${idx + 1}`,
         placement: `Placement ${idx + 1}`,
+        partner: `Partner ${(idx % 10) + 1}`,
         nickname: `Nickname ${idx + 1}`,
         uniqueId: `ID-${Math.random().toString(36).substring(7).toUpperCase()}`,
         status: statuses[Math.floor(Math.random() * statuses.length)],
         country: countries[Math.floor(Math.random() * countries.length)],
+        dailyBudget: Math.round((Math.random() * 500 + 50) * 100) / 100,
         createdAt: format(new Date(2026, 0, 1 + idx), 'MM/dd/yyyy'),
         updatedAt: format(new Date(2026, 0, 10 + idx), 'MM/dd/yyyy'),
     }
@@ -278,6 +303,14 @@ function HourlyBarChart({ data, maxBars = 24 }: HourlyBarChartProps) {
     )
 }
 
+// Helper function to format seconds to hh:mm:ss
+const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+}
+
 // ReportTable component with pagination
 interface ReportTableProps {
     columns: string[]
@@ -285,9 +318,11 @@ interface ReportTableProps {
     linkColumn?: string // Column name that should be a link
     linkPath?: string // Base path for the link (e.g., '/dashboard/partners')
     linkSuffix?: string // Suffix to add to the link (e.g., '/sponsored-ads')
+    linkColumns?: Record<string, { path: string; suffix?: string }> // Multiple link columns: { columnName: { path: '/path', suffix: '/optional' } }
+    showTotals?: boolean // Whether to show the totals row (default: true)
 }
 
-function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: ReportTableProps) {
+function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix, linkColumns, showTotals = true }: ReportTableProps) {
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(10)
 
@@ -311,6 +346,11 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
         if (typeof value === 'number') {
             const lowerCol = columnName.toLowerCase()
 
+            // Time formatting for Indexing Speed and Total Time Indexing
+            if (columnName === 'Indexing Speed' || columnName === 'Total Time Indexing') {
+                return formatTime(value)
+            }
+
             // Currency fields
             if (lowerCol.includes('revenue') || lowerCol.includes('cpc') || lowerCol.includes('cpa') || lowerCol.includes('rpm')) {
                 return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -321,8 +361,8 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                 return `${value.toFixed(2)}%`
             }
 
-            // Large numbers (impressions, clicks)
-            if (lowerCol.includes('impression') || lowerCol.includes('click') || lowerCol.includes('conversion') || lowerCol.includes('ls')) {
+            // Large numbers (impressions, clicks, jobs)
+            if (lowerCol.includes('impression') || lowerCol.includes('click') || lowerCol.includes('conversion') || lowerCol.includes('ls') || lowerCol === 'jobs') {
                 return value.toLocaleString()
             }
 
@@ -390,6 +430,13 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                 if (colName === 'Conversion %') dataKey = 'conversionPercentage'
                 if (colName === 'LS #s') dataKey = 'lsNumbers'
                 if (colName === 'API Key') dataKey = 'apiKey'
+                if (colName === 'Last Updated') dataKey = 'lastUpdated'
+                if (colName === 'Next Run') dataKey = 'nextRun'
+                if (colName === 'Last Status') dataKey = 'lastStatus'
+                if (colName === 'Indexing Speed') dataKey = 'indexingSpeed'
+                if (colName === 'Total Time Indexing') dataKey = 'totalTimeIndexing'
+                if (colName === 'Min. CPC') dataKey = 'minCpc'
+                if (colName === 'Max. CPC') dataKey = 'maxCpc'
 
                 const value = (row as any)[dataKey]
                 if (typeof value === 'number') {
@@ -466,9 +513,17 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                                         if (columnName === 'Conversion %') dataKey = 'conversionPercentage'
                                         if (columnName === 'LS #s') dataKey = 'lsNumbers'
                                         if (columnName === 'API Key') dataKey = 'apiKey'
+                                        if (columnName === 'Last Updated') dataKey = 'lastUpdated'
+                                        if (columnName === 'Next Run') dataKey = 'nextRun'
+                                        if (columnName === 'Last Status') dataKey = 'lastStatus'
+                                        if (columnName === 'Indexing Speed') dataKey = 'indexingSpeed'
+                                        if (columnName === 'Total Time Indexing') dataKey = 'totalTimeIndexing'
+                                        if (columnName === 'Min. CPC') dataKey = 'minCpc'
+                                        if (columnName === 'Max. CPC') dataKey = 'maxCpc'
 
                                         const value = (row as any)[dataKey]
                                         const isLinkColumn = linkColumn && columnName === linkColumn
+                                        const linkConfig = linkColumns?.[columnName]
 
                                         // Check if value is an array (hourly chart data)
                                         if (Array.isArray(value)) {
@@ -493,6 +548,25 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                                             )
                                         }
 
+                                        // Render link columns from linkColumns config
+                                        if (linkConfig) {
+                                            // Determine which ID to use based on column name
+                                            let linkId = rowId
+                                            if (columnName === 'Feed') linkId = (row as any).feedId || rowId
+                                            if (columnName === 'Partner') linkId = (row as any).partnerId || rowId
+
+                                            return (
+                                                <TableCell key={cellIdx}>
+                                                    <Link
+                                                        href={`${linkConfig.path}/${linkId}${linkConfig.suffix || ''}`}
+                                                        className="text-primary hover:underline font-medium"
+                                                    >
+                                                        {formatValue(columnName, value)}
+                                                    </Link>
+                                                </TableCell>
+                                            )
+                                        }
+
                                         return (
                                             <TableCell key={cellIdx}>
                                                 {formatValue(columnName, value)}
@@ -503,17 +577,19 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
                             )
                         })}
                         {/* Total row */}
-                        <TableRow className="bg-muted/50 font-semibold">
-                            <TableCell>Totals</TableCell>
-                            {columns.slice(1).map((colName, idx) => {
-                                const totalValue = totals[idx]
-                                return (
-                                    <TableCell key={idx}>
-                                        {totalValue !== undefined && totalValue > 0 ? formatValue(colName, totalValue) : '-'}
-                                    </TableCell>
-                                )
-                            })}
-                        </TableRow>
+                        {showTotals && (
+                            <TableRow className="bg-muted/50 font-semibold">
+                                <TableCell>Totals</TableCell>
+                                {columns.slice(1).map((colName, idx) => {
+                                    const totalValue = totals[idx]
+                                    return (
+                                        <TableCell key={idx}>
+                                            {totalValue !== undefined && totalValue > 0 ? formatValue(colName, totalValue) : '-'}
+                                        </TableCell>
+                                    )
+                                })}
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
 
@@ -624,9 +700,9 @@ export default function Page() {
 
     // Memoize all mock data generators
     const partnerData = React.useMemo(() => generateMockPartnerData(), [])
-    const parsingData = React.useMemo(() => generateMockBoardData(), [])
-    const campaignData = React.useMemo(() => generateMockPlacementData(), [])
-    const categoryData = React.useMemo(() => generateMockSourceData(), [])
+    const parsingData = React.useMemo(() => generateMockParsingData(), [])
+    const campaignData = React.useMemo(() => generateMockCampaignData(), [])
+    const categoryData = React.useMemo(() => generateMockCategoryData(), [])
     const adsData = React.useMemo(() => generateMockAdsData(), [])
 
     // Filter and paginate ads data
@@ -636,8 +712,8 @@ export default function Page() {
                 adsSearchQuery === '' ||
                 ad.title.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
                 ad.nickname.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
-                ad.placement.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
-                ad.uniqueId.toLowerCase().includes(adsSearchQuery.toLowerCase())
+                ad.uniqueId.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
+                ad.partner.toLowerCase().includes(adsSearchQuery.toLowerCase())
 
             const matchesCountry = adsCountryFilter === 'all' || ad.country === adsCountryFilter
             const matchesStatus = adsStatusFilter === 'all' || ad.status === adsStatusFilter
@@ -773,7 +849,7 @@ export default function Page() {
 
             {/* Add Reports Here */}
             <Tabs defaultValue="reports" className="mt-6">
-                <TabsList className="w-full max-w-md grid-cols-2 border-b">
+                <TabsList className="w-full max-w-md grid-cols-2">
                     <TabsTrigger value="reports">Reports</TabsTrigger>
                     <TabsTrigger value="xmls">XMLs</TabsTrigger>
                 </TabsList>
@@ -887,9 +963,11 @@ export default function Page() {
                             <ReportTable
                                 columns={['Feed', 'Partner', 'Jobs', 'Last Updated', 'Next Run', 'Cycles', 'Last Status', 'Indexing Speed', 'Total Time Indexing']}
                                 data={parsingData}
-                                linkColumn="Partner"
-                                linkPath="/dashboard/partners"
-                                linkSuffix="/xml"
+                                linkColumns={{
+                                    'Feed': { path: '/dashboard/ads/xml' },
+                                    'Partner': { path: '/dashboard/partners', suffix: '/xml' },
+                                }}
+                                showTotals={false}
                             />
                         </TabsContent>
 
@@ -898,6 +976,10 @@ export default function Page() {
                             <ReportTable
                                 columns={['Date', 'Feed', 'Partner', 'Clicks', 'Avg. CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'CPA', 'Revenue']}
                                 data={campaignData}
+                                linkColumns={{
+                                    'Feed': { path: '/dashboard/ads/xml' },
+                                    'Partner': { path: '/dashboard/partners', suffix: '/xml' },
+                                }}
                             />
                         </TabsContent>
 
@@ -911,7 +993,7 @@ export default function Page() {
                     </Tabs>
                 </TabsContent>
 
-                {/* Ads Tab */}
+                {/* XMLs Tab */}
                 <TabsContent value="xmls">
                     <Card size="sm">
                         <CardHeader>
@@ -973,15 +1055,15 @@ export default function Page() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Title</TableHead>
-                                        <TableHead>Placement</TableHead>
-                                        <TableHead>Nickname</TableHead>
+                                        <TableHead>Campaign Title</TableHead>
+                                        <TableHead>Partner</TableHead>
+                                        <TableHead>Original Name</TableHead>
                                         <TableHead>Unique ID</TableHead>
                                         <TableHead>Country</TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Daily Budget</TableHead>
                                         <TableHead>Created At</TableHead>
                                         <TableHead>Updated At</TableHead>
-                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -996,7 +1078,14 @@ export default function Page() {
                                                         {ad.title}
                                                     </Link>
                                                 </TableCell>
-                                                <TableCell>{ad.placement}</TableCell>
+                                                <TableCell>
+                                                    <Link
+                                                        href={`/dashboard/partners/${ad.partnerId}/xml`}
+                                                        className="text-primary hover:underline font-medium"
+                                                    >
+                                                        {ad.partner}
+                                                    </Link>
+                                                </TableCell>
                                                 <TableCell>{ad.nickname}</TableCell>
                                                 <TableCell>{ad.uniqueId}</TableCell>
                                                 <TableCell>{ad.country}</TableCell>
@@ -1013,13 +1102,9 @@ export default function Page() {
                                                         {ad.status}
                                                     </Badge>
                                                 </TableCell>
+                                                <TableCell>${ad.dailyBudget.toFixed(2)}</TableCell>
                                                 <TableCell>{ad.createdAt}</TableCell>
                                                 <TableCell>{ad.updatedAt}</TableCell>
-                                                <TableCell>
-                                                    <Button size="sm" variant="outline" asChild>
-                                                        <Link href={`/dashboard/ads/sponsored/${ad.id}`}>View</Link>
-                                                    </Button>
-                                                </TableCell>
                                             </TableRow>
                                         ))
                                     ) : (

@@ -243,12 +243,15 @@ const generateMockAdsData = () => [...Array(50)].map((_, idx) => {
     const statuses = ['active', 'inactive', 'pending', 'paused']
     return {
         id: idx + 1,
+        partnerId: (idx % 10) + 1,
         title: `Ad Title ${idx + 1}`,
         placement: `Placement ${idx + 1}`,
+        partner: `Partner ${(idx % 10) + 1}`,
         nickname: `Nickname ${idx + 1}`,
         uniqueId: `ID-${Math.random().toString(36).substring(7).toUpperCase()}`,
         status: statuses[Math.floor(Math.random() * statuses.length)],
         country: countries[Math.floor(Math.random() * countries.length)],
+        dailyBudget: Math.round((Math.random() * 500 + 50) * 100) / 100,
         createdAt: format(new Date(2026, 0, 1 + idx), 'MM/dd/yyyy'),
         updatedAt: format(new Date(2026, 0, 10 + idx), 'MM/dd/yyyy'),
     }
@@ -641,7 +644,8 @@ export default function Page() {
                 ad.title.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
                 ad.nickname.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
                 ad.placement.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
-                ad.uniqueId.toLowerCase().includes(adsSearchQuery.toLowerCase())
+                ad.uniqueId.toLowerCase().includes(adsSearchQuery.toLowerCase()) ||
+                ad.partner.toLowerCase().includes(adsSearchQuery.toLowerCase())
 
             const matchesCountry = adsCountryFilter === 'all' || ad.country === adsCountryFilter
             const matchesStatus = adsStatusFilter === 'all' || ad.status === adsStatusFilter
@@ -1013,14 +1017,15 @@ export default function Page() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Title</TableHead>
+                                        <TableHead>Partner</TableHead>
                                         <TableHead>Placement</TableHead>
                                         <TableHead>Nickname</TableHead>
                                         <TableHead>Unique ID</TableHead>
                                         <TableHead>Country</TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Daily Budget</TableHead>
                                         <TableHead>Created At</TableHead>
                                         <TableHead>Updated At</TableHead>
-                                        <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -1033,6 +1038,14 @@ export default function Page() {
                                                         className="text-primary hover:underline font-medium"
                                                     >
                                                         {ad.title}
+                                                    </Link>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Link
+                                                        href={`/dashboard/partners/${ad.partnerId}/sponsored`}
+                                                        className="text-primary hover:underline font-medium"
+                                                    >
+                                                        {ad.partner}
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>{ad.placement}</TableCell>
@@ -1052,18 +1065,14 @@ export default function Page() {
                                                         {ad.status}
                                                     </Badge>
                                                 </TableCell>
+                                                <TableCell>${ad.dailyBudget.toFixed(2)}</TableCell>
                                                 <TableCell>{ad.createdAt}</TableCell>
                                                 <TableCell>{ad.updatedAt}</TableCell>
-                                                <TableCell>
-                                                    <Button size="sm" variant="outline" asChild>
-                                                        <Link href={`/dashboard/ads/sponsored/${ad.id}`}>View</Link>
-                                                    </Button>
-                                                </TableCell>
                                             </TableRow>
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                                            <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                                                 No ads found matching the current filters
                                             </TableCell>
                                         </TableRow>
