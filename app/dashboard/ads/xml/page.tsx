@@ -203,63 +203,6 @@ const generateMockCategoryData = () => [...Array(50)].map((_, idx) => {
     }
 })
 
-const generateMockMediumData = () => [...Array(50)].map((_, idx) => ({
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    medium: `Medium ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    conversion: Math.floor(Math.random() * 100) + 10,
-    conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
-    cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
-
-const generateMockKeywordsData = () => [...Array(50)].map((_, idx) => ({
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    keyword: `Keyword ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    conversion: Math.floor(Math.random() * 100) + 10,
-    conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
-    cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
-
-const generateMockCompaniesData = () => [...Array(50)].map((_, idx) => ({
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    company: `Company ${idx + 1}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    conversion: Math.floor(Math.random() * 100) + 10,
-    conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
-    cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
-
-const generateMockApiKeyData = () => [...Array(50)].map((_, idx) => ({
-    id: idx + 1,
-    date: format(new Date(2026, 0, 1 + (idx % 30)), 'MM/dd/yyyy'),
-    apiKey: `key-${Math.random().toString(36).substring(7)}`,
-    impressions: Math.floor(Math.random() * 50000) + 10000,
-    clicks: Math.floor(Math.random() * 1000) + 100,
-    avgCpc: Math.round((Math.random() * 2 + 0.5) * 100) / 100,
-    ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-    rpm: Math.round((Math.random() * 10 + 5) * 100) / 100,
-    conversion: Math.floor(Math.random() * 100) + 10,
-    conversionPercentage: Math.round((Math.random() * 10 + 1) * 100) / 100,
-    cpa: Math.round((Math.random() * 50 + 10) * 100) / 100,
-    revenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
-}))
-
 const generateMockAdsData = () => [...Array(50)].map((_, idx) => {
     const countries = ['US', 'UK', 'CA', 'AU', 'DE', 'FR', 'JP', 'IN']
     const statuses = ['active', 'inactive', 'pending', 'paused']
