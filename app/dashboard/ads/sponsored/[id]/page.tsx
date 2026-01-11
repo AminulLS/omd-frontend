@@ -304,7 +304,7 @@ const KeywordsFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Show Keywords
             </label>
             <FilterTextarea
@@ -316,7 +316,7 @@ const KeywordsFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Hide Keywords
             </label>
             <FilterTextarea
@@ -348,7 +348,7 @@ const SourceFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include Sources
             </label>
             <FilterTextarea
@@ -360,7 +360,7 @@ const SourceFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude Sources
             </label>
             <FilterTextarea
@@ -394,7 +394,7 @@ const SourceWildcardFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include Wildcards
             </label>
             <FilterTextarea
@@ -406,7 +406,7 @@ const SourceWildcardFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude Wildcards
             </label>
             <FilterTextarea
@@ -434,7 +434,7 @@ const MediumsFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include Mediums
             </label>
             <FilterTextarea
@@ -446,7 +446,7 @@ const MediumsFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude Mediums
             </label>
             <FilterTextarea
@@ -474,7 +474,7 @@ const CompaniesFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include Companies
             </label>
             <FilterTextarea
@@ -486,7 +486,7 @@ const CompaniesFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude Companies
             </label>
             <FilterTextarea
@@ -522,7 +522,7 @@ const LocationFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include ZIPs
             </label>
             <FilterTextarea
@@ -542,7 +542,7 @@ const LocationFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude ZIPs
             </label>
             <FilterTextarea
@@ -578,7 +578,7 @@ const StatesFilter = ({
     <div className="space-y-4">
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 bg-green-500"></span>
                 Include States
             </label>
             <FilterTextarea
@@ -590,7 +590,7 @@ const StatesFilter = ({
         </div>
         <div>
             <label className="text-sm font-medium mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                <span className="w-2 h-2 bg-red-500"></span>
                 Exclude States
             </label>
             <FilterTextarea
@@ -716,7 +716,7 @@ const FilterCheckboxGroup = ({ label, value, options, onChange }: FilterCheckbox
                             value={option.value}
                             checked={value.includes(option.value)}
                             onChange={() => onChange(option.value)}
-                            className="w-4 h-4 text-primary border-border rounded"
+                            className="w-4 h-4 text-primary border-border"
                         />
                         <span className="text-sm">{option.label}</span>
                     </label>
@@ -780,7 +780,7 @@ const FilterFile = ({ label, file, onChange, accept }: FilterFileProps) => (
     <Field>
         <FieldLabel>{label}</FieldLabel>
         <FieldContent>
-            <div className="border-2 border-dashed rounded-lg p-4 text-center hover:bg-muted/50 transition-colors">
+            <div className="border-2 border-dashed p-4 text-center hover:bg-muted/50 transition-colors">
                 {file ? (
                     <div className="space-y-2">
                         <p className="text-sm font-medium">{file.name}</p>
@@ -1477,25 +1477,25 @@ export default function SponsoredAdDetailsPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                        <div className="border rounded-lg p-4">
+                                        <div className="border p-4">
                                             <div className="text-sm text-muted-foreground">Total Impressions</div>
                                             <div className="text-2xl font-bold">
                                                 {mockStatsData.reduce((acc, row) => acc + row.impressions, 0).toLocaleString()}
                                             </div>
                                         </div>
-                                        <div className="border rounded-lg p-4">
+                                        <div className="border p-4">
                                             <div className="text-sm text-muted-foreground">Total Clicks</div>
                                             <div className="text-2xl font-bold">
                                                 {mockStatsData.reduce((acc, row) => acc + row.clicks, 0).toLocaleString()}
                                             </div>
                                         </div>
-                                        <div className="border rounded-lg p-4">
+                                        <div className="border p-4">
                                             <div className="text-sm text-muted-foreground">Avg CTR</div>
                                             <div className="text-2xl font-bold">
                                                 {(mockStatsData.reduce((acc, row) => acc + row.ctr, 0) / mockStatsData.length).toFixed(2)}%
                                             </div>
                                         </div>
-                                        <div className="border rounded-lg p-4">
+                                        <div className="border p-4">
                                             <div className="text-sm text-muted-foreground">Total Revenue</div>
                                             <div className="text-2xl font-bold">
                                                 ${mockStatsData.reduce((acc, row) => acc + row.revenue, 0).toFixed(2)}
@@ -1793,7 +1793,7 @@ export default function SponsoredAdDetailsPage() {
                                                 <Field>
                                                     <FieldLabel>Ad Image</FieldLabel>
                                                     <FieldContent>
-                                                        <div className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-muted/50 transition-colors">
+                                                        <div className="border-2 border-dashed p-6 text-center hover:bg-muted/50 transition-colors">
                                                             {settingsData.adImage ? (
                                                                 <div className="space-y-2">
                                                                     <p className="text-sm font-medium">{settingsData.adImage.name}</p>
@@ -2093,10 +2093,10 @@ export default function SponsoredAdDetailsPage() {
                                                                     {boardCodes.map((board) => (
                                                                         <div
                                                                             key={board.value}
-                                                                            className="flex items-center space-x-2 p-2 hover:bg-muted rounded-md cursor-pointer"
+                                                                            className="flex items-center space-x-2 p-2 hover:bg-muted cursor-pointer"
                                                                             onClick={() => toggleBoard(board.value)}
                                                                         >
-                                                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${
+                                                                            <div className={`w-4 h-4 border flex items-center justify-center ${
                                                                                 settingsData.selectedBoards.includes(board.value)
                                                                                     ? 'bg-primary border-primary'
                                                                                     : 'border-border'
@@ -2601,9 +2601,9 @@ export default function SponsoredAdDetailsPage() {
                                 <CardDescription>See how your ad will appear</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="border rounded-lg p-6 bg-muted/50 space-y-4">
+                                <div className="border p-6 bg-muted/50 space-y-4">
                                     {settingsData.adImage && (
-                                        <div className="aspect-video bg-background rounded-lg overflow-hidden flex items-center justify-center">
+                                        <div className="aspect-video bg-background overflow-hidden flex items-center justify-center">
                                             <img
                                                 src={URL.createObjectURL(settingsData.adImage)}
                                                 alt="Ad preview"
@@ -2732,7 +2732,7 @@ export default function SponsoredAdDetailsPage() {
                                             key={day.value}
                                             type="button"
                                             onClick={() => toggleDay(day.value)}
-                                            className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                                            className={`px-3 py-1.5 text-sm border transition-colors ${
                                                 scheduleForm.days.includes(day.value)
                                                     ? 'bg-primary text-primary-foreground border-primary'
                                                     : 'bg-background hover:bg-muted border-border'
