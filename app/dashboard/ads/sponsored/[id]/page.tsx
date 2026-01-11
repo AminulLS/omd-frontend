@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dialog'
 import { ArrowLeft, BarChart3, Settings, Calendar, FileText, Eye, Plus, Pencil, Trash2, Play, Pause, Upload, Code, Variable, Filter, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { format } from 'date-fns'
+import { PLACEMENTS } from '@/lib/constants/placements'
 
 // Filter Types
 type FilterRadioOption = { value: string; label: string }
@@ -132,17 +133,23 @@ const pricingTypes = [
     { value: 'auto', label: 'Auto (Rev Event)' },
 ]
 
+const categoryOptions = [
+    { value: 'employment', label: 'Employment' },
+    { value: 'education', label: 'Education' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'health', label: 'Health' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'travel', label: 'Travel' },
+    { value: 'automotive', label: 'Automotive' },
+    { value: 'retail', label: 'Retail' },
+    { value: 'real-estate', label: 'Real Estate' },
+    { value: 'other', label: 'Other' },
+]
+
 const imagePriorities = [
     { value: 'high', label: 'High' },
     { value: 'medium', label: 'Medium' },
     { value: 'low', label: 'Low' },
-]
-
-const boardPlacements = [
-    { value: 'top', label: 'Top' },
-    { value: 'sidebar', label: 'Sidebar' },
-    { value: 'footer', label: 'Footer' },
-    { value: 'featured', label: 'Featured' },
 ]
 
 // Board codes for multi-select (A-Z)
@@ -230,23 +237,435 @@ const ageLogicOptions = [
     { value: '<=', label: 'Less or Equal (<=)' },
 ]
 
-// ========== REUSABLE FILTER COMPONENTS ==========
+// ========== INDEPENDENT FILTER COMPONENTS ==========
 
-interface FilterSectionProps {
-    title: string
-    description?: string
-    children: React.ReactNode
-}
-
-const FilterSection = ({ title, description, children }: FilterSectionProps) => (
-    <Card>
-        <CardHeader>
-            <CardTitle className="text-base">{title}</CardTitle>
-            {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-        <CardContent>{children}</CardContent>
-    </Card>
+// User Type Filter Component
+const UserTypeFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="User Type"
+        value={value}
+        options={userTypeOptions}
+        onChange={onChange}
+    />
 )
+
+// Gender Filter Component
+const GenderFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="Gender"
+        value={value}
+        options={genderOptions}
+        onChange={onChange}
+    />
+)
+
+// Age Ranges Filter Component
+const AgeRangesFilter = ({
+    rules,
+    onAdd,
+    onUpdate,
+    onRemove
+}: {
+    rules: AgeRangeRule[]
+    onAdd: () => void
+    onUpdate: (id: string, field: 'logic' | 'value', value: string) => void
+    onRemove: (id: string) => void
+}) => (
+    <AgeRangeRepeater
+        rules={rules}
+        onAdd={onAdd}
+        onUpdate={onUpdate}
+        onRemove={onRemove}
+    />
+)
+
+// Prepop Filter Component
+const PrepopFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="Prepop"
+        value={value}
+        options={prepopOptions}
+        onChange={onChange}
+    />
+)
+
+// Keywords Filter Component
+const KeywordsFilter = ({
+    show,
+    hide,
+    onShowChange,
+    onHideChange
+}: {
+    show: string
+    hide: string
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Show Keywords
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="sales, marketing, manager"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Hide Keywords
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="competitor, spam"
+            />
+        </div>
+    </div>
+)
+
+// Source Filter Component
+const SourceFilter = ({
+    show,
+    hide,
+    hideOwnSource,
+    onShowChange,
+    onHideChange,
+    onHideOwnSourceChange
+}: {
+    show: string
+    hide: string
+    hideOwnSource: boolean
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+    onHideOwnSourceChange: (v: boolean) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include Sources
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="google, facebook, newsletter"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude Sources
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="competitor, low-quality"
+            />
+        </div>
+        <FilterSwitch
+            label="Hide Own Source Traffic"
+            value={hideOwnSource}
+            onChange={onHideOwnSourceChange}
+            description="Automatically exclude traffic from your own sources to prevent self-referrals"
+        />
+    </div>
+)
+
+// Source Wildcard Filter Component
+const SourceWildcardFilter = ({
+    show,
+    hide,
+    onShowChange,
+    onHideChange
+}: {
+    show: string
+    hide: string
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include Wildcards
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="*.google.com, mail.*"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude Wildcards
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="spam.*, ?-tracker.com"
+            />
+        </div>
+    </div>
+)
+
+// Mediums Filter Component
+const MediumsFilter = ({
+    show,
+    hide,
+    onShowChange,
+    onHideChange
+}: {
+    show: string
+    hide: string
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include Mediums
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="cpc, organic, referral"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude Mediums
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="email, direct"
+            />
+        </div>
+    </div>
+)
+
+// Companies Filter Component
+const CompaniesFilter = ({
+    show,
+    hide,
+    onShowChange,
+    onHideChange
+}: {
+    show: string
+    hide: string
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include Companies
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="Google, Microsoft, Amazon"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude Companies
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="Competitors, agencies"
+            />
+        </div>
+    </div>
+)
+
+// Location Filter Component
+const LocationFilter = ({
+    zipsShow,
+    zipsHide,
+    zipsShowFile,
+    zipsHideFile,
+    onZipsShowChange,
+    onZipsHideChange,
+    onZipsShowFileChange,
+    onZipsHideFileChange
+}: {
+    zipsShow: string
+    zipsHide: string
+    zipsShowFile: File | null
+    zipsHideFile: File | null
+    onZipsShowChange: (v: string) => void
+    onZipsHideChange: (v: string) => void
+    onZipsShowFileChange: (f: File | null) => void
+    onZipsHideFileChange: (f: File | null) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include ZIPs
+            </label>
+            <FilterTextarea
+                label=""
+                value={zipsShow}
+                onChange={onZipsShowChange}
+                placeholder="90210, 10001, 60601"
+            />
+            <div className="mt-2">
+                <FilterFile
+                    label="Upload ZIP Include File"
+                    file={zipsShowFile}
+                    onChange={onZipsShowFileChange}
+                    accept=".csv,.txt"
+                />
+            </div>
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude ZIPs
+            </label>
+            <FilterTextarea
+                label=""
+                value={zipsHide}
+                onChange={onZipsHideChange}
+                placeholder="90210, 10001, 60601"
+            />
+            <div className="mt-2">
+                <FilterFile
+                    label="Upload ZIP Exclude File"
+                    file={zipsHideFile}
+                    onChange={onZipsHideFileChange}
+                    accept=".csv,.txt"
+                />
+            </div>
+        </div>
+    </div>
+)
+
+// States Filter Component
+const StatesFilter = ({
+    show,
+    hide,
+    onShowChange,
+    onHideChange
+}: {
+    show: string
+    hide: string
+    onShowChange: (v: string) => void
+    onHideChange: (v: string) => void
+}) => (
+    <div className="space-y-4">
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Include States
+            </label>
+            <FilterTextarea
+                label=""
+                value={show}
+                onChange={onShowChange}
+                placeholder="CA, NY, TX, FL"
+            />
+        </div>
+        <div>
+            <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                Exclude States
+            </label>
+            <FilterTextarea
+                label=""
+                value={hide}
+                onChange={onHideChange}
+                placeholder="CA, NY, TX, FL"
+            />
+        </div>
+    </div>
+)
+
+// Education Filter Component
+const EducationFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="Education"
+        value={value}
+        options={educationOptions}
+        onChange={onChange}
+    />
+)
+
+// Device Filter Component
+const DeviceFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="Device"
+        value={value}
+        options={deviceOptions}
+        onChange={onChange}
+    />
+)
+
+// Browser Language Filter Component
+const BrowserLanguageFilter = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+    <FilterRadio
+        label="Browser Language"
+        value={value}
+        options={browserLanguageOptions}
+        onChange={onChange}
+    />
+)
+
+// Employment Status Filter Component
+const EmploymentStatusFilter = ({
+    value,
+    onChange
+}: {
+    value: string[]
+    onChange: (v: string) => void
+}) => (
+    <FilterCheckboxGroup
+        label="Employment Status"
+        value={value}
+        options={employmentStatusOptions}
+        onChange={onChange}
+    />
+)
+
+// Mobile OS Filter Component
+const MobileOsFilter = ({
+    value,
+    onChange
+}: {
+    value: string[]
+    onChange: (v: string) => void
+}) => (
+    <FilterCheckboxGroup
+        label="Mobile OS"
+        value={value}
+        options={mobileOsOptions}
+        onChange={onChange}
+    />
+)
+
+// ========== REUSABLE FILTER COMPONENTS ==========
 
 interface FilterRadioProps {
     label: string
@@ -496,13 +915,23 @@ export default function SponsoredAdDetailsPage() {
         adImage: null as File | null,
         imagePriority: 'medium',
         originalUrl: '',
+        // Buttons
+        progressButtonPrimary: '',
+        progressButtonSecondary: '',
+        skipButton: '',
+        // Display Settings
+        adDisclaimer: '',
+        showImageOnOffer: false,
+        showAdDescription: true,
         // Prepop Data
         appendHashedUserData: false,
+        appendHashedUserDataFluent: false,
         hashedKey: '',
+        hashedKeyFluent: '',
         // Board Filters
         countrySpecific: 'US',
         selectedBoards: [] as string[],
-        boardPlacement: 'top',
+        boardPlacement: 'serp-top',
     })
 
     const [isSaving, setIsSaving] = useState(false)
@@ -530,6 +959,145 @@ export default function SponsoredAdDetailsPage() {
     const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null)
 
     // ========== FILTERS STATE ==========
+
+    // Available filter types
+    const availableFilterTypes = [
+        { id: 'userType', label: 'User Type', category: 'User Demographics' },
+        { id: 'gender', label: 'Gender', category: 'User Demographics' },
+        { id: 'ageRanges', label: 'Age Ranges', category: 'User Demographics' },
+        { id: 'prepop', label: 'Prepop', category: 'Traffic Type' },
+        { id: 'keywords', label: 'Keywords', category: 'Keywords' },
+        { id: 'source', label: 'Source', category: 'Source' },
+        { id: 'sourceWildcard', label: 'Source Wildcard', category: 'Source' },
+        { id: 'mediums', label: 'Mediums', category: 'Mediums' },
+        { id: 'companies', label: 'Companies', category: 'Companies' },
+        { id: 'location', label: 'ZIP Codes', category: 'Location' },
+        { id: 'states', label: 'States', category: 'Location' },
+        { id: 'education', label: 'Education', category: 'User Attributes' },
+        { id: 'device', label: 'Device', category: 'User Attributes' },
+        { id: 'browserLanguage', label: 'Browser Language', category: 'User Attributes' },
+        { id: 'employmentStatus', label: 'Employment Status', category: 'User Attributes' },
+        { id: 'mobileOs', label: 'Mobile OS', category: 'User Attributes' },
+    ] as const
+
+    type ActiveFilterId = typeof availableFilterTypes[number]['id']
+
+    const [activeFilters, setActiveFilters] = useState<ActiveFilterId[]>([])
+    const [addFilterOpen, setAddFilterOpen] = useState(false)
+    const [editingFilterId, setEditingFilterId] = useState<ActiveFilterId | null>(null)
+    const [filterModalOpen, setFilterModalOpen] = useState(false)
+
+    // Filter management handlers
+    const addFilter = (filterId: ActiveFilterId) => {
+        if (!activeFilters.includes(filterId)) {
+            setActiveFilters([...activeFilters, filterId])
+        }
+        setAddFilterOpen(false)
+        // Open modal for editing
+        setEditingFilterId(filterId)
+        setFilterModalOpen(true)
+    }
+
+    const editFilter = (filterId: ActiveFilterId) => {
+        setEditingFilterId(filterId)
+        setFilterModalOpen(true)
+    }
+
+    const removeFilter = (filterId: ActiveFilterId) => {
+        setActiveFilters(activeFilters.filter(f => f !== filterId))
+    }
+
+    // Get available filters (not currently active)
+    const getAvailableFilters = () => {
+        return availableFilterTypes.filter(f => !activeFilters.includes(f.id))
+    }
+
+    // Group filters by category
+    const groupFiltersByCategory = (filters: (typeof availableFilterTypes)[number][]) => {
+        const grouped: Record<string, (typeof availableFilterTypes)[number][]> = {}
+        filters.forEach(filter => {
+            if (!grouped[filter.category]) {
+                grouped[filter.category] = []
+            }
+            grouped[filter.category].push(filter)
+        })
+        return grouped
+    }
+
+    // Get display value for a filter
+    const getFilterDisplayValue = (filterId: ActiveFilterId): string => {
+        switch (filterId) {
+            case 'userType':
+                return userTypeOptions.find(o => o.value === filtersData.userType)?.label || filtersData.userType
+            case 'gender':
+                return genderOptions.find(o => o.value === filtersData.gender)?.label || filtersData.gender
+            case 'ageRanges':
+                return filtersData.ageRanges.length > 0
+                    ? `${filtersData.ageRanges.length} rule${filtersData.ageRanges.length > 1 ? 's' : ''}`
+                    : 'No rules'
+            case 'prepop':
+                return prepopOptions.find(o => o.value === filtersData.prepop)?.label || filtersData.prepop
+            case 'keywords':
+                const keywords = []
+                if (filtersData.keywordsShow) keywords.push(`Show: ${filtersData.keywordsShow}`)
+                if (filtersData.keywordsHide) keywords.push(`Hide: ${filtersData.keywordsHide}`)
+                return keywords.length > 0 ? keywords.join(' | ') : 'Not set'
+            case 'source':
+                const source = []
+                if (filtersData.sourceShow) source.push(`Include: ${filtersData.sourceShow}`)
+                if (filtersData.sourceHide) source.push(`Exclude: ${filtersData.sourceHide}`)
+                if (filtersData.sourceHideOwnSource) source.push('Hide Own Source')
+                return source.length > 0 ? source.join(' | ') : 'Not set'
+            case 'sourceWildcard':
+                const wildcard = []
+                if (filtersData.sourceWildcardShow) wildcard.push(`Include: ${filtersData.sourceWildcardShow}`)
+                if (filtersData.sourceWildcardHide) wildcard.push(`Exclude: ${filtersData.sourceWildcardHide}`)
+                return wildcard.length > 0 ? wildcard.join(' | ') : 'Not set'
+            case 'mediums':
+                const mediums = []
+                if (filtersData.mediumsShow) mediums.push(`Include: ${filtersData.mediumsShow}`)
+                if (filtersData.mediumsHide) mediums.push(`Exclude: ${filtersData.mediumsHide}`)
+                return mediums.length > 0 ? mediums.join(' | ') : 'Not set'
+            case 'companies':
+                const companies = []
+                if (filtersData.companiesShow) companies.push(`Include: ${filtersData.companiesShow}`)
+                if (filtersData.companiesHide) companies.push(`Exclude: ${filtersData.companiesHide}`)
+                return companies.length > 0 ? companies.join(' | ') : 'Not set'
+            case 'location':
+                const location = []
+                if (filtersData.zipsShow) location.push(`Include: ${filtersData.zipsShow}`)
+                if (filtersData.zipsHide) location.push(`Exclude: ${filtersData.zipsHide}`)
+                return location.length > 0 ? location.join(' | ') : 'Not set'
+            case 'states':
+                const states = []
+                if (filtersData.statesShow) states.push(`Include: ${filtersData.statesShow}`)
+                if (filtersData.statesHide) states.push(`Exclude: ${filtersData.statesHide}`)
+                return states.length > 0 ? states.join(' | ') : 'Not set'
+            case 'education':
+                return educationOptions.find(o => o.value === filtersData.education)?.label || filtersData.education
+            case 'device':
+                return deviceOptions.find(o => o.value === filtersData.device)?.label || filtersData.device
+            case 'browserLanguage':
+                return browserLanguageOptions.find(o => o.value === filtersData.browserLanguage)?.label || filtersData.browserLanguage
+            case 'employmentStatus':
+                return filtersData.employmentStatus.length > 0
+                    ? employmentStatusOptions
+                        .filter(o => filtersData.employmentStatus.includes(o.value))
+                        .map(o => o.label)
+                        .join(', ')
+                    : 'All'
+            case 'mobileOs':
+                return filtersData.mobileOs.length > 0
+                    ? mobileOsOptions
+                        .filter(o => filtersData.mobileOs.includes(o.value))
+                        .map(o => o.label)
+                        .join(', ')
+                    : 'All'
+            default:
+                return 'Not set'
+        }
+    }
+
     const [filtersData, setFiltersData] = useState({
         // User Demographics
         userType: 'mixed',
@@ -1007,11 +1575,21 @@ export default function SponsoredAdDetailsPage() {
                                                 <Field>
                                                     <FieldLabel>Category</FieldLabel>
                                                     <FieldContent>
-                                                        <Input
+                                                        <Select
                                                             value={settingsData.category}
-                                                            onChange={(e) => setSettingsData({ ...settingsData, category: e.target.value })}
-                                                            placeholder="Enter category"
-                                                        />
+                                                            onValueChange={(value) => setSettingsData({ ...settingsData, category: value })}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select category" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {categoryOptions.map((option) => (
+                                                                    <SelectItem key={option.value} value={option.value}>
+                                                                        {option.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
                                                     </FieldContent>
                                                 </Field>
                                             </div>
@@ -1038,19 +1616,21 @@ export default function SponsoredAdDetailsPage() {
                                                         />
                                                     </FieldContent>
                                                 </Field>
-
-                                                <Field>
-                                                    <FieldLabel>Notes</FieldLabel>
-                                                    <FieldContent>
-                                                        <Textarea
-                                                            value={settingsData.notes}
-                                                            onChange={(e) => setSettingsData({ ...settingsData, notes: e.target.value })}
-                                                            placeholder="Enter notes"
-                                                            rows={3}
-                                                        />
-                                                    </FieldContent>
-                                                </Field>
                                             </div>
+                                        </div>
+
+                                        <div className="mt-6">
+                                            <Field>
+                                                <FieldLabel>Notes</FieldLabel>
+                                                <FieldContent>
+                                                    <Textarea
+                                                        value={settingsData.notes}
+                                                        onChange={(e) => setSettingsData({ ...settingsData, notes: e.target.value })}
+                                                        placeholder="Enter notes"
+                                                        rows={3}
+                                                    />
+                                                </FieldContent>
+                                            </Field>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -1268,6 +1848,109 @@ export default function SponsoredAdDetailsPage() {
                                     </CardContent>
                                 </Card>
 
+                                {/* Buttons Section */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Buttons</CardTitle>
+                                        <CardDescription>Custom button labels for your ad</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                            <Field>
+                                                <FieldLabel>Progress Button (Primary)</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        value={settingsData.progressButtonPrimary}
+                                                        onChange={(e) => setSettingsData({ ...settingsData, progressButtonPrimary: e.target.value })}
+                                                        placeholder="e.g., Continue"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+
+                                            <Field>
+                                                <FieldLabel>Progress Button (Secondary)</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        value={settingsData.progressButtonSecondary}
+                                                        onChange={(e) => setSettingsData({ ...settingsData, progressButtonSecondary: e.target.value })}
+                                                        placeholder="e.g., Next Step"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+
+                                            <Field>
+                                                <FieldLabel>Skip Button</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        value={settingsData.skipButton}
+                                                        onChange={(e) => setSettingsData({ ...settingsData, skipButton: e.target.value })}
+                                                        placeholder="e.g., Skip"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Display Settings Section */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Display Settings</CardTitle>
+                                        <CardDescription>Control how your ad is displayed</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            <div className="space-y-4">
+                                                <Field>
+                                                    <FieldLabel>Ad Disclaimer</FieldLabel>
+                                                    <FieldContent>
+                                                        <Textarea
+                                                            value={settingsData.adDisclaimer}
+                                                            onChange={(e) => setSettingsData({ ...settingsData, adDisclaimer: e.target.value })}
+                                                            placeholder="Enter disclaimer text"
+                                                            rows={3}
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <Field>
+                                                    <FieldLabel>Show Image on Offer</FieldLabel>
+                                                    <FieldContent>
+                                                        <div className="flex items-center gap-2">
+                                                            <Switch
+                                                                checked={settingsData.showImageOnOffer}
+                                                                onCheckedChange={(checked) => setSettingsData({ ...settingsData, showImageOnOffer: checked })}
+                                                            />
+                                                            <span className="text-sm text-muted-foreground">
+                                                                {settingsData.showImageOnOffer ? 'Enabled' : 'Disabled'}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground mt-1">Display ad image on the offer page</p>
+                                                    </FieldContent>
+                                                </Field>
+
+                                                <Field>
+                                                    <FieldLabel>Show Ad Description/Copy</FieldLabel>
+                                                    <FieldContent>
+                                                        <div className="flex items-center gap-2">
+                                                            <Switch
+                                                                checked={settingsData.showAdDescription}
+                                                                onCheckedChange={(checked) => setSettingsData({ ...settingsData, showAdDescription: checked })}
+                                                            />
+                                                            <span className="text-sm text-muted-foreground">
+                                                                {settingsData.showAdDescription ? 'Enabled' : 'Disabled'}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground mt-1">Show ad copy in the listing</p>
+                                                    </FieldContent>
+                                                </Field>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
                                 {/* Prepop Data Section */}
                                 <Card>
                                     <CardHeader>
@@ -1292,6 +1975,21 @@ export default function SponsoredAdDetailsPage() {
                                                         <p className="text-xs text-muted-foreground mt-1">Automatically append hashed user data to URLs</p>
                                                     </FieldContent>
                                                 </Field>
+                                                <Field>
+                                                    <FieldLabel>Append Hashed User Data (FLUENT only)</FieldLabel>
+                                                    <FieldContent>
+                                                        <div className="flex items-center gap-2">
+                                                            <Switch
+                                                                checked={settingsData.appendHashedUserDataFluent}
+                                                                onCheckedChange={(checked) => setSettingsData({ ...settingsData, appendHashedUserDataFluent: checked })}
+                                                            />
+                                                            <span className="text-sm text-muted-foreground">
+                                                                {settingsData.appendHashedUserDataFluent ? 'Enabled' : 'Disabled'}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-xs text-muted-foreground mt-1">FLUENT data hashing for user data</p>
+                                                    </FieldContent>
+                                                </Field>
                                             </div>
 
                                             <div className="space-y-4">
@@ -1305,6 +2003,18 @@ export default function SponsoredAdDetailsPage() {
                                                             type="password"
                                                         />
                                                         <p className="text-xs text-muted-foreground mt-1">OpenSSL key for hashing user data</p>
+                                                    </FieldContent>
+                                                </Field>
+                                                <Field>
+                                                    <FieldLabel>Hashed Key (FLUENT)</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsData.hashedKeyFluent}
+                                                            onChange={(e) => setSettingsData({ ...settingsData, hashedKeyFluent: e.target.value })}
+                                                            placeholder="Enter FLUENT hashed key"
+                                                            type="password"
+                                                        />
+                                                        <p className="text-xs text-muted-foreground mt-1">FLUENT key for hashing user data</p>
                                                     </FieldContent>
                                                 </Field>
                                             </div>
@@ -1350,11 +2060,11 @@ export default function SponsoredAdDetailsPage() {
                                                             onValueChange={(value) => setSettingsData({ ...settingsData, boardPlacement: value })}
                                                         >
                                                             <SelectTrigger>
-                                                                <SelectValue />
+                                                                <SelectValue placeholder="Select placement" />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                {boardPlacements.map((placement) => (
-                                                                    <SelectItem key={placement.value} value={placement.value}>
+                                                                {PLACEMENTS.map((placement) => (
+                                                                    <SelectItem key={placement.slug} value={placement.slug}>
                                                                         {placement.label}
                                                                     </SelectItem>
                                                                 ))}
@@ -1594,216 +2304,255 @@ export default function SponsoredAdDetailsPage() {
 
                         {/* Filters Tab */}
                         <TabsContent value="filters">
-                            <div className="space-y-4">
-                                {/* User Demographics */}
-                                <FilterSection title="User Demographics" description="Target users by type, gender, and age">
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                        <FilterRadio
-                                            label="User Type"
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <CardTitle>Filters</CardTitle>
+                                            <CardDescription>Manage your targeting filters ({activeFilters.length} active)</CardDescription>
+                                        </div>
+                                        <Popover open={addFilterOpen} onOpenChange={setAddFilterOpen}>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="outline">
+                                                    <Plus className="h-4 w-4 mr-2" />
+                                                    Add Filter
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80 p-0" align="end">
+                                                <div className="max-h-96 overflow-y-auto">
+                                                    {Object.entries(groupFiltersByCategory(getAvailableFilters())).map(([category, filters]) => (
+                                                        <div key={category}>
+                                                            <div className="px-3 py-2 text-sm font-semibold text-muted-foreground bg-muted/50">
+                                                                {category}
+                                                            </div>
+                                                            {filters.map((filter) => (
+                                                                <button
+                                                                    key={filter.id}
+                                                                    className="w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
+                                                                    onClick={() => addFilter(filter.id)}
+                                                                >
+                                                                    {filter.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    ))}
+                                                    {getAvailableFilters().length === 0 && (
+                                                        <div className="px-3 py-8 text-center text-sm text-muted-foreground">
+                                                            All filters are active
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    {activeFilters.length === 0 ? (
+                                        <div className="text-center py-12">
+                                            <Filter className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                                            <h4 className="text-lg font-semibold mb-2">No Active Filters</h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                Add filters to customize your targeting settings
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Filter Name</TableHead>
+                                                    <TableHead>Category</TableHead>
+                                                    <TableHead>Current Value</TableHead>
+                                                    <TableHead className="text-right">Actions</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {activeFilters.map((filterId) => {
+                                                    const filter = availableFilterTypes.find(f => f.id === filterId)
+                                                    if (!filter) return null
+
+                                                    return (
+                                                        <TableRow key={filter.id}>
+                                                            <TableCell className="font-medium">{filter.label}</TableCell>
+                                                            <TableCell>
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    {filter.category}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell className="text-muted-foreground max-w-md truncate">
+                                                                {getFilterDisplayValue(filter.id)}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <div className="flex justify-end gap-2">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => editFilter(filter.id)}
+                                                                        title="Edit filter"
+                                                                    >
+                                                                        <Pencil className="h-4 w-4" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => removeFilter(filter.id)}
+                                                                        title="Remove filter"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        {/* Filter Edit Modal */}
+                        <Dialog open={filterModalOpen} onOpenChange={setFilterModalOpen}>
+                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        {editingFilterId && availableFilterTypes.find(f => f.id === editingFilterId)?.label}
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {editingFilterId && availableFilterTypes.find(f => f.id === editingFilterId)?.category}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4">
+                                    {editingFilterId === 'userType' && (
+                                        <UserTypeFilter
                                             value={filtersData.userType}
-                                            options={userTypeOptions}
                                             onChange={(v) => updateFilter('userType', v)}
                                         />
-                                        <FilterRadio
-                                            label="Gender"
+                                    )}
+                                    {editingFilterId === 'gender' && (
+                                        <GenderFilter
                                             value={filtersData.gender}
-                                            options={genderOptions}
                                             onChange={(v) => updateFilter('gender', v)}
                                         />
-                                        <AgeRangeRepeater
+                                    )}
+                                    {editingFilterId === 'ageRanges' && (
+                                        <AgeRangesFilter
                                             rules={filtersData.ageRanges}
                                             onAdd={addAgeRangeRule}
                                             onUpdate={updateAgeRangeRule}
                                             onRemove={removeAgeRangeRule}
                                         />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Traffic Type */}
-                                <FilterSection title="Traffic Type" description="Filter based on prepop data availability">
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                        <FilterRadio
-                                            label="Prepop"
+                                    )}
+                                    {editingFilterId === 'prepop' && (
+                                        <PrepopFilter
                                             value={filtersData.prepop}
-                                            options={prepopOptions}
                                             onChange={(v) => updateFilter('prepop', v)}
                                         />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Keywords */}
-                                <FilterSection title="Keywords" description="Filter by keyword matching">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <FilterTextarea
-                                            label="Keywords Show"
-                                            value={filtersData.keywordsShow}
-                                            onChange={(v) => updateFilter('keywordsShow', v)}
-                                            placeholder="keyword1, keyword2, keyword3"
+                                    )}
+                                    {editingFilterId === 'keywords' && (
+                                        <KeywordsFilter
+                                            show={filtersData.keywordsShow}
+                                            hide={filtersData.keywordsHide}
+                                            onShowChange={(v) => updateFilter('keywordsShow', v)}
+                                            onHideChange={(v) => updateFilter('keywordsHide', v)}
                                         />
-                                        <FilterTextarea
-                                            label="Keywords Hide"
-                                            value={filtersData.keywordsHide}
-                                            onChange={(v) => updateFilter('keywordsHide', v)}
-                                            placeholder="keyword1, keyword2, keyword3"
+                                    )}
+                                    {editingFilterId === 'source' && (
+                                        <SourceFilter
+                                            show={filtersData.sourceShow}
+                                            hide={filtersData.sourceHide}
+                                            hideOwnSource={filtersData.sourceHideOwnSource}
+                                            onShowChange={(v) => updateFilter('sourceShow', v)}
+                                            onHideChange={(v) => updateFilter('sourceHide', v)}
+                                            onHideOwnSourceChange={(v) => updateFilter('sourceHideOwnSource', v)}
                                         />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Source */}
-                                <FilterSection title="Source" description="Filter by traffic source">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <FilterTextarea
-                                            label="Source Show"
-                                            value={filtersData.sourceShow}
-                                            onChange={(v) => updateFilter('sourceShow', v)}
-                                            placeholder="source1, source2, source3"
+                                    )}
+                                    {editingFilterId === 'sourceWildcard' && (
+                                        <SourceWildcardFilter
+                                            show={filtersData.sourceWildcardShow}
+                                            hide={filtersData.sourceWildcardHide}
+                                            onShowChange={(v) => updateFilter('sourceWildcardShow', v)}
+                                            onHideChange={(v) => updateFilter('sourceWildcardHide', v)}
                                         />
-                                        <div className="space-y-4">
-                                            <FilterTextarea
-                                                label="Source Hide"
-                                                value={filtersData.sourceHide}
-                                                onChange={(v) => updateFilter('sourceHide', v)}
-                                                placeholder="source1, source2, source3"
-                                            />
-                                            <FilterSwitch
-                                                label="Source Hide Own Source"
-                                                value={filtersData.sourceHideOwnSource}
-                                                onChange={(v) => updateFilter('sourceHideOwnSource', v)}
-                                                description="Hide traffic from your own source"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-                                        <FilterTextarea
-                                            label="Source Wildcard Show"
-                                            value={filtersData.sourceWildcardShow}
-                                            onChange={(v) => updateFilter('sourceWildcardShow', v)}
-                                            placeholder="wildcard1, wildcard2, wildcard3"
+                                    )}
+                                    {editingFilterId === 'mediums' && (
+                                        <MediumsFilter
+                                            show={filtersData.mediumsShow}
+                                            hide={filtersData.mediumsHide}
+                                            onShowChange={(v) => updateFilter('mediumsShow', v)}
+                                            onHideChange={(v) => updateFilter('mediumsHide', v)}
                                         />
-                                        <FilterTextarea
-                                            label="Source Wildcard Hide"
-                                            value={filtersData.sourceWildcardHide}
-                                            onChange={(v) => updateFilter('sourceWildcardHide', v)}
-                                            placeholder="wildcard1, wildcard2, wildcard3"
+                                    )}
+                                    {editingFilterId === 'companies' && (
+                                        <CompaniesFilter
+                                            show={filtersData.companiesShow}
+                                            hide={filtersData.companiesHide}
+                                            onShowChange={(v) => updateFilter('companiesShow', v)}
+                                            onHideChange={(v) => updateFilter('companiesHide', v)}
                                         />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Mediums */}
-                                <FilterSection title="Mediums" description="Filter by traffic medium">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <FilterTextarea
-                                            label="Mediums Show"
-                                            value={filtersData.mediumsShow}
-                                            onChange={(v) => updateFilter('mediumsShow', v)}
-                                            placeholder="medium1, medium2, medium3"
+                                    )}
+                                    {editingFilterId === 'location' && (
+                                        <LocationFilter
+                                            zipsShow={filtersData.zipsShow}
+                                            zipsHide={filtersData.zipsHide}
+                                            zipsShowFile={filtersData.zipsShowFile}
+                                            zipsHideFile={filtersData.zipsHideFile}
+                                            onZipsShowChange={(v) => updateFilter('zipsShow', v)}
+                                            onZipsHideChange={(v) => updateFilter('zipsHide', v)}
+                                            onZipsShowFileChange={(f) => handleFilterFileUpload('zipsShowFile', f)}
+                                            onZipsHideFileChange={(f) => handleFilterFileUpload('zipsHideFile', f)}
                                         />
-                                        <FilterTextarea
-                                            label="Mediums Hide"
-                                            value={filtersData.mediumsHide}
-                                            onChange={(v) => updateFilter('mediumsHide', v)}
-                                            placeholder="medium1, medium2, medium3"
+                                    )}
+                                    {editingFilterId === 'states' && (
+                                        <StatesFilter
+                                            show={filtersData.statesShow}
+                                            hide={filtersData.statesHide}
+                                            onShowChange={(v) => updateFilter('statesShow', v)}
+                                            onHideChange={(v) => updateFilter('statesHide', v)}
                                         />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Companies */}
-                                <FilterSection title="Companies" description="Filter by company names">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <FilterTextarea
-                                            label="Companies Show"
-                                            value={filtersData.companiesShow}
-                                            onChange={(v) => updateFilter('companiesShow', v)}
-                                            placeholder="company1, company2, company3"
-                                        />
-                                        <FilterTextarea
-                                            label="Companies Hide"
-                                            value={filtersData.companiesHide}
-                                            onChange={(v) => updateFilter('companiesHide', v)}
-                                            placeholder="company1, company2, company3"
-                                        />
-                                    </div>
-                                </FilterSection>
-
-                                {/* Location */}
-                                <FilterSection title="Location" description="Filter by geographic location">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                        <FilterTextarea
-                                            label="Zips Show"
-                                            value={filtersData.zipsShow}
-                                            onChange={(v) => updateFilter('zipsShow', v)}
-                                            placeholder="90210, 90211, 90212"
-                                        />
-                                        <FilterTextarea
-                                            label="Zips Hide"
-                                            value={filtersData.zipsHide}
-                                            onChange={(v) => updateFilter('zipsHide', v)}
-                                            placeholder="90210, 90211, 90212"
-                                        />
-                                        <FilterFile
-                                            label="Zips Show File"
-                                            file={filtersData.zipsShowFile}
-                                            onChange={(f) => handleFilterFileUpload('zipsShowFile', f)}
-                                            accept=".csv,.txt"
-                                        />
-                                        <FilterFile
-                                            label="Zips Hide File"
-                                            file={filtersData.zipsHideFile}
-                                            onChange={(f) => handleFilterFileUpload('zipsHideFile', f)}
-                                            accept=".csv,.txt"
-                                        />
-                                        <FilterTextarea
-                                            label="States Show"
-                                            value={filtersData.statesShow}
-                                            onChange={(v) => updateFilter('statesShow', v)}
-                                            placeholder="CA, NY, TX"
-                                        />
-                                        <FilterTextarea
-                                            label="States Hide"
-                                            value={filtersData.statesHide}
-                                            onChange={(v) => updateFilter('statesHide', v)}
-                                            placeholder="CA, NY, TX"
-                                        />
-                                    </div>
-                                </FilterSection>
-
-                                {/* User Attributes */}
-                                <FilterSection title="User Attributes" description="Filter by user characteristics">
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                        <FilterRadio
-                                            label="Education"
+                                    )}
+                                    {editingFilterId === 'education' && (
+                                        <EducationFilter
                                             value={filtersData.education}
-                                            options={educationOptions}
                                             onChange={(v) => updateFilter('education', v)}
                                         />
-                                        <FilterRadio
-                                            label="Device"
+                                    )}
+                                    {editingFilterId === 'device' && (
+                                        <DeviceFilter
                                             value={filtersData.device}
-                                            options={deviceOptions}
                                             onChange={(v) => updateFilter('device', v)}
                                         />
-                                        <FilterRadio
-                                            label="Browser Language"
+                                    )}
+                                    {editingFilterId === 'browserLanguage' && (
+                                        <BrowserLanguageFilter
                                             value={filtersData.browserLanguage}
-                                            options={browserLanguageOptions}
                                             onChange={(v) => updateFilter('browserLanguage', v)}
                                         />
-                                        <FilterCheckboxGroup
-                                            label="Employment Status"
+                                    )}
+                                    {editingFilterId === 'employmentStatus' && (
+                                        <EmploymentStatusFilter
                                             value={filtersData.employmentStatus}
-                                            options={employmentStatusOptions}
                                             onChange={(v) => toggleFilterCheckbox('employmentStatus', v)}
                                         />
-                                        <FilterCheckboxGroup
-                                            label="Mobile OS"
+                                    )}
+                                    {editingFilterId === 'mobileOs' && (
+                                        <MobileOsFilter
                                             value={filtersData.mobileOs}
-                                            options={mobileOsOptions}
                                             onChange={(v) => toggleFilterCheckbox('mobileOs', v)}
                                         />
-                                    </div>
-                                </FilterSection>
-                            </div>
-                        </TabsContent>
+                                    )}
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline" onClick={() => setFilterModalOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={() => setFilterModalOpen(false)}>
+                                        Done
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
 
                         {/* Audit Logs Tab */}
                         <TabsContent value="audit-logs">
