@@ -163,7 +163,9 @@ const boardCodes = [
 
 // User Type Options
 const userTypeOptions: FilterRadioOption[] = [
-    { value: 'any', label: 'Any (Uniques/Duplicates)' },
+    { value: 'mixed', label: 'Mixed (Uniques/Duplicates)' },
+    { value: 'uniques', label: 'Uniques Only' },
+    { value: 'duplicates', label: 'Duplicates Only' },
 ]
 
 // Gender Options
@@ -530,7 +532,7 @@ export default function SponsoredAdDetailsPage() {
     // ========== FILTERS STATE ==========
     const [filtersData, setFiltersData] = useState({
         // User Demographics
-        userType: 'any',
+        userType: 'mixed',
         gender: 'any',
         ageRanges: [] as AgeRangeRule[],
 
@@ -1649,20 +1651,20 @@ export default function SponsoredAdDetailsPage() {
 
                                 {/* Source */}
                                 <FilterSection title="Source" description="Filter by traffic source">
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                         <FilterTextarea
                                             label="Source Show"
                                             value={filtersData.sourceShow}
                                             onChange={(v) => updateFilter('sourceShow', v)}
                                             placeholder="source1, source2, source3"
                                         />
-                                        <FilterTextarea
-                                            label="Source Hide"
-                                            value={filtersData.sourceHide}
-                                            onChange={(v) => updateFilter('sourceHide', v)}
-                                            placeholder="source1, source2, source3"
-                                        />
                                         <div className="space-y-4">
+                                            <FilterTextarea
+                                                label="Source Hide"
+                                                value={filtersData.sourceHide}
+                                                onChange={(v) => updateFilter('sourceHide', v)}
+                                                placeholder="source1, source2, source3"
+                                            />
                                             <FilterSwitch
                                                 label="Source Hide Own Source"
                                                 value={filtersData.sourceHideOwnSource}
