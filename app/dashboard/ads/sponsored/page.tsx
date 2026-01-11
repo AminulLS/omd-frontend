@@ -16,8 +16,18 @@ import { Input } from '@/components/ui/input'
 import { FieldGroup } from '@/components/ui/field'
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import * as React from 'react'
+import { useRouter } from 'next/navigation'
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet'
 
 const data = (hours = 24) => {
     return [...Array(hours)].map((_, h) => {
@@ -119,6 +129,15 @@ type DateRange = {
 }
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50, 100]
+
+// Mock partners for dropdown
+const mockPartners = [
+    { id: 1, name: 'Partner 1' },
+    { id: 2, name: 'Partner 2' },
+    { id: 3, name: 'Partner 3' },
+    { id: 4, name: 'Partner 4' },
+    { id: 5, name: 'Partner 5' },
+]
 
 // Mock data generators
 const generateMockPartnerData = () => [...Array(50)].map((_, idx) => {
@@ -610,6 +629,7 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix }: Report
 }
 
 export default function Page() {
+    const router = useRouter()
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const [selectedCountry, setSelectedCountry] = useState<string>('all')
@@ -620,6 +640,14 @@ export default function Page() {
     const [adsStatusFilter, setAdsStatusFilter] = useState<string>('all')
     const [adsCurrentPage, setAdsCurrentPage] = useState(1)
     const [adsItemsPerPage, setAdsItemsPerPage] = useState(10)
+
+    // Create Ad state
+    const [isCreateAdOpen, setIsCreateAdOpen] = useState(false)
+    const [createAdForm, setCreateAdForm] = useState({
+        name: '',
+        partner: '',
+    })
+    const [createAdErrors, setCreateAdErrors] = useState<Record<string, string>>({})
 
     // Memoize data generation to prevent hydration errors
     const hourlyData = React.useMemo(() => data(), [])
@@ -670,11 +698,98 @@ export default function Page() {
         return `${format(dateRange.from, 'MMM d, yyyy')} - ${format(dateRange.to, 'MMM d, yyyy')}`
     }
 
+    const handleCreateAdSubmit = async () => {
+        // Validate form
+        const errors: Record<string, string> = {}
+        if (!createAdForm.name || createAdForm.name.trim().length < 2) {
+            errors.name = 'Name must be at least 2 characters'
+        }
+        if (!createAdForm.partner) {
+            errors.partner = 'Partner is required'
+        }
+
+        setCreateAdErrors(errors)
+
+        if (Object.keys(errors).length > 0) {
+            return
+        }
+
+        // Simulate creating ad and getting new ID
+        const newAdId = Date.now()
+        router.push(`/dashboard/ads/sponsored/${newAdId}`)
+    }
+
     return (
         <div>
-            <div className="mb-4 border-b pb-2">
-                <h2 className="text-lg font-semibold">Ads</h2>
-                <p className="text-sm text-muted-foreground">Manage all of the sponsored ads</p>
+            <div className="mb-4 border-b pb-2 flex items-center justify-between">
+                <div>
+                    <h2 className="text-lg font-semibold">Ads</h2>
+                    <p className="text-sm text-muted-foreground">Manage all of the sponsored ads</p>
+                </div>
+                <Sheet open={isCreateAdOpen} onOpenChange={setIsCreateAdOpen}>
+                    <SheetTrigger asChild>
+                        <Button>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Ad
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-96">
+                        <SheetHeader>
+                            <SheetTitle>Create New Ad</SheetTitle>
+                            <SheetDescription>
+                                Fill in the details to create a new sponsored ad.
+                            </SheetDescription>
+                        </SheetHeader>
+                        <div className="py-4 px-4 space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="ad-name">Name *</Label>
+                                <Input
+                                    id="ad-name"
+                                    placeholder="Enter ad name"
+                                    value={createAdForm.name}
+                                    onChange={(e) => setCreateAdForm({ ...createAdForm, name: e.target.value })}
+                                />
+                                {createAdErrors.name && (
+                                    <p className="text-sm text-destructive">{createAdErrors.name}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="ad-partner">Partner *</Label>
+                                <Select
+                                    value={createAdForm.partner}
+                                    onValueChange={(value) => setCreateAdForm({ ...createAdForm, partner: value })}
+                                >
+                                    <SelectTrigger id="ad-partner">
+                                        <SelectValue placeholder="Select a partner" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {mockPartners.map((partner) => (
+                                            <SelectItem key={partner.id} value={partner.id.toString()}>
+                                                {partner.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {createAdErrors.partner && (
+                                    <p className="text-sm text-destructive">{createAdErrors.partner}</p>
+                                )}
+                            </div>
+                        </div>
+                        <SheetFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setIsCreateAdOpen(false)
+                                    setCreateAdForm({ name: '', partner: '' })
+                                    setCreateAdErrors({})
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={handleCreateAdSubmit}>Create Ad</Button>
+                        </SheetFooter>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div className="flex flex-col gap-4">
