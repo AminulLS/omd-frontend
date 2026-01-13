@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import { MonthlyChart } from '@/components/blocks/charts/monthly-chart'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,9 +15,19 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { FieldGroup } from '@/components/ui/field'
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet'
+import { Field, FieldLabel, FieldContent } from '@/components/ui/field'
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight, PlusIcon } from 'lucide-react'
 import * as React from 'react'
 
 const data = (hours = 24) => {
@@ -626,9 +637,14 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix, linkColu
 }
 
 export default function Page() {
+    const router = useRouter()
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const [selectedCountry, setSelectedCountry] = useState<string>('all')
+
+    // Create XML sheet state
+    const [createXmlSheetOpen, setCreateXmlSheetOpen] = useState(false)
+    const [createXmlForm, setCreateXmlForm] = useState({ name: '', partner: '', feedXmlUrl: '' })
 
     // Ads filters and pagination state
     const [adsSearchQuery, setAdsSearchQuery] = useState<string>('')
@@ -683,10 +699,19 @@ export default function Page() {
 
     return (
         <div>
-            <div className="mb-4 border-b pb-2">
-                <h2 className="text-lg font-semibold">XML Direct Listings</h2>
-                <p className="text-sm text-muted-foreground">Manage all of the XML Direct Listings</p>
-            </div>
+            <Sheet open={createXmlSheetOpen} onOpenChange={setCreateXmlSheetOpen}>
+                <div className="mb-4 border-b pb-2 flex justify-between items-center">
+                    <div>
+                        <h2 className="text-lg font-semibold">XML Direct Listings</h2>
+                        <p className="text-sm text-muted-foreground">Manage all of the XML Direct Listings</p>
+                    </div>
+                    <SheetTrigger asChild>
+                        <Button size="sm">
+                            <PlusIcon className="size-4" />
+                            Create XML
+                        </Button>
+                    </SheetTrigger>
+                </div>
 
             <div className="flex flex-col gap-4">
                 {/* Daily chart (current & last month) */}
@@ -1147,6 +1172,63 @@ export default function Page() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <SheetContent side="right" className="w-full sm:max-w-md">
+                <SheetHeader>
+                    <SheetTitle>Create XML</SheetTitle>
+                    <SheetDescription>
+                        Fill in the details to create a new XML feed.
+                    </SheetDescription>
+                </SheetHeader>
+                <FieldGroup className="mt-4 px-4">
+                    <Field>
+                        <FieldLabel>Name</FieldLabel>
+                        <FieldContent>
+                            <Input
+                                value={createXmlForm.name}
+                                onChange={(e) => setCreateXmlForm({ ...createXmlForm, name: e.target.value })}
+                                placeholder="XML feed name"
+                            />
+                        </FieldContent>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Partner</FieldLabel>
+                        <FieldContent>
+                            <Input
+                                value={createXmlForm.partner}
+                                onChange={(e) => setCreateXmlForm({ ...createXmlForm, partner: e.target.value })}
+                                placeholder="Partner name"
+                            />
+                        </FieldContent>
+                    </Field>
+                    <Field>
+                        <FieldLabel>Feed XML URL</FieldLabel>
+                        <FieldContent>
+                            <Input
+                                type="url"
+                                value={createXmlForm.feedXmlUrl}
+                                onChange={(e) => setCreateXmlForm({ ...createXmlForm, feedXmlUrl: e.target.value })}
+                                placeholder="https://example.com/feed.xml"
+                            />
+                        </FieldContent>
+                    </Field>
+                </FieldGroup>
+                <SheetFooter>
+                    <Button variant="outline" onClick={() => setCreateXmlSheetOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            // Create new XML and redirect
+                            const newId = Date.now().toString()
+                            router.push(`/dashboard/ads/xml/${newId}`)
+                        }}
+                    >
+                        Create
+                    </Button>
+                </SheetFooter>
+            </SheetContent>
+        </Sheet>
         </div>
     )
 }

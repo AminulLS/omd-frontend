@@ -486,7 +486,7 @@ export default function PartnersPage() {
                     </FieldContent>
                   </Field>
                 </FieldGroup>
-                <SheetFooter className="mt-4">
+                <SheetFooter>
                   <Button variant="outline" onClick={() => setSheetOpen(false)}>
                     Cancel
                   </Button>

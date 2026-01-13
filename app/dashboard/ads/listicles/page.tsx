@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -36,6 +37,15 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import {
   SearchIcon,
   FileDownIcon,
   CopyIcon,
@@ -46,6 +56,7 @@ import {
   EditIcon,
   Copy as DuplicateIcon,
   TrashIcon,
+  PlusIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
@@ -184,11 +195,16 @@ function formatDate(dateString: string): string {
 }
 
 export default function ListiclesPage() {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [listicles, setListicles] = useState<Listicle[]>(mockListicles)
+
+  // Create Listicle sheet state
+  const [createListicleSheetOpen, setCreateListicleSheetOpen] = useState(false)
+  const [createListicleForm, setCreateListicleForm] = useState({ name: '', slug: '' })
 
   // Filter listicles based on search
   const filteredListicles = listicles.filter((listicle) => {
@@ -286,12 +302,21 @@ export default function ListiclesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <div>
-        <div className="mb-4 border-b pb-2">
-          <h2 className="text-lg font-semibold">Listicles</h2>
-          <p className="text-sm text-muted-foreground">Manage all listicle ads and their configurations</p>
-        </div>
+    <Sheet open={createListicleSheetOpen} onOpenChange={setCreateListicleSheetOpen}>
+      <div className="flex flex-col gap-y-4">
+        <div>
+          <div className="mb-4 border-b pb-2 flex justify-between items-center">
+            <div>
+              <h2 className="text-lg font-semibold">Listicles</h2>
+              <p className="text-sm text-muted-foreground">Manage all listicle ads and their configurations</p>
+            </div>
+            <SheetTrigger asChild>
+              <Button size="sm">
+                <PlusIcon className="size-4" />
+                Create Listicle
+              </Button>
+            </SheetTrigger>
+          </div>
 
         <div className="flex flex-col gap-4">
           {/* Search and Export */}
@@ -504,5 +529,52 @@ export default function ListiclesPage() {
         </div>
       </div>
     </div>
+
+    <SheetContent side="right" className="w-full sm:max-w-md">
+      <SheetHeader>
+        <SheetTitle>Create Listicle</SheetTitle>
+        <SheetDescription>
+          Fill in the details to create a new listicle.
+        </SheetDescription>
+      </SheetHeader>
+      <FieldGroup className="mt-4 px-4">
+        <Field>
+          <FieldLabel>Name</FieldLabel>
+          <FieldContent>
+            <Input
+              value={createListicleForm.name}
+              onChange={(e) => setCreateListicleForm({ ...createListicleForm, name: e.target.value })}
+              placeholder="Listicle name"
+            />
+          </FieldContent>
+        </Field>
+
+        <Field>
+          <FieldLabel>Slug</FieldLabel>
+          <FieldContent>
+            <Input
+                value={createListicleForm.slug}
+                onChange={(e) => setCreateListicleForm({ ...createListicleForm, slug: e.target.value })}
+                placeholder="Listicle slug"
+            />
+          </FieldContent>
+        </Field>
+      </FieldGroup>
+      <SheetFooter>
+        <Button variant="outline" onClick={() => setCreateListicleSheetOpen(false)}>
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            // Create new listicle and redirect
+            const newId = Date.now().toString()
+            router.push(`/dashboard/ads/listicles/${newId}`)
+          }}
+        >
+          Create
+        </Button>
+      </SheetFooter>
+    </SheetContent>
+  </Sheet>
   )
 }
