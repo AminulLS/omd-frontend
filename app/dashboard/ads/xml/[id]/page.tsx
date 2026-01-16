@@ -79,6 +79,8 @@ interface XmlAdData {
     acr?: number
     xmlSplitCampaigns?: XmlSplitCampaign[]
     additionalUrlParams?: AdditionalUrlParam[]
+    originsInclude?: string
+    originsExclude?: string
     todayRevenue?: number
     yesterdayRevenue?: number
     sdlwRevenue?: number
@@ -209,6 +211,8 @@ const generateMockXmlAdData = (id: string): XmlAdData => {
             { id: '1', name: 'source', value: 'api' },
             { id: '2', name: 'utm_medium', value: 'xml_feed' },
         ],
+        originsInclude: '',
+        originsExclude: '',
         todayRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
         yesterdayRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
         sdlwRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
@@ -462,6 +466,8 @@ export default function XmlDetailsPage() {
         acr?: number
         xmlSplitCampaigns?: XmlSplitCampaign[]
         additionalUrlParams?: AdditionalUrlParam[]
+        originsInclude?: string
+        originsExclude?: string
     }>({
         name: '',
         dailyBudget: 0,
@@ -499,6 +505,8 @@ export default function XmlDetailsPage() {
         acr: 0,
         additionalUrlParams: [],
         xmlSplitCampaigns: [],
+        originsInclude: '',
+        originsExclude: '',
     })
 
     // Load data on mount
@@ -553,6 +561,8 @@ export default function XmlDetailsPage() {
                 additionalUrlParams: xmlData.additionalUrlParams || [],
                 acr: xmlData.acr || 0,
                 xmlSplitCampaigns: xmlData.xmlSplitCampaigns || [],
+                originsInclude: xmlData.originsInclude || '',
+                originsExclude: xmlData.originsExclude || '',
             })
         }
     }, [xmlData])
@@ -914,7 +924,7 @@ export default function XmlDetailsPage() {
 
             {/* Main Content */}
             <Tabs defaultValue="overview" className="space-y-4">
-                <TabsList>
+                <TabsList variant="line">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="parsing-logs">Parsing Logs</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -1821,7 +1831,51 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* 10. XML Split Campaigns by Value */}
+                    {/* 10. Origins Filters */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Origins Filters</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure origin inclusion and exclusion filters</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <FieldGroup>
+                                        <Field>
+                                            <FieldLabel>Origins Include</FieldLabel>
+                                            <FieldContent>
+                                                <Textarea
+                                                    value={settingsForm.originsInclude || ''}
+                                                    onChange={(e) => setSettingsForm({ ...settingsForm, originsInclude: e.target.value })}
+                                                    placeholder="Enter origins to include, one per line..."
+                                                    rows={4}
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-1.5">
+                                                    Enter one origin per line to include only these origins
+                                                </p>
+                                            </FieldContent>
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel>Origins Exclude</FieldLabel>
+                                            <FieldContent>
+                                                <Textarea
+                                                    value={settingsForm.originsExclude || ''}
+                                                    onChange={(e) => setSettingsForm({ ...settingsForm, originsExclude: e.target.value })}
+                                                    placeholder="Enter origins to exclude, one per line..."
+                                                    rows={4}
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-1.5">
+                                                    Enter one origin per line to exclude these origins
+                                                </p>
+                                            </FieldContent>
+                                        </Field>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 11. XML Split Campaigns by Value */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
