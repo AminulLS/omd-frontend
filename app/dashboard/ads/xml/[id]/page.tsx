@@ -14,7 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, BarChart3, Settings, Calendar, FileText, Eye, Plus, Pencil, Trash2, Play, Pause, Code, RefreshCw, Globe, Clock, DollarSign, AlertCircle, Copy } from 'lucide-react'
+import { ArrowLeft, BarChart3, Settings, Calendar, FileText, Eye, Plus, Trash2, Play, Pause, Code, RefreshCw, Globe, Clock, DollarSign, AlertCircle, Copy } from 'lucide-react'
 import { format } from 'date-fns'
 
 // Types
@@ -268,8 +268,6 @@ export default function XmlDetailsPage() {
     const [parsingLogs, setParsingLogs] = useState<ParsingLog[]>([])
     const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>([])
     const [isLoading, setIsLoading] = useState(true)
-    const [isEditing, setIsEditing] = useState(false)
-    const [editForm, setEditForm] = useState<Partial<XmlAdData>>({})
     const [settingsForm, setSettingsForm] = useState<{
         name: string
         dailyBudget: number
@@ -357,13 +355,6 @@ export default function XmlDetailsPage() {
         }, 500)
     }, [id])
 
-    // Update edit form when xmlData changes
-    useEffect(() => {
-        if (xmlData) {
-            setEditForm(xmlData)
-        }
-    }, [xmlData])
-
     // Update settings form when xmlData changes
     useEffect(() => {
         if (xmlData) {
@@ -407,21 +398,6 @@ export default function XmlDetailsPage() {
             })
         }
     }, [xmlData])
-
-    const handleSave = () => {
-        if (xmlData && editForm) {
-            // Simulate API call to save
-            setXmlData({ ...xmlData, ...editForm } as XmlAdData)
-            setIsEditing(false)
-        }
-    }
-
-    const handleCancel = () => {
-        if (xmlData) {
-            setEditForm(xmlData)
-        }
-        setIsEditing(false)
-    }
 
     const handleTriggerParse = () => {
         // Simulate triggering a parse
@@ -653,10 +629,6 @@ export default function XmlDetailsPage() {
                             <Copy className="h-4 w-4 mr-2" />
                             Duplicate
                         </Button>
-                        <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            {isEditing ? 'Cancel' : 'Edit'}
-                        </Button>
                     </div>
                 </div>
             </div>
@@ -743,74 +715,37 @@ export default function XmlDetailsPage() {
                                 <CardTitle>Basic Information</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {isEditing ? (
-                                    <FieldGroup>
-                                        <Field>
-                                            <FieldLabel>Title</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    value={editForm.title || ''}
-                                                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Nickname</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    value={editForm.nickname || ''}
-                                                    onChange={(e) => setEditForm({ ...editForm, nickname: e.target.value })}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Description</FieldLabel>
-                                            <FieldContent>
-                                                <Textarea
-                                                    value={editForm.description || ''}
-                                                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                                                    rows={3}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                        <div className="flex gap-2">
-                                            <Button size="sm" onClick={handleSave}>Save</Button>
-                                            <Button size="sm" variant="outline" onClick={handleCancel}>Cancel</Button>
-                                        </div>
-                                    </FieldGroup>
-                                ) : (
-                                    <div className="space-y-3">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Title</p>
-                                            <p className="font-medium">{xmlData.title}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Nickname</p>
-                                            <p className="font-medium">{xmlData.nickname}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Description</p>
-                                            <p className="text-sm">{xmlData.description || 'No description'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Partner</p>
-                                            <Link
-                                                href={`/dashboard/partners/${xmlData.partnerId}/xml`}
-                                                className="text-primary hover:underline font-medium"
-                                            >
-                                                {xmlData.partner}
-                                            </Link>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Created At</p>
-                                            <p className="text-sm">{xmlData.createdAt}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Updated At</p>
-                                            <p className="text-sm">{xmlData.updatedAt}</p>
-                                        </div>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Title</p>
+                                        <p className="font-medium">{settingsForm.name}</p>
                                     </div>
-                                )}
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Nickname</p>
+                                        <p className="font-medium">{xmlData.nickname}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Description</p>
+                                        <p className="text-sm">{xmlData.description || 'No description'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Partner</p>
+                                        <Link
+                                            href={`/dashboard/partners/${xmlData.partnerId}/xml`}
+                                            className="text-primary hover:underline font-medium"
+                                        >
+                                            {xmlData.partner}
+                                        </Link>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Created At</p>
+                                        <p className="text-sm">{xmlData.createdAt}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Updated At</p>
+                                        <p className="text-sm">{xmlData.updatedAt}</p>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -820,102 +755,54 @@ export default function XmlDetailsPage() {
                                 <CardTitle>XML Configuration</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {isEditing ? (
-                                    <FieldGroup>
-                                        <Field>
-                                            <FieldLabel>Feed XML URL</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    type="url"
-                                                    value={editForm.feedXmlUrl || ''}
-                                                    onChange={(e) => setEditForm({ ...editForm, feedXmlUrl: e.target.value })}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Status</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={editForm.status || xmlData.status}
-                                                    onValueChange={(value) => setEditForm({ ...editForm, status: value as XmlAdStatus })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {statuses.map((status) => (
-                                                            <SelectItem key={status.value} value={status.value}>
-                                                                {status.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Country</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={editForm.country || xmlData.country}
-                                                    onValueChange={(value) => setEditForm({ ...editForm, country: value })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {countries.map((country) => (
-                                                            <SelectItem key={country.value} value={country.value}>
-                                                                {country.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Daily Budget</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    type="number"
-                                                    step="0.01"
-                                                    value={editForm.dailyBudget || xmlData.dailyBudget}
-                                                    onChange={(e) => setEditForm({ ...editForm, dailyBudget: parseFloat(e.target.value) })}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                    </FieldGroup>
-                                ) : (
-                                    <div className="space-y-3">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Feed XML URL</p>
-                                            <div className="flex items-center gap-2">
-                                                <Code className="h-4 w-4 text-muted-foreground" />
-                                                <a
-                                                    href={xmlData.feedXmlUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-primary hover:underline text-sm break-all"
-                                                >
-                                                    {xmlData.feedXmlUrl}
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Last Parsed</p>
-                                            <div className="flex items-center gap-2">
-                                                <Clock className="h-4 w-4 text-muted-foreground" />
-                                                <p className="text-sm">{xmlData.lastParsed}</p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Next Parse</p>
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                                <p className="text-sm">{xmlData.nextParse}</p>
-                                            </div>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Feed XML URL</p>
+                                        <div className="flex items-center gap-2">
+                                            <Code className="h-4 w-4 text-muted-foreground" />
+                                            <a
+                                                href={settingsForm.xmlUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:underline text-sm break-all"
+                                            >
+                                                {settingsForm.xmlUrl}
+                                            </a>
                                         </div>
                                     </div>
-                                )}
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Status</p>
+                                        <Badge variant={getStatusVariant(settingsForm.status)}>
+                                            {settingsForm.status}
+                                        </Badge>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Country</p>
+                                        <p className="text-sm">{settingsForm.country}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Daily Budget</p>
+                                        <p className="text-sm">${settingsForm.dailyBudget.toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Monthly Budget</p>
+                                        <p className="text-sm">${settingsForm.monthlyBudget.toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Last Parsed</p>
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="h-4 w-4 text-muted-foreground" />
+                                            <p className="text-sm">{xmlData.lastParsed}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Next Parse</p>
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            <p className="text-sm">{xmlData.nextParse}</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
