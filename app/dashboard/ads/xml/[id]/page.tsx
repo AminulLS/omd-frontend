@@ -126,6 +126,17 @@ interface ParsingLog {
     errorMessage?: string
 }
 
+interface AuditLog {
+    id: number
+    timestamp: string
+    user: string
+    action: string
+    entity: string
+    entityId: string
+    changes: string
+    ipAddress: string
+}
+
 // Mock data generator
 const generateMockXmlAdData = (id: string): XmlAdData => {
     const statuses: XmlAdStatus[] = ['active', 'inactive', 'pending', 'paused']
@@ -211,6 +222,62 @@ const generateMockParsingLogs = (): ParsingLog[] => {
     })
 }
 
+const generateMockAuditLogs = (): AuditLog[] => {
+    const actions = [
+        'Created', 'Updated', 'Deleted', 'Paused', 'Activated',
+        'Modified Configuration', 'Changed Status', 'Added Schedule',
+        'Removed Schedule', 'Updated Budget'
+    ]
+    const entities = ['XML Feed', 'Schedule', 'Budget', 'Field Mapping', 'URL Parameter']
+    const users = ['admin@example.com', 'john.doe@example.com', 'jane.smith@example.com', 'system']
+
+    return [...Array(20)].map((_, idx) => {
+        const action = actions[Math.floor(Math.random() * actions.length)]
+        const entity = entities[Math.floor(Math.random() * entities.length)]
+        const user = users[Math.floor(Math.random() * users.length)]
+
+        return {
+            id: idx + 1,
+            timestamp: format(new Date(Date.now() - idx * 7200000), 'MM/dd/yyyy HH:mm:ss'),
+            user,
+            action,
+            entity,
+            entityId: Math.floor(Math.random() * 1000).toString(),
+            changes: `${action} ${entity} - ${idx % 3 === 0 ? 'Field value changed' : 'Configuration updated'}`,
+            ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+        }
+    })
+}
+
+const generateMockSchedules = (): Record<number, Schedule> => {
+    return {
+        1: {
+            id: 1,
+            name: 'Business Hours',
+            startTime: '09:00',
+            endTime: '17:00',
+            days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+            status: 'active',
+        },
+        2: {
+            id: 2,
+            name: 'Weekend Shift',
+            startTime: '10:00',
+            endTime: '14:00',
+            days: ['Sat', 'Sun'],
+            status: 'active',
+        },
+        3: {
+            id: 3,
+            name: 'Evening Peak',
+            startTime: '18:00',
+            endTime: '22:00',
+            days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+            status: 'paused',
+        },
+    }
+}
+
 // Constants
 const countries = [
     { value: 'US', label: 'United States' },
@@ -290,6 +357,7 @@ export default function XmlDetailsPage() {
 
     const [xmlData, setXmlData] = useState<XmlAdData | null>(null)
     const [parsingLogs, setParsingLogs] = useState<ParsingLog[]>([])
+    const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [fieldMapping, setFieldMapping] = useState<FieldMapping[]>([
         { ourField: 'job_id', partnerField: 'job_id' },
@@ -322,6 +390,8 @@ export default function XmlDetailsPage() {
     const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
     const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [showDuplicateDialog, setShowDuplicateDialog] = useState(false)
+    const [duplicateCampaignName, setDuplicateCampaignName] = useState('')
     const [scheduleForm, setScheduleForm] = useState({
         name: '',
         startTime: '09:00',
@@ -412,6 +482,8 @@ export default function XmlDetailsPage() {
         setTimeout(() => {
             setXmlData(generateMockXmlAdData(id))
             setParsingLogs(generateMockParsingLogs())
+            setAuditLogs(generateMockAuditLogs())
+            setSchedules(generateMockSchedules())
             setIsLoading(false)
         }, 500)
     }, [id])
@@ -466,8 +538,15 @@ export default function XmlDetailsPage() {
     }
 
     const handleDuplicate = () => {
-        // Simulate duplicating the XML feed
+        // Show dialog to ask for campaign name
+        setDuplicateCampaignName(`${xmlData?.nickname || xmlData?.title || 'Campaign'} (Copy)`)
+        setShowDuplicateDialog(true)
+    }
+
+    const handleConfirmDuplicate = () => {
+        // Simulate duplicating the XML feed with the new name
         const newId = Date.now().toString()
+        // TODO: In real implementation, you would pass the duplicateCampaignName to the API
         window.location.href = `/dashboard/ads/xml/${newId}`
     }
 
@@ -662,21 +741,6 @@ export default function XmlDetailsPage() {
         }
     }
 
-    const getStatusColor = (status: ParsingStatus) => {
-        switch (status) {
-            case 'success':
-                return 'text-green-600'
-            case 'failed':
-                return 'text-red-600'
-            case 'running':
-                return 'text-blue-600'
-            case 'pending':
-                return 'text-yellow-600'
-            default:
-                return 'text-gray-600'
-        }
-    }
-
     // Schedule handlers
     const scheduleList = Object.values(schedules)
 
@@ -813,6 +877,12 @@ export default function XmlDetailsPage() {
                             <Copy className="h-4 w-4 mr-2" />
                             Duplicate
                         </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/dashboard/audit-logs">
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Audit Logs
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -824,6 +894,7 @@ export default function XmlDetailsPage() {
                     <TabsTrigger value="parsing-logs">Parsing Logs</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                     <TabsTrigger value="schedules">Schedules</TabsTrigger>
+                    <TabsTrigger value="audit-logs">Audit Logs</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -1051,9 +1122,26 @@ export default function XmlDetailsPage() {
                                         <TableRow key={log.id}>
                                             <TableCell>{log.timestamp}</TableCell>
                                             <TableCell>
-                                                <Badge variant={getStatusVariant(log.status)} className={getStatusColor(log.status)}>
-                                                    {log.status}
-                                                </Badge>
+                                                {log.status === 'success' && (
+                                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                                        {log.status}
+                                                    </Badge>
+                                                )}
+                                                {log.status === 'failed' && (
+                                                    <Badge variant="destructive">
+                                                        {log.status}
+                                                    </Badge>
+                                                )}
+                                                {log.status === 'running' && (
+                                                    <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+                                                        {log.status}
+                                                    </Badge>
+                                                )}
+                                                {log.status === 'pending' && (
+                                                    <Badge variant="secondary" className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                                                        {log.status}
+                                                    </Badge>
+                                                )}
                                             </TableCell>
                                             <TableCell>{log.jobsProcessed.toLocaleString()}</TableCell>
                                             <TableCell>{log.duration}</TableCell>
@@ -2082,6 +2170,53 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
+                {/* Audit Logs Tab */}
+                <TabsContent value="audit-logs" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Audit Logs</CardTitle>
+                            <CardDescription>Track all changes and activities related to this XML feed</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {auditLogs.length === 0 ? (
+                                <div className="text-center py-12 text-muted-foreground">
+                                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                    <p>No audit logs available</p>
+                                </div>
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Timestamp</TableHead>
+                                            <TableHead>User</TableHead>
+                                            <TableHead>Action</TableHead>
+                                            <TableHead>Entity</TableHead>
+                                            <TableHead>Changes</TableHead>
+                                            <TableHead>IP Address</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {auditLogs.map((log) => (
+                                            <TableRow key={log.id}>
+                                                <TableCell className="font-mono text-sm">{log.timestamp}</TableCell>
+                                                <TableCell>{log.user}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant={log.action === 'Deleted' ? 'destructive' : 'secondary'}>
+                                                        {log.action}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>{log.entity} (ID: {log.entityId})</TableCell>
+                                                <TableCell className="max-w-md truncate">{log.changes}</TableCell>
+                                                <TableCell className="font-mono text-sm">{log.ipAddress}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
 
             {/* Add/Edit Schedule Dialog */}
@@ -2201,6 +2336,42 @@ export default function XmlDetailsPage() {
                         </Button>
                         <Button variant="destructive" onClick={handleDeleteSchedule}>
                             Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Duplicate Campaign Dialog */}
+            <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Duplicate Campaign</DialogTitle>
+                        <DialogDescription>
+                            Enter a name for the duplicated campaign
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Field>
+                            <FieldLabel>Campaign Name *</FieldLabel>
+                            <FieldContent>
+                                <Input
+                                    value={duplicateCampaignName}
+                                    onChange={(e) => setDuplicateCampaignName(e.target.value)}
+                                    placeholder="e.g., My Campaign (Copy)"
+                                    autoFocus
+                                />
+                            </FieldContent>
+                        </Field>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowDuplicateDialog(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConfirmDuplicate}
+                            disabled={!duplicateCampaignName.trim()}
+                        >
+                            Duplicate
                         </Button>
                     </DialogFooter>
                 </DialogContent>
