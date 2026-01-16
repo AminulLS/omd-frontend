@@ -468,6 +468,15 @@ export default function XmlDetailsPage() {
         additionalUrlParams?: AdditionalUrlParam[]
         originsInclude?: string
         originsExclude?: string
+        // FTP/S3 fields
+        ftpProtocol?: 'FTP' | 'SFTP'
+        ftpHost?: string
+        ftpUsername?: string
+        ftpPassword?: string
+        ftpPort?: number
+        ftpFilePath?: string
+        s3Bucket?: string
+        s3Key?: string
     }>({
         name: '',
         dailyBudget: 0,
@@ -507,6 +516,15 @@ export default function XmlDetailsPage() {
         xmlSplitCampaigns: [],
         originsInclude: '',
         originsExclude: '',
+        // FTP/S3 fields
+        ftpProtocol: 'FTP',
+        ftpHost: '',
+        ftpUsername: '',
+        ftpPassword: '',
+        ftpPort: 21,
+        ftpFilePath: '',
+        s3Bucket: '',
+        s3Key: '',
     })
 
     // Load data on mount
@@ -1467,6 +1485,118 @@ export default function XmlDetailsPage() {
                                                 </FieldContent>
                                             </Field>
                                         </div>
+
+                                        {/* FTP Configuration */}
+                                        {settingsForm.downloadMethod === 'ftp' && (
+                                            <>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <Field>
+                                                        <FieldLabel>Protocol</FieldLabel>
+                                                        <FieldContent>
+                                                            <Select
+                                                                value={settingsForm.ftpProtocol}
+                                                                onValueChange={(value) => setSettingsForm({ ...settingsForm, ftpProtocol: value as 'FTP' | 'SFTP' })}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="FTP">FTP</SelectItem>
+                                                                    <SelectItem value="SFTP">SFTP</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FieldContent>
+                                                    </Field>
+                                                    <Field>
+                                                        <FieldLabel>Port</FieldLabel>
+                                                        <FieldContent>
+                                                            <Input
+                                                                type="number"
+                                                                value={settingsForm.ftpPort || 21}
+                                                                onChange={(e) => setSettingsForm({ ...settingsForm, ftpPort: parseInt(e.target.value) || 21 })}
+                                                                placeholder="21"
+                                                                required
+                                                            />
+                                                        </FieldContent>
+                                                    </Field>
+                                                </div>
+                                                <Field>
+                                                    <FieldLabel>Host</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.ftpHost || ''}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, ftpHost: e.target.value })}
+                                                            placeholder="ftp.example.com"
+                                                            required
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <Field>
+                                                        <FieldLabel>Username</FieldLabel>
+                                                        <FieldContent>
+                                                            <Input
+                                                                value={settingsForm.ftpUsername || ''}
+                                                                onChange={(e) => setSettingsForm({ ...settingsForm, ftpUsername: e.target.value })}
+                                                                placeholder="username"
+                                                                required
+                                                            />
+                                                        </FieldContent>
+                                                    </Field>
+                                                    <Field>
+                                                        <FieldLabel>Password</FieldLabel>
+                                                        <FieldContent>
+                                                            <Input
+                                                                type="password"
+                                                                value={settingsForm.ftpPassword || ''}
+                                                                onChange={(e) => setSettingsForm({ ...settingsForm, ftpPassword: e.target.value })}
+                                                                placeholder="••••••••"
+                                                                required
+                                                            />
+                                                        </FieldContent>
+                                                    </Field>
+                                                </div>
+                                                <Field>
+                                                    <FieldLabel>Full File Path & Name</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.ftpFilePath || ''}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, ftpFilePath: e.target.value })}
+                                                            placeholder="/path/to/jobs.xml"
+                                                            required
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                            </>
+                                        )}
+
+                                        {/* S3 Configuration */}
+                                        {settingsForm.downloadMethod === 's3' && (
+                                            <>
+                                                <Field>
+                                                    <FieldLabel>S3 Bucket</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.s3Bucket || ''}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, s3Bucket: e.target.value })}
+                                                            placeholder="my-bucket-name"
+                                                            required
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                                <Field>
+                                                    <FieldLabel>S3 Key</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.s3Key || ''}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, s3Key: e.target.value })}
+                                                            placeholder="path/to/jobs.xml"
+                                                            required
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                            </>
+                                        )}
                                     </FieldGroup>
                                 </div>
                             </div>
