@@ -1679,9 +1679,11 @@ export default function XmlDetailsPage() {
                     </Card>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2">
-                        <Button onClick={handleSaveSettings}>Save Settings</Button>
-                        <Button variant="outline" onClick={handleResetSettings}>Reset to Defaults</Button>
+                    <div className="sticky bottom-0 bg-background border-t p-4 -mx-4">
+                        <div className="flex gap-2 justify-end">
+                            <Button onClick={handleSaveSettings}>Save Settings</Button>
+                            <Button variant="outline" onClick={handleResetSettings}>Reset to Defaults</Button>
+                        </div>
                     </div>
                 </TabsContent>
             </Tabs>
