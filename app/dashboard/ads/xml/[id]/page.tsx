@@ -119,11 +119,19 @@ interface Schedule {
 
 interface ParsingLog {
     id: number
-    timestamp: string
-    status: ParsingStatus
-    jobsProcessed: number
+    startedAt: string
+    finishedAt?: string
     duration: string
-    errorMessage?: string
+    status: ParsingStatus
+    jobsCount: number
+    bcJobsCount: number
+    cpcFloorSkipCount: number
+    locationSkipCount: number
+    remoteFlagsCount: number
+    locLookupsCount: number
+    countryList: string
+    errors?: string
+    triggeredAs: string
 }
 
 interface AuditLog {
@@ -209,15 +217,32 @@ const generateMockXmlAdData = (id: string): XmlAdData => {
 
 const generateMockParsingLogs = (): ParsingLog[] => {
     const statuses: ParsingStatus[] = ['success', 'failed', 'running', 'pending']
+    const triggerTypes = ['scheduled', 'manual', 'api', 'webhook']
+    const countries = ['US', 'UK', 'CA', 'AU', 'DE', 'FR', 'JP', 'IN', 'BR', 'MX']
+
     return [...Array(10)].map((_, idx) => {
         const status = statuses[Math.floor(Math.random() * statuses.length)]
+        const startTime = new Date(Date.now() - idx * 3600000)
+        const endTime = status === 'running' || status === 'pending' ? undefined : new Date(startTime.getTime() + Math.random() * 300000)
+        const duration = endTime ? `${Math.round((endTime.getTime() - startTime.getTime()) / 1000)}s` : '-'
+        const numCountries = Math.floor(Math.random() * 5) + 1
+        const countryList = countries.sort(() => 0.5 - Math.random()).slice(0, numCountries).join(', ')
+
         return {
             id: idx + 1,
-            timestamp: format(new Date(Date.now() - idx * 3600000), 'MM/dd/yyyy HH:mm:ss'),
+            startedAt: format(startTime, 'MM/dd/yyyy HH:mm:ss'),
+            finishedAt: endTime ? format(endTime, 'MM/dd/yyyy HH:mm:ss') : undefined,
+            duration,
             status,
-            jobsProcessed: Math.floor(Math.random() * 1000) + 100,
-            duration: `${Math.floor(Math.random() * 60)}s`,
-            errorMessage: status === 'failed' ? 'Connection timeout or invalid XML format' : undefined,
+            jobsCount: Math.floor(Math.random() * 1000) + 100,
+            bcJobsCount: Math.floor(Math.random() * 200) + 20,
+            cpcFloorSkipCount: Math.floor(Math.random() * 50),
+            locationSkipCount: Math.floor(Math.random() * 100),
+            remoteFlagsCount: Math.floor(Math.random() * 30),
+            locLookupsCount: Math.floor(Math.random() * 500) + 50,
+            countryList,
+            errors: status === 'failed' ? 'Connection timeout or invalid XML format' : undefined,
+            triggeredAs: triggerTypes[Math.floor(Math.random() * triggerTypes.length)],
         }
     })
 }
@@ -1107,58 +1132,80 @@ export default function XmlDetailsPage() {
                             <CardDescription>Recent parsing activity</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Timestamp</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Jobs Processed</TableHead>
-                                        <TableHead>Duration</TableHead>
-                                        <TableHead>Error Message</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {parsingLogs.map((log) => (
-                                        <TableRow key={log.id}>
-                                            <TableCell>{log.timestamp}</TableCell>
-                                            <TableCell>
-                                                {log.status === 'success' && (
-                                                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
-                                                        {log.status}
-                                                    </Badge>
-                                                )}
-                                                {log.status === 'failed' && (
-                                                    <Badge variant="destructive">
-                                                        {log.status}
-                                                    </Badge>
-                                                )}
-                                                {log.status === 'running' && (
-                                                    <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
-                                                        {log.status}
-                                                    </Badge>
-                                                )}
-                                                {log.status === 'pending' && (
-                                                    <Badge variant="secondary" className="bg-yellow-600 hover:bg-yellow-700 text-white">
-                                                        {log.status}
-                                                    </Badge>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>{log.jobsProcessed.toLocaleString()}</TableCell>
-                                            <TableCell>{log.duration}</TableCell>
-                                            <TableCell>
-                                                {log.errorMessage ? (
-                                                    <div className="flex items-center gap-1 text-red-600">
-                                                        <AlertCircle className="h-4 w-4" />
-                                                        <span className="text-sm">{log.errorMessage}</span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-muted-foreground">-</span>
-                                                )}
-                                            </TableCell>
+                            <div className="border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Started At</TableHead>
+                                            <TableHead>Finished At</TableHead>
+                                            <TableHead>Duration</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Jobs</TableHead>
+                                            <TableHead className="text-right">BC Jobs</TableHead>
+                                            <TableHead className="text-right">CPC Floor Skip</TableHead>
+                                            <TableHead className="text-right">Location Skip</TableHead>
+                                            <TableHead className="text-right">Remote Flags</TableHead>
+                                            <TableHead className="text-right">Loc Lookups</TableHead>
+                                            <TableHead>Countries</TableHead>
+                                            <TableHead>Triggered As</TableHead>
+                                            <TableHead>Errors</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {parsingLogs.map((log) => (
+                                            <TableRow key={log.id}>
+                                                <TableCell className="text-sm">{log.startedAt}</TableCell>
+                                                <TableCell className="text-sm">{log.finishedAt || '-'}</TableCell>
+                                                <TableCell className="text-sm">{log.duration}</TableCell>
+                                                <TableCell>
+                                                    {log.status === 'success' && (
+                                                        <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                                                            {log.status}
+                                                        </Badge>
+                                                    )}
+                                                    {log.status === 'failed' && (
+                                                        <Badge variant="destructive">
+                                                            {log.status}
+                                                        </Badge>
+                                                    )}
+                                                    {log.status === 'running' && (
+                                                        <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+                                                            {log.status}
+                                                        </Badge>
+                                                    )}
+                                                    {log.status === 'pending' && (
+                                                        <Badge variant="secondary" className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                                                            {log.status}
+                                                        </Badge>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-sm text-right">{log.jobsCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm text-right">{log.bcJobsCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm text-right">{log.cpcFloorSkipCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm text-right">{log.locationSkipCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm text-right">{log.remoteFlagsCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm text-right">{log.locLookupsCount.toLocaleString()}</TableCell>
+                                                <TableCell className="text-sm">{log.countryList}</TableCell>
+                                                <TableCell className="text-sm">
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {log.triggeredAs}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-sm">
+                                                    {log.errors ? (
+                                                        <div className="flex items-center gap-1 text-red-600">
+                                                            <AlertCircle className="h-4 w-4" />
+                                                            <span className="text-xs">{log.errors}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground">-</span>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
