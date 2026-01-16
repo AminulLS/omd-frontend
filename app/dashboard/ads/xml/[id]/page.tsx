@@ -822,8 +822,8 @@ export default function XmlDetailsPage() {
                 <TabsList>
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="parsing-logs">Parsing Logs</TabsTrigger>
-                    <TabsTrigger value="schedules">Schedules</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
+                    <TabsTrigger value="schedules">Schedules</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -1075,94 +1075,9 @@ export default function XmlDetailsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* Schedules Tab */}
-                <TabsContent value="schedules">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <CardTitle>Ad Schedules</CardTitle>
-                                    <CardDescription>Manage when your ads are displayed</CardDescription>
-                                </div>
-                                <Button onClick={openAddSchedule} size="sm">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Schedule
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {scheduleList.length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">
-                                    No schedules configured. Click "Add Schedule" to create one.
-                                </div>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Start Time</TableHead>
-                                            <TableHead>End Time</TableHead>
-                                            <TableHead>Days</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {scheduleList.map((schedule) => (
-                                            <TableRow key={schedule.id}>
-                                                <TableCell className="font-medium">{schedule.name}</TableCell>
-                                                <TableCell>{schedule.startTime}</TableCell>
-                                                <TableCell>{schedule.endTime}</TableCell>
-                                                <TableCell>{schedule.days.join(', ')}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant={schedule.status === 'active' ? 'default' : 'secondary'}>
-                                                        {schedule.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => toggleScheduleStatus(schedule.id)}
-                                                            title={schedule.status === 'active' ? 'Pause' : 'Activate'}
-                                                        >
-                                                            {schedule.status === 'active' ? (
-                                                                <Pause className="h-4 w-4" />
-                                                            ) : (
-                                                                <Play className="h-4 w-4" />
-                                                            )}
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => openEditSchedule(schedule)}
-                                                            title="Edit"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => openDeleteSchedule(schedule.id)}
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
                 {/* Settings Tab */}
                 <TabsContent value="settings" className="space-y-4">
-                    {/* General Settings */}
+                    {/* 1. General Settings */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1180,6 +1095,26 @@ export default function XmlDetailsPage() {
                                                     onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })}
                                                     placeholder="XML feed name"
                                                 />
+                                            </FieldContent>
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel>Status</FieldLabel>
+                                            <FieldContent>
+                                                <Select
+                                                    value={settingsForm.status}
+                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, status: value as XmlAdStatus })}
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {statuses.map((status) => (
+                                                            <SelectItem key={status.value} value={status.value}>
+                                                                {status.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </FieldContent>
                                         </Field>
                                         <div className="grid grid-cols-2 gap-4">
@@ -1216,24 +1151,72 @@ export default function XmlDetailsPage() {
                                                 </FieldContent>
                                             </Field>
                                         </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Field>
+                                                <FieldLabel>Country</FieldLabel>
+                                                <FieldContent>
+                                                    <Select
+                                                        value={settingsForm.country}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, country: value })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {countries.map((country) => (
+                                                                <SelectItem key={country.value} value={country.value}>
+                                                                    {country.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FieldContent>
+                                            </Field>
+                                            <Field>
+                                                <FieldLabel>Currency</FieldLabel>
+                                                <FieldContent>
+                                                    <Select
+                                                        value={settingsForm.currency}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, currency: value })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {currencies.map((currency) => (
+                                                                <SelectItem key={currency.value} value={currency.value}>
+                                                                    {currency.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FieldContent>
+                                            </Field>
+                                        </div>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 2. Additional Notes */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Additional Notes</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Add any extra information or instructions</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <FieldGroup>
                                         <Field>
-                                            <FieldLabel>Status</FieldLabel>
                                             <FieldContent>
-                                                <Select
-                                                    value={settingsForm.status}
-                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, status: value as XmlAdStatus })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {statuses.map((status) => (
-                                                            <SelectItem key={status.value} value={status.value}>
-                                                                {status.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
+                                                <Textarea
+                                                    value={settingsForm.notes}
+                                                    onChange={(e) => setSettingsForm({ ...settingsForm, notes: e.target.value })}
+                                                    placeholder="Add notes, special instructions, or important information..."
+                                                    rows={4}
+                                                />
                                             </FieldContent>
                                         </Field>
                                     </FieldGroup>
@@ -1242,7 +1225,7 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Feed Configuration Settings */}
+                    {/* 3. Feed Configuration */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1253,12 +1236,23 @@ export default function XmlDetailsPage() {
                                 <div className="lg:col-span-2 p-6">
                                     <FieldGroup>
                                         <Field>
-                                            <FieldLabel>XML Feed Name</FieldLabel>
+                                            <FieldLabel>XML URL</FieldLabel>
                                             <FieldContent>
                                                 <Input
-                                                    value={settingsForm.xmlFeedName}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, xmlFeedName: e.target.value })}
-                                                    placeholder="feed_name"
+                                                    type="url"
+                                                    value={settingsForm.xmlUrl}
+                                                    onChange={(e) => setSettingsForm({ ...settingsForm, xmlUrl: e.target.value })}
+                                                    placeholder="https://example.com/feed.xml"
+                                                />
+                                            </FieldContent>
+                                        </Field>
+                                        <Field>
+                                            <FieldLabel>Job Field</FieldLabel>
+                                            <FieldContent>
+                                                <Input
+                                                    value={settingsForm.jobField}
+                                                    onChange={(e) => setSettingsForm({ ...settingsForm, jobField: e.target.value })}
+                                                    placeholder="e.g., technology, healthcare, finance"
                                                 />
                                             </FieldContent>
                                         </Field>
@@ -1274,97 +1268,57 @@ export default function XmlDetailsPage() {
                                                 onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, requiresDownload: checked })}
                                             />
                                         </div>
-                                        <Field>
-                                            <FieldLabel>Download Method</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={settingsForm.downloadMethod}
-                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, downloadMethod: value as 'url' | 'ftp' | 's3' })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {downloadMethods.map((method) => (
-                                                            <SelectItem key={method.value} value={method.value}>
-                                                                {method.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>XML Content Type</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={settingsForm.xmlContentType}
-                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, xmlContentType: value as any })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {xmlContentTypes.map((type) => (
-                                                            <SelectItem key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>XML URL</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    type="url"
-                                                    value={settingsForm.xmlUrl}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, xmlUrl: e.target.value })}
-                                                    placeholder="https://example.com/feed.xml"
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Crawl Frequency Settings */}
-                    <Card className='p-0'>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 lg:grid-cols-3">
-                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Crawl Frequency</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Configure crawling and waiting time intervals</p>
-                                </div>
-                                <div className="lg:col-span-2 p-6">
-                                    <FieldGroup>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        {settingsForm.requiresDownload && (
                                             <Field>
-                                                <FieldLabel>Running Frequency</FieldLabel>
+                                                <FieldLabel>XML Feed Name</FieldLabel>
                                                 <FieldContent>
                                                     <Input
-                                                        type="number"
-                                                        value={settingsForm.runningFrequency || ''}
-                                                        onChange={(e) => setSettingsForm({ ...settingsForm, runningFrequency: parseInt(e.target.value) || 2 })}
-                                                        placeholder="2"
+                                                        value={settingsForm.xmlFeedName}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, xmlFeedName: e.target.value })}
+                                                        placeholder="feed_name"
                                                     />
-                                                    <p className="text-xs text-muted-foreground mt-1.5">Default Frequency : 2</p>
+                                                </FieldContent>
+                                            </Field>
+                                        )}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Field>
+                                                <FieldLabel>Download Method</FieldLabel>
+                                                <FieldContent>
+                                                    <Select
+                                                        value={settingsForm.downloadMethod}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, downloadMethod: value as 'url' | 'ftp' | 's3' })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {downloadMethods.map((method) => (
+                                                                <SelectItem key={method.value} value={method.value}>
+                                                                    {method.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                 </FieldContent>
                                             </Field>
                                             <Field>
-                                                <FieldLabel>Interval Waiting time</FieldLabel>
+                                                <FieldLabel>XML Content Type</FieldLabel>
                                                 <FieldContent>
-                                                    <Input
-                                                        type="time"
-                                                        step="1"
-                                                        value={settingsForm.intervalWaitingTime || ''}
-                                                        onChange={(e) => setSettingsForm({ ...settingsForm, intervalWaitingTime: e.target.value })}
-                                                        placeholder="04:30:00"
-                                                    />
-                                                    <p className="text-xs text-muted-foreground mt-1.5">Default waiting time(HH:mm:ss) 04:30:00. Should follow this format HH:mm:ss</p>
+                                                    <Select
+                                                        value={settingsForm.xmlContentType}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, xmlContentType: value as any })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {xmlContentTypes.map((type) => (
+                                                                <SelectItem key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
                                                 </FieldContent>
                                             </Field>
                                         </div>
@@ -1374,76 +1328,135 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Pricing Settings */}
+                    {/* 4. Content & Branding */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
                                 <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Pricing</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Configure revenue and pricing models</p>
+                                    <h4 className="font-medium text-sm">Content & Branding</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure content fields and branding options</p>
                                 </div>
                                 <div className="lg:col-span-2 p-6">
                                     <FieldGroup>
-                                        <Field>
-                                            <FieldLabel>Revenue Type</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={settingsForm.revenueType}
-                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, revenueType: value as 'yes_paid' | 'no_paid' })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {revenueTypes.map((type) => (
-                                                            <SelectItem key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <p className="text-xs text-muted-foreground mt-1.5">Flag For Organic Jobs. These are accessable via a param on request.</p>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Pricing Type</FieldLabel>
-                                            <FieldContent>
-                                                <Select
-                                                    value={settingsForm.pricingType}
-                                                    onValueChange={(value) => setSettingsForm({ ...settingsForm, pricingType: value as 'cpc' | 'cpa' | 'tcpa' })}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {pricingTypes.map((type) => (
-                                                            <SelectItem key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FieldContent>
-                                        </Field>
-                                        <Field>
-                                            <FieldLabel>Flat CPC Override</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    type="number"
-                                                    step="0.01"
-                                                    value={settingsForm.flatCpcOverride || ''}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
-                                                    placeholder="0.00"
-                                                />
-                                            </FieldContent>
-                                        </Field>
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>It's the partner passing the company's logo?</FieldLabel>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Note: If "No" its selected the system will get the logo from our DB or will set a default one.
+                                                </p>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.partnerPassingLogo}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingLogo: checked })}
+                                            />
+                                        </div>
+                                        {settingsForm.partnerPassingLogo && (
+                                            <Field>
+                                                <FieldLabel>Logo Field</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        value={settingsForm.logoField || ''}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, logoField: e.target.value })}
+                                                        placeholder="e.g., logo, company_logo, image_url"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+                                        )}
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>It's the partner passing the category field?</FieldLabel>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.partnerPassingCategory}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingCategory: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>Override BlueCollar Flag Logic?</FieldLabel>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.overrideBlueCollarFlag}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, overrideBlueCollarFlag: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>Remote Job Detection & Expansion</FieldLabel>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.remoteJobDetection}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, remoteJobDetection: checked })}
+                                            />
+                                        </div>
                                     </FieldGroup>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Feed Adjustments Settings */}
+                    {/* 5. Location Settings */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Location Settings</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure location and coordinate handling</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <FieldGroup>
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>Would you like the system to assign the zip code and coordinates (lat/lon) based on raw location? (city/state)</FieldLabel>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.assignZipCoordinates}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, assignZipCoordinates: checked })}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between space-y-0">
+                                            <div className="space-y-0.5">
+                                                <FieldLabel>It's the partner passing (coordinates) lat/lon?</FieldLabel>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Note: If "No" its selected the system will get the coordinates based on the zip code.
+                                                </p>
+                                            </div>
+                                            <Switch
+                                                checked={settingsForm.partnerPassingCoordinates}
+                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingCoordinates: checked })}
+                                            />
+                                        </div>
+                                        {settingsForm.partnerPassingCoordinates && (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <Field>
+                                                    <FieldLabel>Latitude Field</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.latitudeField}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, latitudeField: e.target.value })}
+                                                            placeholder="lat"
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                                <Field>
+                                                    <FieldLabel>Longitude Field</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            value={settingsForm.longitudeField}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, longitudeField: e.target.value })}
+                                                            placeholder="lon"
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                            </div>
+                                        )}
+                                    </FieldGroup>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 6. Feed Adjustments */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1509,7 +1522,7 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Content Access Settings */}
+                    {/* 7. Content Access */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1559,7 +1572,121 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* XML Split Campaigns by Value Settings */}
+                    {/* 8. Pricing */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Pricing</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure revenue and pricing models</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <FieldGroup>
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <Field>
+                                                <FieldLabel>Revenue Type</FieldLabel>
+                                                <FieldContent>
+                                                    <Select
+                                                        value={settingsForm.revenueType}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, revenueType: value as 'yes_paid' | 'no_paid' })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {revenueTypes.map((type) => (
+                                                                <SelectItem key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <p className="text-xs text-muted-foreground mt-1.5">Flag For Organic Jobs. These are accessable via a param on request.</p>
+                                                </FieldContent>
+                                            </Field>
+                                            <Field>
+                                                <FieldLabel>Pricing Type</FieldLabel>
+                                                <FieldContent>
+                                                    <Select
+                                                        value={settingsForm.pricingType}
+                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, pricingType: value as 'cpc' | 'cpa' | 'tcpa' })}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {pricingTypes.map((type) => (
+                                                                <SelectItem key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FieldContent>
+                                            </Field>
+                                            <Field>
+                                                <FieldLabel>Flat CPC Override</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={settingsForm.flatCpcOverride || ''}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.00"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+                                        </div>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 9. Crawl Frequency */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Crawl Frequency</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure crawling and waiting time intervals</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <FieldGroup>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Field>
+                                                <FieldLabel>Running Frequency</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        type="number"
+                                                        value={settingsForm.runningFrequency || ''}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, runningFrequency: parseInt(e.target.value) || 2 })}
+                                                        placeholder="2"
+                                                    />
+                                                    <p className="text-xs text-muted-foreground mt-1.5">Default Frequency : 2</p>
+                                                </FieldContent>
+                                            </Field>
+                                            <Field>
+                                                <FieldLabel>Interval Waiting time</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        type="time"
+                                                        step="1"
+                                                        value={settingsForm.intervalWaitingTime || ''}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, intervalWaitingTime: e.target.value })}
+                                                        placeholder="04:30:00"
+                                                    />
+                                                    <p className="text-xs text-muted-foreground mt-1.5">Default waiting time(HH:mm:ss) 04:30:00. Should follow this format HH:mm:ss</p>
+                                                </FieldContent>
+                                            </Field>
+                                        </div>
+                                    </FieldGroup>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* 10. XML Split Campaigns by Value */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1653,7 +1780,7 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Additional URL Params Settings */}
+                    {/* 11. Additional URL Params */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -1733,225 +1860,7 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Location Settings */}
-                    <Card className='p-0'>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 lg:grid-cols-3">
-                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Location Settings</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Configure location and coordinate handling</p>
-                                </div>
-                                <div className="lg:col-span-2 p-6">
-                                    <FieldGroup>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>Would you like the system to assign the zip code and coordinates (lat/lon) based on raw location? (city/state)</FieldLabel>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.assignZipCoordinates}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, assignZipCoordinates: checked })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>It's the partner passing (coordinates) lat/lon?</FieldLabel>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Note: If "No" its selected the system will get the coordinates based on the zip code.
-                                                </p>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.partnerPassingCoordinates}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingCoordinates: checked })}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <Field>
-                                                <FieldLabel>Latitude Field</FieldLabel>
-                                                <FieldContent>
-                                                    <Input
-                                                        value={settingsForm.latitudeField}
-                                                        onChange={(e) => setSettingsForm({ ...settingsForm, latitudeField: e.target.value })}
-                                                        placeholder="lat"
-                                                    />
-                                                </FieldContent>
-                                            </Field>
-                                            <Field>
-                                                <FieldLabel>Longitude Field</FieldLabel>
-                                                <FieldContent>
-                                                    <Input
-                                                        value={settingsForm.longitudeField}
-                                                        onChange={(e) => setSettingsForm({ ...settingsForm, longitudeField: e.target.value })}
-                                                        placeholder="lon"
-                                                    />
-                                                </FieldContent>
-                                            </Field>
-                                        </div>
-                                    </FieldGroup>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Content & Branding Settings */}
-                    <Card className='p-0'>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 lg:grid-cols-3">
-                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Content & Branding</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Configure content fields and branding options</p>
-                                </div>
-                                <div className="lg:col-span-2 p-6">
-                                    <FieldGroup>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>It's the partner passing the company's logo?</FieldLabel>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Note: If "No" its selected the system will get the logo from our DB or will set a default one.
-                                                </p>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.partnerPassingLogo}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingLogo: checked })}
-                                            />
-                                        </div>
-                                        <Field>
-                                            <FieldLabel>Logo Field</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    value={settingsForm.logoField || ''}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, logoField: e.target.value })}
-                                                    placeholder="e.g., logo, company_logo, image_url"
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>It's the partner passing the category field?</FieldLabel>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.partnerPassingCategory}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, partnerPassingCategory: checked })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>Override BlueCollar Flag Logic?</FieldLabel>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.overrideBlueCollarFlag}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, overrideBlueCollarFlag: checked })}
-                                            />
-                                        </div>
-                                        <div className="flex items-center justify-between space-y-0">
-                                            <div className="space-y-0.5">
-                                                <FieldLabel>Remote Job Detection & Expansion</FieldLabel>
-                                            </div>
-                                            <Switch
-                                                checked={settingsForm.remoteJobDetection}
-                                                onCheckedChange={(checked) => setSettingsForm({ ...settingsForm, remoteJobDetection: checked })}
-                                            />
-                                        </div>
-                                        <Field>
-                                            <FieldLabel>Job Field</FieldLabel>
-                                            <FieldContent>
-                                                <Input
-                                                    value={settingsForm.jobField}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, jobField: e.target.value })}
-                                                    placeholder="e.g., technology, healthcare, finance"
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Regional Settings */}
-                    <Card className='p-0'>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 lg:grid-cols-3">
-                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Regional Settings</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Configure country and currency options</p>
-                                </div>
-                                <div className="lg:col-span-2 p-6">
-                                    <FieldGroup>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <Field>
-                                                <FieldLabel>Country</FieldLabel>
-                                                <FieldContent>
-                                                    <Select
-                                                        value={settingsForm.country}
-                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, country: value })}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {countries.map((country) => (
-                                                                <SelectItem key={country.value} value={country.value}>
-                                                                    {country.label}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FieldContent>
-                                            </Field>
-                                            <Field>
-                                                <FieldLabel>Currency</FieldLabel>
-                                                <FieldContent>
-                                                    <Select
-                                                        value={settingsForm.currency}
-                                                        onValueChange={(value) => setSettingsForm({ ...settingsForm, currency: value })}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {currencies.map((currency) => (
-                                                                <SelectItem key={currency.value} value={currency.value}>
-                                                                    {currency.label}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FieldContent>
-                                            </Field>
-                                        </div>
-                                    </FieldGroup>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Additional Notes */}
-                    <Card className='p-0'>
-                        <CardContent className="p-0">
-                            <div className="grid grid-cols-1 lg:grid-cols-3">
-                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
-                                    <h4 className="font-medium text-sm">Additional Notes</h4>
-                                    <p className="text-xs text-muted-foreground mt-1">Add any extra information or instructions</p>
-                                </div>
-                                <div className="lg:col-span-2 p-6">
-                                    <FieldGroup>
-                                        <Field>
-                                            <FieldContent>
-                                                <Textarea
-                                                    value={settingsForm.notes}
-                                                    onChange={(e) => setSettingsForm({ ...settingsForm, notes: e.target.value })}
-                                                    placeholder="Add notes, special instructions, or important information..."
-                                                    rows={4}
-                                                />
-                                            </FieldContent>
-                                        </Field>
-                                    </FieldGroup>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Field Mapping Settings */}
+                    {/* 12. Field Mapping */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -2000,7 +1909,7 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* URL Variable Replacement Settings */}
+                    {/* 13. URL Variable Replacement */}
                     <Card className='p-0'>
                         <CardContent className="p-0">
                             <div className="grid grid-cols-1 lg:grid-cols-3">
@@ -2087,6 +1996,91 @@ export default function XmlDetailsPage() {
                             <Button variant="outline" onClick={handleResetSettings}>Reset to Defaults</Button>
                         </div>
                     </div>
+                </TabsContent>
+
+                {/* Schedules Tab */}
+                <TabsContent value="schedules">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <CardTitle>Ad Schedules</CardTitle>
+                                    <CardDescription>Manage when your ads are displayed</CardDescription>
+                                </div>
+                                <Button onClick={openAddSchedule} size="sm">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Schedule
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {scheduleList.length === 0 ? (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    No schedules configured. Click "Add Schedule" to create one.
+                                </div>
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Start Time</TableHead>
+                                            <TableHead>End Time</TableHead>
+                                            <TableHead>Days</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {scheduleList.map((schedule) => (
+                                            <TableRow key={schedule.id}>
+                                                <TableCell className="font-medium">{schedule.name}</TableCell>
+                                                <TableCell>{schedule.startTime}</TableCell>
+                                                <TableCell>{schedule.endTime}</TableCell>
+                                                <TableCell>{schedule.days.join(', ')}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant={schedule.status === 'active' ? 'default' : 'secondary'}>
+                                                        {schedule.status}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => toggleScheduleStatus(schedule.id)}
+                                                            title={schedule.status === 'active' ? 'Pause' : 'Activate'}
+                                                        >
+                                                            {schedule.status === 'active' ? (
+                                                                <Pause className="h-4 w-4" />
+                                                            ) : (
+                                                                <Play className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => openEditSchedule(schedule)}
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => openDeleteSchedule(schedule.id)}
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
 
