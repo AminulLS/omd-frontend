@@ -14,7 +14,15 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, BarChart3, Settings, Calendar, FileText, Eye, Plus, Trash2, Play, Pause, Code, RefreshCw, Globe, Clock, DollarSign, AlertCircle, Copy } from 'lucide-react'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import { ArrowLeft, ArrowRight, BarChart3, Settings, Calendar, FileText, Eye, Plus, Pencil, Trash2, Play, Pause, Code, RefreshCw, Globe, Clock, DollarSign, AlertCircle, Copy } from 'lucide-react'
 import { format } from 'date-fns'
 
 // Types
@@ -71,6 +79,9 @@ interface XmlAdData {
     acr?: number
     xmlSplitCampaigns?: XmlSplitCampaign[]
     additionalUrlParams?: AdditionalUrlParam[]
+    todayRevenue?: number
+    yesterdayRevenue?: number
+    sdlwRevenue?: number
 }
 
 interface XmlSplitCampaign {
@@ -86,6 +97,26 @@ interface AdditionalUrlParam {
     value: string
 }
 
+interface FieldMapping {
+    ourField: string
+    partnerField: string
+}
+
+interface UrlVariableReplacement {
+    id: string
+    variable: string
+    replacement: string
+}
+
+interface Schedule {
+    id: number
+    name: string
+    startTime: string
+    endTime: string
+    days: string[]
+    status: 'active' | 'paused'
+}
+
 interface ParsingLog {
     id: number
     timestamp: string
@@ -93,15 +124,6 @@ interface ParsingLog {
     jobsProcessed: number
     duration: string
     errorMessage?: string
-}
-
-interface PerformanceMetric {
-    date: string
-    impressions: number
-    clicks: number
-    ctr: number
-    revenue: number
-    jobs: number
 }
 
 // Mock data generator
@@ -168,6 +190,9 @@ const generateMockXmlAdData = (id: string): XmlAdData => {
             { id: '1', name: 'source', value: 'api' },
             { id: '2', name: 'utm_medium', value: 'xml_feed' },
         ],
+        todayRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
+        yesterdayRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
+        sdlwRevenue: Math.round((Math.random() * 5000 + 500) * 100) / 100,
     }
 }
 
@@ -184,17 +209,6 @@ const generateMockParsingLogs = (): ParsingLog[] => {
             errorMessage: status === 'failed' ? 'Connection timeout or invalid XML format' : undefined,
         }
     })
-}
-
-const generateMockPerformanceData = (): PerformanceMetric[] => {
-    return [...Array(7)].map((_, idx) => ({
-        date: format(new Date(Date.now() - idx * 86400000), 'MM/dd/yyyy'),
-        impressions: Math.floor(Math.random() * 50000) + 10000,
-        clicks: Math.floor(Math.random() * 1000) + 100,
-        ctr: Math.round((Math.random() * 5 + 1) * 100) / 100,
-        revenue: Math.round((Math.random() * 500 + 50) * 100) / 100,
-        jobs: Math.floor(Math.random() * 1000) + 100,
-    }))
 }
 
 // Constants
@@ -217,6 +231,16 @@ const currencies = [
     { value: 'AUD', label: 'AUD - Australian Dollar' },
     { value: 'JPY', label: 'JPY - Japanese Yen' },
     { value: 'INR', label: 'INR - Indian Rupee' },
+]
+
+const weekDays = [
+    { value: 'Mon', label: 'Monday' },
+    { value: 'Tue', label: 'Tuesday' },
+    { value: 'Wed', label: 'Wednesday' },
+    { value: 'Thu', label: 'Thursday' },
+    { value: 'Fri', label: 'Friday' },
+    { value: 'Sat', label: 'Saturday' },
+    { value: 'Sun', label: 'Sunday' },
 ]
 
 const downloadMethods = [
@@ -266,8 +290,46 @@ export default function XmlDetailsPage() {
 
     const [xmlData, setXmlData] = useState<XmlAdData | null>(null)
     const [parsingLogs, setParsingLogs] = useState<ParsingLog[]>([])
-    const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [fieldMapping, setFieldMapping] = useState<FieldMapping[]>([
+        { ourField: 'job_id', partnerField: 'job_id' },
+        { ourField: 'company', partnerField: 'company_name' },
+        { ourField: 'title', partnerField: 'job_title' },
+        { ourField: 'description', partnerField: 'job_description' },
+        { ourField: 'location', partnerField: 'location' },
+        { ourField: 'city', partnerField: 'city' },
+        { ourField: 'state', partnerField: 'state' },
+        { ourField: 'zip', partnerField: 'postal_code' },
+        { ourField: 'country', partnerField: 'country_code' },
+        { ourField: 'url', partnerField: 'job_url' },
+        { ourField: 'cpc', partnerField: 'cost_per_click' },
+        { ourField: 'partner_category', partnerField: 'category' },
+        { ourField: 'created_at', partnerField: 'date_posted' },
+        { ourField: 'expired_at', partnerField: 'expiry_date' },
+        { ourField: 'cpa', partnerField: 'cost_per_action' },
+        { ourField: 'risk', partnerField: 'risk_level' },
+        { ourField: 'job_type', partnerField: 'employment_type' },
+        { ourField: 'compensation', partnerField: 'salary' },
+    ])
+    const [urlVariableReplacements, setUrlVariableReplacements] = useState<UrlVariableReplacement[]>([
+        { id: '1', variable: '{job_id}', replacement: '' },
+        { id: '2', variable: '{company}', replacement: '' },
+    ])
+
+    // Schedule state
+    const [schedules, setSchedules] = useState<Record<number, Schedule>>({})
+    const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false)
+    const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
+    const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [scheduleForm, setScheduleForm] = useState({
+        name: '',
+        startTime: '09:00',
+        endTime: '17:00',
+        days: [] as string[],
+        status: 'active' as 'active' | 'paused',
+    })
+
     const [settingsForm, setSettingsForm] = useState<{
         name: string
         dailyBudget: number
@@ -350,7 +412,6 @@ export default function XmlDetailsPage() {
         setTimeout(() => {
             setXmlData(generateMockXmlAdData(id))
             setParsingLogs(generateMockParsingLogs())
-            setPerformanceData(generateMockPerformanceData())
             setIsLoading(false)
         }, 500)
     }, [id])
@@ -556,6 +617,33 @@ export default function XmlDetailsPage() {
         })
     }
 
+    const handleUpdateFieldMapping = (index: number, value: string) => {
+        const updatedMapping = [...fieldMapping]
+        updatedMapping[index].partnerField = value
+        setFieldMapping(updatedMapping)
+    }
+
+    const handleAddUrlVariableReplacement = () => {
+        const newReplacement: UrlVariableReplacement = {
+            id: Date.now().toString(),
+            variable: '',
+            replacement: '',
+        }
+        setUrlVariableReplacements([...urlVariableReplacements, newReplacement])
+    }
+
+    const handleRemoveUrlVariableReplacement = (id: string) => {
+        setUrlVariableReplacements(urlVariableReplacements.filter(r => r.id !== id))
+    }
+
+    const handleUpdateUrlVariableReplacement = (id: string, field: keyof UrlVariableReplacement, value: string) => {
+        setUrlVariableReplacements(
+            urlVariableReplacements.map(r =>
+                r.id === id ? { ...r, [field]: value } : r
+            )
+        )
+    }
+
     const getStatusVariant = (status: XmlAdStatus | ParsingStatus) => {
         switch (status) {
             case 'active':
@@ -587,6 +675,102 @@ export default function XmlDetailsPage() {
             default:
                 return 'text-gray-600'
         }
+    }
+
+    // Schedule handlers
+    const scheduleList = Object.values(schedules)
+
+    const openAddSchedule = () => {
+        setEditingSchedule(null)
+        setScheduleForm({
+            name: '',
+            startTime: '09:00',
+            endTime: '17:00',
+            days: [],
+            status: 'active',
+        })
+        setScheduleDialogOpen(true)
+    }
+
+    const openEditSchedule = (schedule: Schedule) => {
+        setEditingSchedule(schedule)
+        setScheduleForm({
+            name: schedule.name,
+            startTime: schedule.startTime,
+            endTime: schedule.endTime,
+            days: [...schedule.days],
+            status: schedule.status,
+        })
+        setScheduleDialogOpen(true)
+    }
+
+    const handleSaveSchedule = () => {
+        if (editingSchedule) {
+            // Update existing
+            setSchedules(prev => ({
+                ...prev,
+                [editingSchedule.id]: {
+                    ...editingSchedule,
+                    name: scheduleForm.name,
+                    startTime: scheduleForm.startTime,
+                    endTime: scheduleForm.endTime,
+                    days: scheduleForm.days,
+                    status: scheduleForm.status,
+                },
+            }))
+        } else {
+            // Add new
+            const newId = Math.max(...Object.keys(schedules).map(Number), 0) + 1
+            setSchedules(prev => ({
+                ...prev,
+                [newId]: {
+                    id: newId,
+                    name: scheduleForm.name,
+                    startTime: scheduleForm.startTime,
+                    endTime: scheduleForm.endTime,
+                    days: scheduleForm.days,
+                    status: scheduleForm.status,
+                },
+            }))
+        }
+        setScheduleDialogOpen(false)
+        setEditingSchedule(null)
+    }
+
+    const openDeleteSchedule = (id: number) => {
+        setScheduleToDelete(id)
+        setDeleteDialogOpen(true)
+    }
+
+    const handleDeleteSchedule = () => {
+        if (scheduleToDelete) {
+            setSchedules(prev => {
+                const newSchedules = { ...prev }
+                delete newSchedules[scheduleToDelete]
+                return newSchedules
+            })
+        }
+        setDeleteDialogOpen(false)
+        setScheduleToDelete(null)
+    }
+
+    const toggleScheduleStatus = (id: number) => {
+        setSchedules(prev => ({
+            ...prev,
+            [id]: {
+                ...prev[id],
+                status: prev[id].status === 'active' ? 'paused' : 'active',
+            },
+        }))
+    }
+
+    const toggleDay = (dayValue: string) => {
+        setScheduleForm(prev => ({
+            ...prev,
+            days: prev.days.includes(dayValue)
+                ? prev.days.filter(d => d !== dayValue)
+                : [...prev.days, dayValue],
+        }))
     }
 
     if (isLoading) {
@@ -637,8 +821,8 @@ export default function XmlDetailsPage() {
             <Tabs defaultValue="overview" className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="performance">Performance</TabsTrigger>
                     <TabsTrigger value="parsing-logs">Parsing Logs</TabsTrigger>
+                    <TabsTrigger value="schedules">Schedules</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                 </TabsList>
 
@@ -687,20 +871,24 @@ export default function XmlDetailsPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Budget Card */}
+                        {/* Revenue Card */}
                         <Card>
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-sm font-medium">Budget</CardTitle>
+                                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">Daily Budget</span>
-                                        <span className="text-sm font-semibold">${xmlData.dailyBudget.toFixed(2)}</span>
+                                        <span className="text-sm text-muted-foreground">Today</span>
+                                        <span className="text-sm font-semibold">${xmlData.todayRevenue?.toFixed(2) || '0.00'}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm text-muted-foreground">Country</span>
-                                        <span className="text-sm font-semibold">{xmlData.country}</span>
+                                        <span className="text-sm text-muted-foreground">Yesterday</span>
+                                        <span className="text-sm font-semibold">${xmlData.yesterdayRevenue?.toFixed(2) || '0.00'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">SDLW</span>
+                                        <span className="text-sm font-semibold">${xmlData.sdlwRevenue?.toFixed(2) || '0.00'}</span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -806,40 +994,36 @@ export default function XmlDetailsPage() {
                             </CardContent>
                         </Card>
                     </div>
-                </TabsContent>
 
-                {/* Performance Tab */}
-                <TabsContent value="performance" className="space-y-4">
+                    {/* Additional Notes */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Performance Metrics</CardTitle>
-                            <CardDescription>Last 7 days</CardDescription>
+                            <CardTitle>Additional Notes</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Impressions</TableHead>
-                                        <TableHead>Clicks</TableHead>
-                                        <TableHead>CTR</TableHead>
-                                        <TableHead>Jobs</TableHead>
-                                        <TableHead>Revenue</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {performanceData.map((metric, idx) => (
-                                        <TableRow key={idx}>
-                                            <TableCell>{metric.date}</TableCell>
-                                            <TableCell>{metric.impressions.toLocaleString()}</TableCell>
-                                            <TableCell>{metric.clicks.toLocaleString()}</TableCell>
-                                            <TableCell>{metric.ctr}%</TableCell>
-                                            <TableCell>{metric.jobs.toLocaleString()}</TableCell>
-                                            <TableCell>${metric.revenue.toFixed(2)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            <Textarea
+                                value={settingsForm.notes}
+                                onChange={(e) => setSettingsForm({ ...settingsForm, notes: e.target.value })}
+                                placeholder="Add notes, special instructions, or important information..."
+                                rows={4}
+                                className="resize-none"
+                            />
+                            <div className="flex justify-end mt-2">
+                                <Button
+                                    size="sm"
+                                    onClick={() => {
+                                        if (xmlData && settingsForm) {
+                                            setXmlData({
+                                                ...xmlData,
+                                                notes: settingsForm.notes
+                                            })
+                                            alert('Notes saved successfully!')
+                                        }
+                                    }}
+                                >
+                                    Save Notes
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -887,6 +1071,91 @@ export default function XmlDetailsPage() {
                                     ))}
                                 </TableBody>
                             </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Schedules Tab */}
+                <TabsContent value="schedules">
+                    <Card>
+                        <CardHeader>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <CardTitle>Ad Schedules</CardTitle>
+                                    <CardDescription>Manage when your ads are displayed</CardDescription>
+                                </div>
+                                <Button onClick={openAddSchedule} size="sm">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Schedule
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {scheduleList.length === 0 ? (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    No schedules configured. Click "Add Schedule" to create one.
+                                </div>
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Start Time</TableHead>
+                                            <TableHead>End Time</TableHead>
+                                            <TableHead>Days</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {scheduleList.map((schedule) => (
+                                            <TableRow key={schedule.id}>
+                                                <TableCell className="font-medium">{schedule.name}</TableCell>
+                                                <TableCell>{schedule.startTime}</TableCell>
+                                                <TableCell>{schedule.endTime}</TableCell>
+                                                <TableCell>{schedule.days.join(', ')}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant={schedule.status === 'active' ? 'default' : 'secondary'}>
+                                                        {schedule.status}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => toggleScheduleStatus(schedule.id)}
+                                                            title={schedule.status === 'active' ? 'Pause' : 'Activate'}
+                                                        >
+                                                            {schedule.status === 'active' ? (
+                                                                <Pause className="h-4 w-4" />
+                                                            ) : (
+                                                                <Play className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => openEditSchedule(schedule)}
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => openDeleteSchedule(schedule.id)}
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -1398,9 +1667,10 @@ export default function XmlDetailsPage() {
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
-                                                        <TableHead className="w-[45%]">Param Name</TableHead>
-                                                        <TableHead className="w-[45%]">Param Value</TableHead>
-                                                        <TableHead className="w-[10%]"></TableHead>
+                                                        <TableHead className="w-[42%]">Param Name</TableHead>
+                                                        <TableHead className="w-[8%] text-center"></TableHead>
+                                                        <TableHead className="w-[42%]">Param Value</TableHead>
+                                                        <TableHead className="w-[8%]"></TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -1411,15 +1681,18 @@ export default function XmlDetailsPage() {
                                                                     value={param.name}
                                                                     onChange={(e) => handleUpdateAdditionalUrlParam(param.id, 'name', e.target.value)}
                                                                     placeholder="e.g., source"
-                                                                    className="h-8"
+                                                                    className="h-7 text-sm"
                                                                 />
+                                                            </TableCell>
+                                                            <TableCell className="text-center">
+                                                                <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
                                                             </TableCell>
                                                             <TableCell>
                                                                 <Input
                                                                     value={param.value}
                                                                     onChange={(e) => handleUpdateAdditionalUrlParam(param.id, 'value', e.target.value)}
                                                                     placeholder="e.g., api"
-                                                                    className="h-8"
+                                                                    className="h-7 text-sm"
                                                                 />
                                                             </TableCell>
                                                             <TableCell>
@@ -1437,7 +1710,7 @@ export default function XmlDetailsPage() {
                                                     ))}
                                                     {(settingsForm.additionalUrlParams || []).length === 0 && (
                                                         <TableRow>
-                                                            <TableCell colSpan={3} className="text-center text-muted-foreground text-sm py-4">
+                                                            <TableCell colSpan={4} className="text-center text-muted-foreground text-sm py-4">
                                                                 No URL parameters added yet
                                                             </TableCell>
                                                         </TableRow>
@@ -1678,6 +1951,135 @@ export default function XmlDetailsPage() {
                         </CardContent>
                     </Card>
 
+                    {/* Field Mapping Settings */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">Field Mapping</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Map your partner's XML fields to our system fields</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <div className="border overflow-hidden">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[45%]">Our Fields</TableHead>
+                                                    <TableHead className="w-[10%] text-center"></TableHead>
+                                                    <TableHead className="w-[45%]">Partner Fields</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {fieldMapping.map((field, index) => (
+                                                    <TableRow key={field.ourField}>
+                                                        <TableCell>
+                                                            <Input
+                                                                value={field.ourField}
+                                                                disabled
+                                                                className="h-7 text-sm bg-muted/30"
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Input
+                                                                value={field.partnerField}
+                                                                onChange={(e) => handleUpdateFieldMapping(index, e.target.value)}
+                                                                placeholder="Partner field"
+                                                                className="h-7 text-sm"
+                                                            />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* URL Variable Replacement Settings */}
+                    <Card className='p-0'>
+                        <CardContent className="p-0">
+                            <div className="grid grid-cols-1 lg:grid-cols-3">
+                                <div className="p-6 border-b lg:border-b-0 lg:border-r bg-muted/50">
+                                    <h4 className="font-medium text-sm">URL Variable Replacement</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">Configure variable replacements for URLs</p>
+                                </div>
+                                <div className="lg:col-span-2 p-6">
+                                    <div className="space-y-4">
+                                        <div className="border overflow-hidden">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead className="w-[42%]">Variable</TableHead>
+                                                        <TableHead className="w-[8%] text-center"></TableHead>
+                                                        <TableHead className="w-[42%]">Replacement</TableHead>
+                                                        <TableHead className="w-[8%]"></TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {urlVariableReplacements.map((replacement) => (
+                                                        <TableRow key={replacement.id}>
+                                                            <TableCell>
+                                                                <Input
+                                                                    value={replacement.variable}
+                                                                    onChange={(e) => handleUpdateUrlVariableReplacement(replacement.id, 'variable', e.target.value)}
+                                                                    placeholder="e.g., {job_id}"
+                                                                    className="h-7 text-sm"
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell className="text-center">
+                                                                <ArrowRight className="h-4 w-4 text-muted-foreground mx-auto" />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Input
+                                                                    value={replacement.replacement}
+                                                                    onChange={(e) => handleUpdateUrlVariableReplacement(replacement.id, 'replacement', e.target.value)}
+                                                                    placeholder="e.g., id"
+                                                                    className="h-7 text-sm"
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => handleRemoveUrlVariableReplacement(replacement.id)}
+                                                                    className="h-8 w-8 p-0"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                    {urlVariableReplacements.length === 0 && (
+                                                        <TableRow>
+                                                            <TableCell colSpan={4} className="text-center text-muted-foreground text-sm py-4">
+                                                                No variable replacements added yet
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleAddUrlVariableReplacement}
+                                            className="w-full"
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add Variable Replacement
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
                     {/* Action Buttons */}
                     <div className="sticky bottom-0 bg-background border-t p-4 -mx-4">
                         <div className="flex gap-2 justify-end">
@@ -1687,6 +2089,128 @@ export default function XmlDetailsPage() {
                     </div>
                 </TabsContent>
             </Tabs>
+
+            {/* Add/Edit Schedule Dialog */}
+            <Dialog open={scheduleDialogOpen} onOpenChange={setScheduleDialogOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle>{editingSchedule ? 'Edit Schedule' : 'Add New Schedule'}</DialogTitle>
+                        <DialogDescription>
+                            {editingSchedule ? 'Update the schedule configuration' : 'Configure when your ads should be displayed'}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <Field>
+                            <FieldLabel>Schedule Name *</FieldLabel>
+                            <FieldContent>
+                                <Input
+                                    value={scheduleForm.name}
+                                    onChange={(e) => setScheduleForm({ ...scheduleForm, name: e.target.value })}
+                                    placeholder="e.g., Morning Rush"
+                                />
+                            </FieldContent>
+                        </Field>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <Field>
+                                <FieldLabel>Start Time *</FieldLabel>
+                                <FieldContent>
+                                    <Input
+                                        type="time"
+                                        value={scheduleForm.startTime}
+                                        onChange={(e) => setScheduleForm({ ...scheduleForm, startTime: e.target.value })}
+                                    />
+                                </FieldContent>
+                            </Field>
+
+                            <Field>
+                                <FieldLabel>End Time *</FieldLabel>
+                                <FieldContent>
+                                    <Input
+                                        type="time"
+                                        value={scheduleForm.endTime}
+                                        onChange={(e) => setScheduleForm({ ...scheduleForm, endTime: e.target.value })}
+                                    />
+                                </FieldContent>
+                            </Field>
+                        </div>
+
+                        <Field>
+                            <FieldLabel>Days *</FieldLabel>
+                            <FieldContent>
+                                <div className="flex flex-wrap gap-2">
+                                    {weekDays.map((day) => (
+                                        <button
+                                            key={day.value}
+                                            type="button"
+                                            onClick={() => toggleDay(day.value)}
+                                            className={`px-3 py-1.5 text-sm border transition-colors ${
+                                                scheduleForm.days.includes(day.value)
+                                                    ? 'bg-primary text-primary-foreground border-primary'
+                                                    : 'bg-background hover:bg-muted border-border'
+                                            }`}
+                                        >
+                                            {day.label.slice(0, 3)}
+                                        </button>
+                                    ))}
+                                </div>
+                                {scheduleForm.days.length === 0 && (
+                                    <p className="text-sm text-destructive mt-1">Please select at least one day</p>
+                                )}
+                            </FieldContent>
+                        </Field>
+
+                        <Field>
+                            <FieldLabel>Status</FieldLabel>
+                            <FieldContent>
+                                <Select
+                                    value={scheduleForm.status}
+                                    onValueChange={(value) => setScheduleForm({ ...scheduleForm, status: value as 'active' | 'paused' })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="paused">Paused</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FieldContent>
+                        </Field>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setScheduleDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSaveSchedule}
+                            disabled={!scheduleForm.name || scheduleForm.days.length === 0}
+                        >
+                            {editingSchedule ? 'Update Schedule' : 'Add Schedule'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Schedule</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this schedule? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleDeleteSchedule}>
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
