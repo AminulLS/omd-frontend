@@ -1194,11 +1194,21 @@ export default function Page() {
                     <Field>
                         <FieldLabel>Partner</FieldLabel>
                         <FieldContent>
-                            <Input
+                            <Select
                                 value={createXmlForm.partner}
-                                onChange={(e) => setCreateXmlForm({ ...createXmlForm, partner: e.target.value })}
-                                placeholder="Partner name"
-                            />
+                                onValueChange={(value) => setCreateXmlForm({ ...createXmlForm, partner: value })}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select a partner" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[...Array(10)].map((_, idx) => (
+                                        <SelectItem key={idx + 1} value={`Partner ${idx + 1}`}>
+                                            Partner {idx + 1}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </FieldContent>
                     </Field>
                     <Field>
