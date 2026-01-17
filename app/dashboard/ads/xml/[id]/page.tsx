@@ -1920,20 +1920,19 @@ export default function XmlDetailsPage() {
                                                     </Select>
                                                 </FieldContent>
                                             </Field>
-                                            {settingsForm.pricingType === 'cpc' ? (
-                                                <Field>
-                                                    <FieldLabel>Flat CPC Override</FieldLabel>
-                                                    <FieldContent>
-                                                        <Input
-                                                            type="number"
-                                                            step="0.01"
-                                                            value={settingsForm.flatCpcOverride || ''}
-                                                            onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
-                                                            placeholder="0.00"
-                                                        />
-                                                    </FieldContent>
-                                                </Field>
-                                            ) : (
+                                            <Field>
+                                                <FieldLabel>Flat CPC Override</FieldLabel>
+                                                <FieldContent>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        value={settingsForm.flatCpcOverride || ''}
+                                                        onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
+                                                        placeholder="0.00"
+                                                    />
+                                                </FieldContent>
+                                            </Field>
+                                            {settingsForm.pricingType !== 'cpc' && (
                                                 <>
                                                     <Field>
                                                         <FieldLabel>CPA/TCPA</FieldLabel>
