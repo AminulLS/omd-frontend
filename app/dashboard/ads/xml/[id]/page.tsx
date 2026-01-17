@@ -71,6 +71,8 @@ interface XmlAdData {
     revenueType?: 'yes_paid' | 'no_paid'
     pricingType?: 'cpc' | 'cpa' | 'tcpa'
     flatCpcOverride?: number
+    cpaTcpa?: number
+    optimizationLogic?: null | 0 | 1 | 2
     cpcScrubPercent?: number
     agencyFeeScrubPercent?: number
     minimumCpc?: number
@@ -197,6 +199,8 @@ const generateMockXmlAdData = (id: string): XmlAdData => {
         revenueType: 'yes_paid',
         pricingType: 'cpc',
         flatCpcOverride: 0.5,
+        cpaTcpa: 0,
+        optimizationLogic: null,
         cpcScrubPercent: 0.15,
         agencyFeeScrubPercent: 0.2,
         minimumCpc: 0.1,
@@ -372,6 +376,13 @@ const pricingTypes = [
     { value: 'tcpa', label: 'TCPA' },
 ]
 
+const optimizationLogicOptions = [
+    { value: 'null', label: 'Global Job ID' },
+    { value: '0', label: 'Job ID Origin Only' },
+    { value: '1', label: 'Job ID Origin + ApiKey' },
+    { value: '2', label: 'Job ID ApiKey Only' },
+]
+
 const xmlSplitLogics = [
     { value: 'INLIST', label: 'INLIST' },
     { value: 'NOTINLIST', label: 'NOTINLIST' },
@@ -458,6 +469,8 @@ export default function XmlDetailsPage() {
         revenueType?: 'yes_paid' | 'no_paid'
         pricingType?: 'cpc' | 'cpa' | 'tcpa'
         flatCpcOverride?: number
+        cpaTcpa?: number
+        optimizationLogic?: null | 0 | 1 | 2
         cpcScrubPercent?: number
         agencyFeeScrubPercent?: number
         minimumCpc?: number
@@ -506,6 +519,8 @@ export default function XmlDetailsPage() {
         revenueType: 'yes_paid',
         pricingType: 'cpc',
         flatCpcOverride: 0,
+        cpaTcpa: 0,
+        optimizationLogic: null,
         cpcScrubPercent: 0,
         agencyFeeScrubPercent: 0,
         minimumCpc: 0,
@@ -571,6 +586,8 @@ export default function XmlDetailsPage() {
                 revenueType: xmlData.revenueType || 'yes_paid',
                 pricingType: xmlData.pricingType || 'cpc',
                 flatCpcOverride: xmlData.flatCpcOverride || 0,
+                cpaTcpa: xmlData.cpaTcpa ?? 0,
+                optimizationLogic: xmlData.optimizationLogic ?? null,
                 cpcScrubPercent: xmlData.cpcScrubPercent || 0,
                 agencyFeeScrubPercent: xmlData.agencyFeeScrubPercent || 0,
                 minimumCpc: xmlData.minimumCpc || 0,
@@ -636,6 +653,8 @@ export default function XmlDetailsPage() {
                 revenueType: settingsForm.revenueType,
                 pricingType: settingsForm.pricingType,
                 flatCpcOverride: settingsForm.flatCpcOverride,
+                cpaTcpa: settingsForm.cpaTcpa,
+                optimizationLogic: settingsForm.optimizationLogic,
                 cpcScrubPercent: settingsForm.cpcScrubPercent,
                 agencyFeeScrubPercent: settingsForm.agencyFeeScrubPercent,
                 minimumCpc: settingsForm.minimumCpc,
@@ -680,6 +699,8 @@ export default function XmlDetailsPage() {
                 revenueType: xmlData.revenueType || 'yes_paid',
                 pricingType: xmlData.pricingType || 'cpc',
                 flatCpcOverride: xmlData.flatCpcOverride || 0,
+                cpaTcpa: xmlData.cpaTcpa ?? 0,
+                optimizationLogic: xmlData.optimizationLogic ?? null,
                 cpcScrubPercent: xmlData.cpcScrubPercent || 0,
                 agencyFeeScrubPercent: xmlData.agencyFeeScrubPercent || 0,
                 minimumCpc: xmlData.minimumCpc || 0,
@@ -1899,18 +1920,59 @@ export default function XmlDetailsPage() {
                                                     </Select>
                                                 </FieldContent>
                                             </Field>
-                                            <Field>
-                                                <FieldLabel>Flat CPC Override</FieldLabel>
-                                                <FieldContent>
-                                                    <Input
-                                                        type="number"
-                                                        step="0.01"
-                                                        value={settingsForm.flatCpcOverride || ''}
-                                                        onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
-                                                        placeholder="0.00"
-                                                    />
-                                                </FieldContent>
-                                            </Field>
+                                            {settingsForm.pricingType === 'cpc' ? (
+                                                <Field>
+                                                    <FieldLabel>Flat CPC Override</FieldLabel>
+                                                    <FieldContent>
+                                                        <Input
+                                                            type="number"
+                                                            step="0.01"
+                                                            value={settingsForm.flatCpcOverride || ''}
+                                                            onChange={(e) => setSettingsForm({ ...settingsForm, flatCpcOverride: parseFloat(e.target.value) || 0 })}
+                                                            placeholder="0.00"
+                                                        />
+                                                    </FieldContent>
+                                                </Field>
+                                            ) : (
+                                                <>
+                                                    <Field>
+                                                        <FieldLabel>CPA/TCPA</FieldLabel>
+                                                        <FieldContent>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                value={settingsForm.cpaTcpa || ''}
+                                                                onChange={(e) => setSettingsForm({ ...settingsForm, cpaTcpa: parseFloat(e.target.value) || 0 })}
+                                                                placeholder="0.00"
+                                                            />
+                                                        </FieldContent>
+                                                    </Field>
+                                                    <Field>
+                                                        <FieldLabel>Optimization Logic</FieldLabel>
+                                                        <FieldContent>
+                                                            <Select
+                                                                value={settingsForm.optimizationLogic === null ? 'null' : String(settingsForm.optimizationLogic)}
+                                                                onValueChange={(value) => setSettingsForm({
+                                                                    ...settingsForm,
+                                                                    optimizationLogic: value === 'null' ? null : (parseInt(value) as 0 | 1 | 2)
+                                                                })}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {optimizationLogicOptions.map((option) => (
+                                                                        <SelectItem key={option.value} value={option.value}>
+                                                                            {option.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <p className="text-xs text-muted-foreground mt-1.5">All optimizations are Job ID level (currently)</p>
+                                                        </FieldContent>
+                                                    </Field>
+                                                </>
+                                            )}
                                         </div>
                                     </FieldGroup>
                                 </div>
