@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
 import { MonthlyChart } from '@/components/blocks/charts/monthly-chart'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,9 +15,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { FieldGroup } from '@/components/ui/field'
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { format } from 'date-fns'
 import { useState } from 'react'
-import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Copy, Download, CalendarIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import * as React from 'react'
 
 const data = (hours = 24) => {
@@ -634,9 +636,11 @@ function ReportTable({ columns, data, linkColumn, linkPath, linkSuffix, linkColu
 }
 
 export default function Page() {
+    const router = useRouter()
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const [selectedCountry, setSelectedCountry] = useState<string>('all')
+    const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false)
 
     // Ads filters and pagination state
     const [adsSearchQuery, setAdsSearchQuery] = useState<string>('')
@@ -644,6 +648,13 @@ export default function Page() {
     const [adsStatusFilter, setAdsStatusFilter] = useState<string>('all')
     const [adsCurrentPage, setAdsCurrentPage] = useState(1)
     const [adsItemsPerPage, setAdsItemsPerPage] = useState(10)
+
+    // Create campaign form state
+    const [newCampaign, setNewCampaign] = useState({
+        trafficType: 'unknown',
+        trafficId: '',
+        campaignName: ''
+    })
 
     // Memoize data generation to prevent hydration errors
     const hourlyData = React.useMemo(() => data(), [])
@@ -689,9 +700,91 @@ export default function Page() {
 
     return (
         <div>
-            <div className="mb-4 border-b pb-2">
-                <h2 className="text-lg font-semibold">Campaigns</h2>
-                <p className="text-sm text-muted-foreground">Manage all of the campaigns</p>
+            <div className="mb-4 border-b pb-2 flex items-center justify-between">
+                <div>
+                    <h2 className="text-lg font-semibold">Campaigns</h2>
+                    <p className="text-sm text-muted-foreground">Manage all of the campaigns</p>
+                </div>
+                <Sheet open={isCreateSheetOpen} onOpenChange={setIsCreateSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Campaign
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>Create New Campaign</SheetTitle>
+                            <SheetDescription>
+                                Create a new campaign by filling in the details below.
+                            </SheetDescription>
+                        </SheetHeader>
+                        <FieldGroup className="mt-4 px-4">
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="traffic-type">Traffic Type</Label>
+                                <Select
+                                    value={newCampaign.trafficType}
+                                    onValueChange={(value) => setNewCampaign({ ...newCampaign, trafficType: value })}
+                                >
+                                    <SelectTrigger id="traffic-type">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="unknown">Unknown</SelectItem>
+                                        <SelectItem value="search">Search</SelectItem>
+                                        <SelectItem value="display">Display</SelectItem>
+                                        <SelectItem value="in-path">In-Path</SelectItem>
+                                        <SelectItem value="serp">SERP</SelectItem>
+                                        <SelectItem value="email">Email</SelectItem>
+                                        <SelectItem value="sms">SMS</SelectItem>
+                                        <SelectItem value="push">Push</SelectItem>
+                                        <SelectItem value="social">Social</SelectItem>
+                                        <SelectItem value="xml">XML</SelectItem>
+                                        <SelectItem value="dtl">DTL</SelectItem>
+                                        <SelectItem value="mixed">Mixed</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="traffic-id">Traffic ID (Origin)</Label>
+                                <Input
+                                    id="traffic-id"
+                                    value={newCampaign.trafficId}
+                                    onChange={(e) => setNewCampaign({ ...newCampaign, trafficId: e.target.value })}
+                                    placeholder="Enter traffic ID"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="campaign-name">Campaign Name</Label>
+                                <Input
+                                    id="campaign-name"
+                                    value={newCampaign.campaignName}
+                                    onChange={(e) => setNewCampaign({ ...newCampaign, campaignName: e.target.value })}
+                                    placeholder="Enter campaign name"
+                                />
+                            </div>
+                        </FieldGroup>
+                        <SheetFooter>
+                            <Button variant="outline" onClick={() => setIsCreateSheetOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    // Simulate creating a campaign and navigate to the new campaign details
+                                    // In a real app, you would make an API call here
+                                    const newId = Math.max(...campaignData.map(c => c.id)) + 1
+                                    router.push(`/dashboard/publishers/campaigns/${newId}`)
+                                    setIsCreateSheetOpen(false)
+                                }}
+                            >
+                                Create Campaign
+                            </Button>
+                        </SheetFooter>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -911,7 +1004,7 @@ export default function Page() {
                                 columns={['Date', 'Campaign', 'Partner', 'Origin', 'Type', 'Scrub', 'Impressions', 'Clicks', 'Uniq. Clicks', 'Bill. Clicks', 'Susp. Clicks', 'Susp. Click %', 'Jobs', 'CPC', 'CTR', 'RPM', 'Conversion', 'Conversion %', 'Spend', 'AGJ Spend', 'Clicks Hourly']}
                                 data={campaignData}
                                 linkColumns={{
-                                    'Campaign': { path: '/dashboard/ads/xml' },
+                                    'Campaign': { path: '/dashboard/publishers/campaigns' },
                                     'Partner': { path: '/dashboard/partners', suffix: '/xml' },
                                 }}
                             />
@@ -998,7 +1091,7 @@ export default function Page() {
                                             <TableRow key={ad.id}>
                                                 <TableCell>
                                                     <Link
-                                                        href={`/dashboard/ads/xml/${ad.id}`}
+                                                        href={`/dashboard/publishers/campaigns/${ad.id}`}
                                                         className="text-primary hover:underline font-medium"
                                                     >
                                                         {ad.title}
