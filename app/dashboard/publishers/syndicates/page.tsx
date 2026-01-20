@@ -1,88 +1,100 @@
-import { HourlyChart } from '@/components/blocks/charts/hourly-chart'
-import SnapshotTable from '@/components/blocks/dashboard/snapshot-table'
+"use client";
 
-const data = (hours = 24) => {
-    return [...Array(hours)].map((_, h) => {
-        const format = (h: number) => `${h % 12 || 12}${h < 12 ? 'am' : 'pm'}`
-        return {
-            key: format(h),
-            fields: {
-                today_revenue: Math.floor(Math.random() * 1000) + 200,
-                today_clicks: Math.floor(Math.random() * 1000) + 200,
-                yesterday_revenue: Math.floor(Math.random() * 1000) + 200,
-                yesterday_clicks: Math.floor(Math.random() * 1000) + 200,
-                sdlw_revenue: Math.floor(Math.random() * 1000) + 200,
-                sdlw_clicks: Math.floor(Math.random() * 1000) + 200,
-            },
-        }
-    })
-}
-const config = {
-    today_revenue: {
-        color: '#F96E5B',
-        label: 'Today Revenue',
-    },
-    today_clicks: {
-        color: '#FFE2AF',
-        label: 'Today Clicks',
-    },
-    yesterday_revenue: {
-        color: '#79C9C5',
-        label: 'Yesterday Revenue',
-    },
-    yesterday_clicks: {
-        color: '#3F9AAE',
-        label: 'Yesterday Clicks',
-    },
-    sdlw_revenue: {
-        color: '#BDE8F5',
-        label: 'SDLW Revenue',
-    },
-    sdlw_clicks: {
-        color: '#4988C4',
-        label: 'SDLW Clicks',
-    },
-}
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { SyndicatesHeader } from "@/components/blocks/syndicate/syndicate-header";
+import { SyndicatesTable } from "@/components/blocks/data-tables/syndicate-table";
+import { SyndicateSheet } from "@/components/blocks/syndicate/syndicate-sheet";
 
-const snapshotData = {
-    today: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
-    },
-    yesterday: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
-    },
-    sdlw: {
-        revenue: '26,070.66',
-        clicks: '72,955',
-        cpc: '0.357',
-        cbh: '72,955',
-        total_revenue: '26,070.66',
-    },
-}
+import { createSyndicate, updateSyndicate, deleteSyndicate } from "@/lib/services/syndicates-api";
+import { getAllPartners } from "@/lib/services/partners-api";
+import type { Syndicate, SyndicateFormData } from "@/lib/types/syndicates";
 
-export default function Page() {
-    return (
-        <div>
-            <div className="mb-4 border-b pb-2">
-                <h2 className="text-lg font-semibold">Syndicates</h2>
-                <p className="text-sm text-muted-foreground">Manager all of the traffic syndicates</p>
-            </div>
-            <div className="flex gap-2">
-                <div className="w-4/6">
-                    <HourlyChart data={data()} config={config} />
-                </div>
-                <div className="w-2/6">
-                    <SnapshotTable data={snapshotData} />
-                </div>
-            </div>
-        </div>
-    )
+export default function SyndicatesPage() {
+  const queryClient = useQueryClient();
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingSyndicate, setEditingSyndicate] = useState<Syndicate | null>(null);
+
+  // Fetch partners for the dropdown
+  const { data: partnersData } = useQuery({
+    queryKey: ["partners"],
+    queryFn: () => getAllPartners({ per_page: 1000 }),
+  });
+
+  const partners = partnersData?.data.map((p) => ({ id: p.id, name: p.name })) || [];
+
+  const createMutation = useMutation({
+    mutationFn: createSyndicate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["syndicates"] });
+      toast.success("Syndicate created successfully");
+      setSheetOpen(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to create syndicate");
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: SyndicateFormData }) => updateSyndicate(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["syndicates"] });
+      toast.success("Syndicate updated successfully");
+      setSheetOpen(false);
+      setEditingSyndicate(null);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to update syndicate");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteSyndicate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["syndicates"] });
+      toast.success("Syndicate deleted successfully");
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to delete syndicate");
+    },
+  });
+
+  const handleAdd = () => {
+    setEditingSyndicate(null);
+    setSheetOpen(true);
+  };
+
+  const handleEdit = (syndicate: Syndicate) => {
+    setEditingSyndicate(syndicate);
+    setSheetOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteMutation.mutate(id);
+  };
+
+  const handleSubmit = (data: SyndicateFormData) => {
+    if (editingSyndicate) {
+      updateMutation.mutate({ id: editingSyndicate.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const handleSheetClose = () => {
+    setSheetOpen(false);
+    setEditingSyndicate(null);
+  };
+
+  return (
+    <div className="flex flex-col gap-y-4">
+      <SyndicatesHeader onAddClick={handleAdd} />
+      <SyndicatesTable onEdit={handleEdit} onDelete={handleDelete} />
+      <SyndicateSheet open={sheetOpen} onOpenChange={handleSheetClose} editingSyndicate={editingSyndicate} onSubmit={handleSubmit} isSubmitting={createMutation.isPending || updateMutation.isPending} partners={partners} />
+    </div>
+  );
 }
