@@ -122,6 +122,173 @@ const generateMonthlyData = () => {
     return data
 }
 
+// Generate audit logs data for the campaign
+const generateMockAuditLogsData = (campaignId: string) => {
+    // Specific realistic audit log entries
+    const specificLogs = [
+        {
+            timestamp: new Date(),
+            user: 'John Doe',
+            action: 'created',
+            entity: 'Campaign',
+            description: `Campaign "${campaignId}" created with initial settings`,
+            ipAddress: '192.168.1.105',
+        },
+        {
+            timestamp: new Date(Date.now() - 5 * 60 * 1000),
+            user: 'John Doe',
+            action: 'settings_changed',
+            entity: 'Settings',
+            description: 'Updated campaign name from "Old Feed" to "Feed ' + campaignId + '"',
+            ipAddress: '192.168.1.105',
+        },
+        {
+            timestamp: new Date(Date.now() - 15 * 60 * 1000),
+            user: 'Jane Smith',
+            action: 'budget_adjusted',
+            entity: 'Budget',
+            description: 'Increased spend cap from $5,000.00 to $10,000.00',
+            ipAddress: '192.168.1.142',
+        },
+        {
+            timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
+            user: 'Admin User',
+            action: 'cpc_updated',
+            entity: 'CPC',
+            description: 'Updated weekday CPC from $0.75 to $0.85',
+            ipAddress: '10.0.0.45',
+        },
+        {
+            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+            user: 'System',
+            action: 'paused',
+            entity: 'Campaign',
+            description: 'Campaign automatically paused due to spend cap reached',
+            ipAddress: 'System',
+        },
+        {
+            timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
+            user: 'Mike Johnson',
+            action: 'resumed',
+            entity: 'Campaign',
+            description: 'Campaign resumed after spend cap adjustment',
+            ipAddress: '192.168.1.203',
+        },
+        {
+            timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+            user: 'Jane Smith',
+            action: 'updated',
+            entity: 'Targeting',
+            description: 'Updated targeting: added country "CA", removed "AU"',
+            ipAddress: '192.168.1.142',
+        },
+        {
+            timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
+            user: 'John Doe',
+            action: 'settings_changed',
+            entity: 'Settings',
+            description: 'Changed traffic type from "unknown" to "email"',
+            ipAddress: '192.168.1.105',
+        },
+        {
+            timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000),
+            user: 'Admin User',
+            action: 'updated',
+            entity: 'Scrub',
+            description: 'Updated conversion scrub rate from 5.00% to 7.50%',
+            ipAddress: '10.0.0.45',
+        },
+        {
+            timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+            user: 'System',
+            action: 'settings_changed',
+            entity: 'Settings',
+            description: 'External IDs updated: added "EXT-001", "EXT-002"',
+            ipAddress: 'System',
+        },
+        {
+            timestamp: new Date(Date.now() - 36 * 60 * 60 * 1000),
+            user: 'Mike Johnson',
+            action: 'cpc_updated',
+            entity: 'CPC',
+            description: 'Updated weekend CPC from $0.65 to $0.75',
+            ipAddress: '192.168.1.203',
+        },
+        {
+            timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000),
+            user: 'Jane Smith',
+            action: 'budget_adjusted',
+            entity: 'Budget',
+            description: 'Decreased spend cap from $15,000.00 to $5,000.00',
+            ipAddress: '192.168.1.142',
+        },
+        {
+            timestamp: new Date(Date.now() - 72 * 60 * 60 * 1000),
+            user: 'Admin User',
+            action: 'updated',
+            entity: 'Partner',
+            description: 'Changed partner assignment from "Partner 3" to "Partner ' + (parseInt(campaignId) % 10 + 1) + '"',
+            ipAddress: '10.0.0.45',
+        },
+        {
+            timestamp: new Date(Date.now() - 96 * 60 * 60 * 1000),
+            user: 'John Doe',
+            action: 'settings_changed',
+            entity: 'Settings',
+            description: 'Enabled "Pay for Suspicious Clicks" option',
+            ipAddress: '192.168.1.105',
+        },
+        {
+            timestamp: new Date(Date.now() - 120 * 60 * 60 * 1000),
+            user: 'System',
+            action: 'updated',
+            entity: 'Status',
+            description: 'Campaign status changed to "active" after approval',
+            ipAddress: 'System',
+        },
+    ]
+
+    // Convert specific logs to the format and add more random logs
+    const logs = specificLogs.map((log, idx) => ({
+        id: idx + 1,
+        timestamp: format(log.timestamp, 'MM/dd/yyyy HH:mm:ss'),
+        user: log.user,
+        action: log.action,
+        entity: log.entity,
+        description: log.description,
+        ipAddress: log.ipAddress,
+        userAgent: log.user === 'System' ? 'System' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    }))
+
+    // Add more random logs for variety
+    const actions = ['created', 'updated', 'paused', 'resumed', 'deleted', 'settings_changed', 'budget_adjusted', 'cpc_updated']
+    const users = ['John Doe', 'Jane Smith', 'Admin User', 'System', 'Mike Johnson']
+    const entities = ['Campaign', 'Budget', 'CPC', 'Settings', 'Targeting', 'Status', 'Partner', 'Scrub']
+
+    const additionalLogs = [...Array(35)].map((_, idx) => {
+        const randomAction = actions[Math.floor(Math.random() * actions.length)]
+        const randomUser = users[Math.floor(Math.random() * users.length)]
+        const randomEntity = entities[Math.floor(Math.random() * entities.length)]
+
+        return {
+            id: logs.length + idx + 1,
+            timestamp: format(new Date(Date.now() - (120 + Math.random() * 500) * 60 * 60 * 1000), 'MM/dd/yyyy HH:mm:ss'),
+            user: randomUser,
+            action: randomAction,
+            entity: randomEntity,
+            description: `${randomAction.charAt(0).toUpperCase() + randomAction.slice(1).replace('_', ' ')} ${randomEntity.toLowerCase()} - ${randomEntity} ID: ${Math.floor(Math.random() * 1000)}`,
+            ipAddress: randomUser === 'System' ? 'System' : `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+            userAgent: randomUser === 'System' ? 'System' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        }
+    })
+
+    return [...logs, ...additionalLogs].sort((a, b) => {
+        const dateA = new Date(a.timestamp)
+        const dateB = new Date(b.timestamp)
+        return dateB.getTime() - dateA.getTime()
+    })
+}
+
 // Generate reports data for the campaign
 const generateMockReportsData = (campaignId: string) => {
     return [...Array(100)].map((_, idx) => {
@@ -227,6 +394,7 @@ export default function CampaignDetailsPage() {
     const [hourlyData, setHourlyData] = React.useState<any[]>([])
     const [monthlyData, setMonthlyData] = React.useState<any[]>([])
     const [reportsData, setReportsData] = React.useState<any[]>([])
+    const [auditLogsData, setAuditLogsData] = React.useState<any[]>([])
 
     React.useEffect(() => {
         // Simulate data fetching
@@ -235,6 +403,7 @@ export default function CampaignDetailsPage() {
         setHourlyData(generateHourlyData())
         setMonthlyData(generateMonthlyData())
         setReportsData(generateMockReportsData(id))
+        setAuditLogsData(generateMockAuditLogsData(id))
     }, [id])
 
     // Reset to page 1 when items per page changes
@@ -367,9 +536,10 @@ export default function CampaignDetailsPage() {
 
             {/* Tabs */}
             <Tabs defaultValue="overview" className="space-y-4">
-                <TabsList className="grid w-full max-w-md grid-cols-2">
+                <TabsList className="grid w-full max-w-lg grid-cols-3">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
+                    <TabsTrigger value="audit-logs">Audit Logs</TabsTrigger>
                 </TabsList>
 
                 {/* Overview Tab */}
@@ -876,6 +1046,54 @@ export default function CampaignDetailsPage() {
                         <Button variant="outline">Cancel</Button>
                         <Button>Save Changes</Button>
                     </div>
+                </TabsContent>
+
+                {/* Audit Logs Tab */}
+                <TabsContent value="audit-logs" className="space-y-4">
+                    <Card size="sm">
+                        <CardHeader>
+                            <CardTitle>Audit Logs</CardTitle>
+                            <CardDescription>Track all changes and activities for this campaign</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Timestamp</TableHead>
+                                        <TableHead>User</TableHead>
+                                        <TableHead>Action</TableHead>
+                                        <TableHead>Entity</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>IP Address</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {auditLogsData.length > 0 ? (
+                                        auditLogsData.slice(0, 20).map((log) => (
+                                            <TableRow key={log.id}>
+                                                <TableCell className="font-medium">{log.timestamp}</TableCell>
+                                                <TableCell>{log.user}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className="capitalize">
+                                                        {log.action.replace('_', ' ')}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>{log.entity}</TableCell>
+                                                <TableCell className="max-w-md truncate">{log.description}</TableCell>
+                                                <TableCell className="text-muted-foreground">{log.ipAddress}</TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                                                No audit logs found
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
