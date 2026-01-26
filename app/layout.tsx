@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/lib/context/auth-context";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+import { Toaster } from "sonner";
+import { Providers } from "@/components/providers/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Operation Media LLC",
-  description: "Your trusted AdOps partner for seamless ad operations.",
+  description: "Performance marketing platform",
 };
 
 export default function RootLayout({
@@ -26,11 +25,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Providers>{children}</Providers>
+        <Toaster position="top-right" />
       </body>
     </html>
   );
