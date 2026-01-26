@@ -1,3 +1,5 @@
+import type { Partner } from '@/lib/types/partners'
+
 export type CampaignStatus = "active" | "inactive" | "paused";
 
 export type CampaignTrafficType = "unknown" | "search" | "display" | "in-path" | "SERP" | "email" | "sms" | "push" | "social" | "xml" | "dtl" | "mixed" | "Other";
@@ -10,6 +12,7 @@ export interface Campaign {
   status: CampaignStatus;
   created_at: string;
   updated_at: string;
+  partner?: Partner;
 }
 
 export interface CampaignFormData {

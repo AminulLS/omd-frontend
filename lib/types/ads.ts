@@ -1,3 +1,5 @@
+import type { Partner } from '@/lib/types/partners'
+
 export type AdStatus = "active" | "paused" | "pending" | "rejected";
 
 export type AdPlacement = "path" | "serp-all" | "serp_offer" | "back_button" | "offer_1" | "offer_2" | "offer_3" | "offer_4" | "offer_5" | "offer_6" | "offer_7" | "medicare" | "health" | "blur" | "listical";
@@ -82,6 +84,7 @@ export interface Ad {
   updated_at: string;
   duplicate_window?: number | null;
   no_click_tcpa_alg?: boolean | null;
+  partner?: Partner
 }
 
 export interface AdFormData {

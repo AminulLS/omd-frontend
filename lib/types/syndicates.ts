@@ -1,3 +1,5 @@
+import type { Partner } from '@/lib/types/partners'
+
 export type SyndicateStatus = "active" | "inactive";
 export type SyndicateType = "external" | "internal";
 
@@ -14,6 +16,7 @@ export interface Syndicate {
   cpc: number | null;
   created_at: string;
   updated_at: string;
+  partner?: Partner;
 }
 
 export interface SyndicateFormData {

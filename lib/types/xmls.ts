@@ -1,3 +1,5 @@
+import type { Partner } from '@/lib/types/partners'
+
 export type XmlStatus = "active" | "paused";
 
 export interface Xml {
@@ -9,6 +11,7 @@ export interface Xml {
   xml_feed_url: string;
   created_at: string;
   updated_at: string;
+  partner?: Partner
 }
 
 export interface XmlFormData {

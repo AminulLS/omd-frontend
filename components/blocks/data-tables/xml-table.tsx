@@ -72,7 +72,7 @@ export function XmlsTable({ onEdit, onDelete, partner_id }: XmlsTableProps) {
       header: "Partner",
       cell: (row) => (
         <Link href={`/dashboard/partners/${row.partner_id}`} className="hover:underline text-primary">
-          {row.partner_id}
+          {row.partner?.name || row.partner_id}
         </Link>
       ),
     },
