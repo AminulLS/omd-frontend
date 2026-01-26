@@ -653,7 +653,8 @@ export default function Page() {
     const [newCampaign, setNewCampaign] = useState({
         trafficType: 'unknown',
         trafficId: '',
-        campaignName: ''
+        campaignName: '',
+        partnerId: ''
     })
 
     // Memoize data generation to prevent hydration errors
@@ -721,6 +722,39 @@ export default function Page() {
                         </SheetHeader>
                         <FieldGroup className="mt-4 px-4">
                             <div className="flex flex-col gap-2">
+                                <Label htmlFor="campaign-name">Campaign Name</Label>
+                                <Input
+                                    id="campaign-name"
+                                    value={newCampaign.campaignName}
+                                    onChange={(e) => setNewCampaign({ ...newCampaign, campaignName: e.target.value })}
+                                    placeholder="Enter campaign name"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="partner">Partner</Label>
+                                <Select
+                                    value={newCampaign.partnerId}
+                                    onValueChange={(value) => setNewCampaign({ ...newCampaign, partnerId: value })}
+                                >
+                                    <SelectTrigger id="partner">
+                                        <SelectValue placeholder="Select partner" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">Partner 1</SelectItem>
+                                        <SelectItem value="2">Partner 2</SelectItem>
+                                        <SelectItem value="3">Partner 3</SelectItem>
+                                        <SelectItem value="4">Partner 4</SelectItem>
+                                        <SelectItem value="5">Partner 5</SelectItem>
+                                        <SelectItem value="6">Partner 6</SelectItem>
+                                        <SelectItem value="7">Partner 7</SelectItem>
+                                        <SelectItem value="8">Partner 8</SelectItem>
+                                        <SelectItem value="9">Partner 9</SelectItem>
+                                        <SelectItem value="10">Partner 10</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
                                 <Label htmlFor="traffic-type">Traffic Type</Label>
                                 <Select
                                     value={newCampaign.trafficType}
@@ -754,16 +788,6 @@ export default function Page() {
                                     value={newCampaign.trafficId}
                                     onChange={(e) => setNewCampaign({ ...newCampaign, trafficId: e.target.value })}
                                     placeholder="Enter traffic ID"
-                                />
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <Label htmlFor="campaign-name">Campaign Name</Label>
-                                <Input
-                                    id="campaign-name"
-                                    value={newCampaign.campaignName}
-                                    onChange={(e) => setNewCampaign({ ...newCampaign, campaignName: e.target.value })}
-                                    placeholder="Enter campaign name"
                                 />
                             </div>
                         </FieldGroup>
