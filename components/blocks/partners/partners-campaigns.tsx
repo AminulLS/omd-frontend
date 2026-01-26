@@ -17,11 +17,11 @@ export default function PartnerCampaignPage({ partner_id }: PartnerCampaignProps
           <TabsTrigger value="ads">Publisher</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="reports">
+        <TabsContent value="reports" className="pt-2">
           <ReportsSection reports={[reportTypes.partners, reportTypes.campaigns]} />
         </TabsContent>
 
-        <TabsContent value="ads">
+        <TabsContent value="ads" className="pt-2">
           <CampaignsTable partner_id={partner_id} />
         </TabsContent>
       </Tabs>

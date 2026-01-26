@@ -221,7 +221,7 @@ export function AdFiltersTab({ control }: AdFiltersTabProps) {
         </CardHeader>
         <CardContent>
           {activeFilterKeys.length === 0 ? (
-            <div className="text-center py-12 border-2 border-dashed rounded-lg bg-muted/20">
+            <div className="text-center py-12 border-2 border-dashed bg-muted/20">
               <p className="text-muted-foreground">No active filters. Click &quot;Add Filter&quot; to start targeting.</p>
             </div>
           ) : (
@@ -229,7 +229,7 @@ export function AdFiltersTab({ control }: AdFiltersTabProps) {
               {activeFilterKeys.map((key) => {
                 const filterDef = AVAILABLE_FILTERS.find((f) => f.id === key);
                 return (
-                  <div key={key} className="flex items-start justify-between p-3 border rounded-lg bg-card hover:border-primary/50 transition-colors group">
+                  <div key={key} className="flex items-start justify-between p-3 border bg-card hover:border-primary/50 transition-colors group">
                     <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">{filterDef?.label}</span>

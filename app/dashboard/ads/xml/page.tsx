@@ -115,11 +115,11 @@ export default function Page() {
           <TabsTrigger value="ads">XML</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="reports">
+        <TabsContent value="reports" className="pt-2">
           <ReportsSection reports={[reportTypes.partners, reportTypes.parsing, reportTypes.campaigns, reportTypes.categories]} />
         </TabsContent>
 
-        <TabsContent value="ads">
+        <TabsContent value="ads" className="pt-2">
           <XmlsTable />
         </TabsContent>
       </Tabs>

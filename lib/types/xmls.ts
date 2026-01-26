@@ -8,7 +8,9 @@ export interface Xml {
   name: string;
   country: string;
   status: XmlStatus;
-  xml_feed_url: string;
+  url: string;
+  budget: number;
+  monthly_budget: number;
   created_at: string;
   updated_at: string;
   partner?: Partner
@@ -19,7 +21,7 @@ export interface XmlFormData {
   name: string;
   country: string;
   status: XmlStatus;
-  xml_feed_url: string;
+  url: string;
 }
 
 export interface PaginatedResponse<T> {

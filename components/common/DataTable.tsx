@@ -1,8 +1,13 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ArrowUp, ArrowDown, Download, Printer, Copy } from "lucide-react";
-import { useState, useMemo } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { ArrowUpDown, ArrowUp, ArrowDown, Download, Printer, Copy } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export interface ColumnDef<T> {
   key: string;
@@ -25,110 +30,117 @@ interface DataTableProps<T> {
   actions?: DataTableActions<T>;
   isLoading?: boolean;
   emptyMessage?: string;
+  tableTitle?: string;
   exportFileName?: string;
 }
 
-export function DataTable<T extends { id: string | number }>({ columns, data, actions, isLoading = false, emptyMessage = "No data available" }: DataTableProps<T>) {
+export function DataTable<T extends { id: string | number }>({ columns, data, actions, isLoading = false, tableTitle = "Records", emptyMessage = "No data available" }: DataTableProps<T>) {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
-    direction: "asc" | "desc";
-  } | null>(null);
+    direction: 'asc' | 'desc';
+  } | null>(null)
 
   const sortedData = useMemo(() => {
-    if (!sortConfig) return data;
+    if (!sortConfig) return data
 
     const sorted = [...data].sort((a, b) => {
-      const column = columns.find((col) => col.key === sortConfig.key);
-      if (!column) return 0;
+      const column = columns.find((col) => col.key === sortConfig.key)
+      if (!column) return 0
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const aValue = column.sortValue ? column.sortValue(a) : (a as any)[sortConfig.key];
+      const aValue = column.sortValue ? column.sortValue(a) : (a as any)[sortConfig.key]
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bValue = column.sortValue ? column.sortValue(b) : (b as any)[sortConfig.key];
+      const bValue = column.sortValue ? column.sortValue(b) : (b as any)[sortConfig.key]
 
-      if (aValue == null) return 1;
-      if (bValue == null) return -1;
+      if (aValue == null) return 1
+      if (bValue == null) return -1
 
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue
       }
 
       if (aValue instanceof Date && bValue instanceof Date) {
-        return sortConfig.direction === "asc" ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime();
+        return sortConfig.direction === 'asc' ? aValue.getTime() - bValue.getTime() : bValue.getTime() - aValue.getTime()
       }
 
-      const aString = String(aValue).toLowerCase();
-      const bString = String(bValue).toLowerCase();
+      const aString = String(aValue).toLowerCase()
+      const bString = String(bValue).toLowerCase()
 
-      return sortConfig.direction === "asc" ? aString.localeCompare(bString) : bString.localeCompare(aString);
-    });
+      return sortConfig.direction === 'asc' ? aString.localeCompare(bString) : bString.localeCompare(aString)
+    })
 
-    return sorted;
-  }, [data, sortConfig, columns]);
+    return sorted
+  }, [data, sortConfig, columns])
 
   const handleSort = (columnKey: string) => {
-    const column = columns.find((col) => col.key === columnKey);
-    if (!column?.sortable) return;
+    const column = columns.find((col) => col.key === columnKey)
+    if (!column?.sortable) return
 
     setSortConfig((current) => {
       if (current?.key === columnKey) {
-        if (current.direction === "asc") {
-          return { key: columnKey, direction: "desc" };
+        if (current.direction === 'asc') {
+          return { key: columnKey, direction: 'desc' }
         } else {
-          return null;
+          return null
         }
       }
-      return { key: columnKey, direction: "asc" };
-    });
-  };
+      return { key: columnKey, direction: 'asc' }
+    })
+  }
 
   const getSortIcon = (columnKey: string) => {
     if (!sortConfig || sortConfig.key !== columnKey) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />;
+      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
     }
-    return sortConfig.direction === "asc" ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />;
-  };
+    return sortConfig.direction === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> :
+      <ArrowDown className="ml-2 h-4 w-4" />
+  }
 
   // Dummy export functions for now
   const exportToCSV = () => {
-    console.log("Export to CSV - Not implemented yet");
-  };
+    console.log('Export to CSV - Not implemented yet')
+  }
 
   // Dummy print functions for now
   const printTable = () => {
-    console.log("Print table - Not implemented yet");
-  };
+    console.log('Print table - Not implemented yet')
+  }
 
   // Dummy copy functions for now
   const handleCopy = () => {
-    console.log("Copy - Not implemented yet");
-  };
+    console.log('Copy - Not implemented yet')
+  }
 
   // Dummy download functions for now
   const handleDownloadCSV = () => {
-    console.log("Download - Not implemented yet");
-  };
+    console.log('Download - Not implemented yet')
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end gap-2">
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={handleCopy} className="cursor-pointer">
-            <Copy className="h-4 w-4 mr-2" />
-            Copy
-          </Button>
-          <Button size="sm" variant="outline" onClick={exportToCSV} className="cursor-pointer">
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadCSV} className="cursor-pointer">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" onClick={printTable} className="cursor-pointer">
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-medium">{tableTitle}</div>
+        </div>
+        <div className="flex items-center justify-end gap-2">
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={handleCopy} className="cursor-pointer">
+              <Copy className="h-4 w-4 mr-2" />
+              Copy
+            </Button>
+            <Button size="sm" variant="outline" onClick={exportToCSV} className="cursor-pointer">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownloadCSV} className="cursor-pointer">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={printTable} className="cursor-pointer">
+              <Printer className="mr-2 h-4 w-4" />
+              Print
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -199,8 +211,10 @@ export function DataTable<T extends { id: string | number }>({ columns, data, ac
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {actions.onView && <DropdownMenuItem onClick={() => actions.onView!(row)}>View</DropdownMenuItem>}
-                            {actions.onEdit && <DropdownMenuItem onClick={() => actions.onEdit!(row)}>Edit</DropdownMenuItem>}
+                            {actions.onView &&
+                              <DropdownMenuItem onClick={() => actions.onView!(row)}>View</DropdownMenuItem>}
+                            {actions.onEdit &&
+                              <DropdownMenuItem onClick={() => actions.onEdit!(row)}>Edit</DropdownMenuItem>}
                             {actions.onDelete && (
                               <DropdownMenuItem onClick={() => actions.onDelete!(row)} className="text-destructive">
                                 Delete
@@ -218,5 +232,5 @@ export function DataTable<T extends { id: string | number }>({ columns, data, ac
         </Table>
       </div>
     </div>
-  );
+  )
 }

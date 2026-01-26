@@ -343,7 +343,7 @@ export default function ReportsSection({ reports }: ReportsSectionProps) {
         </TabsList>
 
         {/* Partner Table */}
-        <TabsContent value="partners">
+        <TabsContent value="partners" className="pt-2">
           <ReportTable
             columns={["Date", "Partner", "Impressions", "Clicks", "CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue", "LS #s", "Clicks Hourly"]}
             data={partnerData}
@@ -354,41 +354,42 @@ export default function ReportsSection({ reports }: ReportsSectionProps) {
         </TabsContent>
 
         {/* Boards Table */}
-        <TabsContent value="boards">
+        <TabsContent value="boards" className="pt-2">
           <ReportTable columns={["Date", "Board", "Impressions", "Clicks", "CTR", "RPM", "Revenue"]} data={boardData} />
         </TabsContent>
 
         {/* Placements Table */}
-        <TabsContent value="placements">
+        <TabsContent value="placements" className="pt-2">
           <ReportTable columns={["Date", "Placement", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={placementData} />
         </TabsContent>
 
         {/* Sources Table */}
-        <TabsContent value="sources">
+        <TabsContent value="sources" className="pt-2">
           <ReportTable columns={["Date", "Source", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={sourceData} />
         </TabsContent>
 
         {/* Mediums Table */}
-        <TabsContent value="mediums">
+        <TabsContent value="mediums" className="pt-2">
           <ReportTable columns={["Date", "Medium", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={mediumData} />
         </TabsContent>
 
         {/* Keywords Table */}
-        <TabsContent value="keywords">
+        <TabsContent value="keywords" className="pt-2">
           <ReportTable columns={["Date", "Keyword", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={keywordsData} />
         </TabsContent>
 
         {/* Companies Table */}
-        <TabsContent value="companies">
+        <TabsContent value="companies" className="pt-2">
           <ReportTable columns={["Date", "Company", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={companiesData} />
         </TabsContent>
 
         {/* API Key Table */}
-        <TabsContent value="apikeys">
+        <TabsContent value="apikeys" className="pt-2">
           <ReportTable columns={["Date", "API Key", "Impressions", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={apiKeyData} linkColumn="API Key" linkPath="/dashboard/publishers/syndicates" />
         </TabsContent>
+
         {/* Parsing Table */}
-        <TabsContent value="parsing">
+        <TabsContent value="parsing" className="pt-2">
           <ReportTable
             columns={["Feed", "Partner", "Jobs", "Last Updated", "Next Run", "Cycles", "Last Status", "Indexing Speed", "Total Time Indexing"]}
             data={parsingData}
@@ -401,7 +402,7 @@ export default function ReportsSection({ reports }: ReportsSectionProps) {
         </TabsContent>
 
         {/* Campaigns Table */}
-        <TabsContent value="campaigns">
+        <TabsContent value="campaigns" className="pt-2">
           <ReportTable
             columns={["Date", "Feed", "Partner", "Clicks", "Avg. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]}
             data={campaignData}
@@ -413,7 +414,7 @@ export default function ReportsSection({ reports }: ReportsSectionProps) {
         </TabsContent>
 
         {/* Categories Table */}
-        <TabsContent value="categories">
+        <TabsContent value="categories" className="pt-2">
           <ReportTable columns={["Date", "Category", "Impressions", "Clicks", "Min. CPC", "Avg. CPC", "Max. CPC", "CTR", "RPM", "Conversion", "Conversion %", "CPA", "Revenue"]} data={categoryData} />
         </TabsContent>
       </Tabs>

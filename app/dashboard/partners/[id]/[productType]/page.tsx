@@ -14,7 +14,7 @@ import type { PartnerFormData, PartnerStatus, PartnerType, ProductType, User } f
 import { toast } from "sonner";
 import { PartnerForm } from "@/components/blocks/partners/partner-form";
 import PartnersStats from "@/components/blocks/stats/partners-stats";
-import PartnerSponseredPage from "@/components/blocks/partners/partners-sponsored";
+import PartnerSponsoredPage from "@/components/blocks/partners/partners-sponsored";
 import PartnerXMLPage from "@/components/blocks/partners/partner-xml";
 import PartnerSyndicatePage from "@/components/blocks/partners/partners-syndicate";
 import PartnerCampaignPage from "@/components/blocks/partners/partners-campaigns";
@@ -226,7 +226,7 @@ export default function PartnerProductPage({ params }: PageProps) {
       {isValidProduct ? (
         <div className="flex flex-col gap-12 mb-4">
           <PartnersStats productType={productType} />
-          {productType === "sponsored" && <PartnerSponseredPage partner_id={id} />}
+          {productType === "sponsored" && <PartnerSponsoredPage partner_id={id} />}
           {productType === "xml" && <PartnerXMLPage partner_id={id} />}
           {productType === "syndication" && <PartnerSyndicatePage partner_id={id} />}
           {productType === "publisher" && <PartnerCampaignPage partner_id={id} />}
